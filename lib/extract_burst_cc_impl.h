@@ -35,7 +35,11 @@ private:
     const int d_burst_len;
     const int d_tag_backoff;
     const pmt::pmt_t d_burst_start_tag;
+    const pmt::pmt_t d_src_id;
     bool d_activate_cfo_correction;
+    const size_t d_num_ports;
+
+    const uint64_t d_max_tag_offset_difference = 100;
 
     uint64_t d_last_tag_offset = 0;
     uint64_t d_last_xcorr_offset = 0;
@@ -55,11 +59,22 @@ private:
                         const gr_complex phase_increment,
                         const int ninput_size);
 
+    void get_tags_all_streams(std::vector<std::vector<gr::tag_t>>& stream_input_tags,
+                              const unsigned available_items);
+    void produce_frame_items(gr_complex* out,
+                             const gr_complex* in,
+                             const pmt::pmt_t& tag_value,
+                             const int actual_start);
+    uint64_t get_uint64_from_dict(const pmt::pmt_t& dict, const pmt::pmt_t& key) const;
+    uint64_t get_stream_tag_offset(const std::vector<gr::tag_t>& tags,
+                                   const size_t position) const;
+
 public:
     extract_burst_cc_impl(int burst_len,
                           int tag_backoff,
                           std::string burst_start_tag,
-                          bool activate_cfo_correction);
+                          bool activate_cfo_correction,
+                          const unsigned num_inputs = 1);
     ~extract_burst_cc_impl();
 
     void forecast(int noutput_items, gr_vector_int& ninput_items_required);
