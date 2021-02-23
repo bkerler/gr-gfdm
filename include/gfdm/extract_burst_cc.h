@@ -29,7 +29,7 @@ namespace gr {
 namespace gfdm {
 
 /*!
- * \brief <+description of block+>
+ * \brief Extract burst at tag position
  * \ingroup gfdm
  *
  */
@@ -52,6 +52,7 @@ public:
                      bool activate_cfo_correction = false);
 
     virtual void activate_cfo_compensation(bool activate_cfo_compensation) = 0;
+    virtual bool cfo_compensation() const = 0;
 };
 
 } // namespace gfdm

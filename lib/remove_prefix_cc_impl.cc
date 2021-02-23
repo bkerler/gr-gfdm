@@ -102,6 +102,10 @@ int remove_prefix_cc_impl::general_work(int noutput_items,
     std::vector<tag_t> tags;
     get_tags_in_window(tags, 0, 0, avail_items, d_tag_key);
     for (int i = 0; i < tags.size(); ++i) {
+        // fmt::print("remove_refix {}\n{}\n",
+        //            d_block_len,
+        //            std::vector<gr_complex>(in + d_offset, in + d_offset +
+        //            d_block_len));
         memcpy(out, in + d_offset, sizeof(gr_complex) * d_block_len);
         add_item_tag(0, nitems_written(0) + produced_items, d_tag_key, tags[i].value);
         consumed_items += d_frame_len;

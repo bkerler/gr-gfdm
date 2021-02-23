@@ -38,8 +38,16 @@ class receiver_cc(gr.hier_block2):
         gr.hier_block2.__init__(self,
                                 "receiver_cc",
                                 gr.io_signature(1, 1, gr.sizeof_gr_complex),
-                                gr.io_signature(2, 2, gr.sizeof_gr_complex))
+                                gr.io_signature(3, 3, gr.sizeof_gr_complex))
 
+        print("######## GFDM receiver ######")
+        print(f'timeslots={timeslots}\tsubcarriers={subcarriers}\tactive_subcarriers={active_subcarriers}')
+        print(f'overlap={overlap}\tcp_len={cp_len}\tcs_len={cs_len}\tramp_len={ramp_len}')
+        print(f'map_resources_per_timeslot={map_resources_per_timeslot}\tchannel_estimator_id={channel_estimator_id}\ttag_key={sync_tag_key}')
+        print(f'ic_iterations={ic_iterations}\tactivate_phase_compensation={activate_phase_compensation}\tactivate_cfo_compensation={activate_cfo_compensation}')
+        print(f'subcarrier_map\n{subcarrier_map}')
+        print(f'frequency_domain_taps\n{frequency_domain_taps}')
+        print(f'preamble {preamble.size}\n{preamble}')
         # These are setable on runtime.
         self.activate_cfo_compensation = activate_cfo_compensation
         self.activate_phase_compensation = activate_phase_compensation
@@ -52,7 +60,12 @@ class receiver_cc(gr.hier_block2):
         # frame_len includes preamble, payload and CP+CS for both
         frame_len = full_preamble_len + full_block_len
 
-        sc_map_is_dc_free = (subcarrier_map[0] == 0)
+        sc_map_is_dc_free = (subcarrier_map[0] != 0)
+
+        print(f'block_len={block_len}\tfull_block_len={full_block_len}\tframe_len={frame_len}')
+        print(f'preamble_len={preamble_len}\tfull_preamble_len={full_preamble_len}')
+        print(f'sc_map_is_dc_free={sc_map_is_dc_free}')
+        print("######## GFDM receiver ######")
 
         self.extract_burst = gfdm.extract_burst_cc(
             frame_len, cp_len, sync_tag_key, activate_cfo_compensation
@@ -112,12 +125,17 @@ class receiver_cc(gr.hier_block2):
             (self.channel_estimator, 0), (self, 1)
         )
 
+        self.connect(
+            (self.extract_burst, 0), (self, 2)
+        )
+
     def get_activate_cfo_compensation(self):
-        return self.activate_cfo_compensation
+        return self.extract_burst.cfo_compensation()
 
     def set_activate_cfo_compensation(self, activate_cfo_compensation):
         self.activate_cfo_compensation = activate_cfo_compensation
         self.extract_burst.activate_cfo_compensation(activate_cfo_compensation)
+        assert self.extract_burst.cfo_compensation() == activate_cfo_compensation
 
     def get_ic_iterations(self):
         return self.ic_iterations

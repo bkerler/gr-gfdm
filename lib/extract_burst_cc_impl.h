@@ -65,6 +65,7 @@ public:
     void forecast(int noutput_items, gr_vector_int& ninput_items_required);
 
     void activate_cfo_compensation(bool activate_cfo_compensation);
+    bool cfo_compensation() const { return d_activate_cfo_correction; }
     // Where all the action really happens
     int general_work(int noutput_items,
                      gr_vector_int& ninput_items,

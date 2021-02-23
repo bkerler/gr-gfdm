@@ -115,6 +115,7 @@ endif(APPLE)
 find_package(Doxygen)
 find_package(FFTW3f)
 find_package(Volk REQUIRED 2.4)
+find_package(fmt REQUIRED)
 
 ########################################################################
 # PyBind11 Related

@@ -97,6 +97,10 @@ int channel_estimator_cc_impl::general_work(int noutput_items,
     const int n_frames = noutput_items / frame_len;
 
     for (int i = 0; i < n_frames; ++i) {
+        // fmt::print("channel_estimator in_len={}\tframe_len={}\n{}\n",
+        //            invec_len,
+        //            frame_len,
+        //            std::vector<gr_complex>(in, in + invec_len));
         d_estimator_kernel->estimate_frame(out, in);
 
         std::vector<float> cnrs(d_estimator_kernel->active_subcarriers());

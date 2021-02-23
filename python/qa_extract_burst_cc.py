@@ -37,7 +37,7 @@ class qa_extract_burst_cc(gr_unittest.TestCase):
         n_frames = 500
         burst_len = 383
         gap_len = 53
-        tag_key = 'energy_start'
+        tag_key = "energy_start"
 
         data = np.arange(burst_len)
         ref = np.array([], dtype=np.complex)
@@ -48,7 +48,7 @@ class qa_extract_burst_cc(gr_unittest.TestCase):
             tag = gr.tag_t()
             tag.key = pmt.string_to_symbol(tag_key)
             tag.offset = burst_len + i * (burst_len + gap_len)
-            tag.srcid = pmt.string_to_symbol('qa')
+            tag.srcid = pmt.string_to_symbol("qa")
             tag.value = pmt.make_dict()
             tags.append(tag)
             data = np.concatenate((data, frame, np.zeros(gap_len)))
@@ -63,6 +63,7 @@ class qa_extract_burst_cc(gr_unittest.TestCase):
 
         res = np.array(snk.data())
         rx_tags = snk.tags()
+        self.assertEqual(len(rx_tags), n_frames)
         for i, t in enumerate(rx_tags):
             self.assertEqual(pmt.symbol_to_string(t.key), tag_key)
             self.assertTrue(pmt.is_true(t.value))
@@ -73,5 +74,5 @@ class qa_extract_burst_cc(gr_unittest.TestCase):
         self.assertComplexTuplesAlmostEqual(ref, res)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     gr_unittest.run(qa_extract_burst_cc)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Free Software Foundation, Inc.
+ * Copyright 2021 Free Software Foundation, Inc.
  *
  * This file is part of GNU Radio
  *
@@ -28,3 +28,6 @@ static const char* __doc_gr_gfdm_extract_burst_cc_make = R"doc()doc";
 
 
 static const char* __doc_gr_gfdm_extract_burst_cc_activate_cfo_compensation = R"doc()doc";
+
+
+static const char* __doc_gr_gfdm_extract_burst_cc_cfo_compensation = R"doc()doc";

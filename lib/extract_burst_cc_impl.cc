@@ -161,34 +161,34 @@ int extract_burst_cc_impl::general_work(int noutput_items,
 
         if (avail_items - burst_start >= d_burst_len &&
             produced_items + d_burst_len <= noutput_items) {
-            if (not tag.offset > d_last_tag_offset) {
-                GR_LOG_DEBUG(d_logger,
-                             "DANGER! Burst " + std::to_string(tags.size()) + "/" +
-                                 std::to_string(n_out_bursts) +
-                                 "\tburst_idx=" + std::to_string(d_frame_counter) + " @" +
-                                 std::to_string(tag.offset) +
-                                 " xcorr_offset=" + std::to_string(xcorr_offset) +
-                                 " xcorr_idx: " + std::to_string(xcorr_idx) +
-                                 " src: " + src_str);
-            }
-            // GR_LOG_DEBUG(d_logger,
-            //              "Burst " + std::to_string(tags.size()) + "/" +
-            //                  std::to_string(n_out_bursts) +
-            //                  "\tburst_idx=" + std::to_string(d_frame_counter) + " @" +
-            //                  std::to_string(tag.offset) +
-            //                  " xcorr_offset=" + std::to_string(xcorr_offset) +
-            //                  " xcorr_idx: " + std::to_string(xcorr_idx) +
-            //                  " src: " + src_str);
+            // if (not tag.offset > d_last_tag_offset) {
+            GR_LOG_DEBUG(d_logger,
+                         fmt::format("DANGER! Burst {}/{}\tburst_idx={} @{} "
+                                     "xcorr_offset={} xcorr_idx: {} src: {}",
+                                     tags.size(),
+                                     n_out_bursts,
+                                     d_frame_counter,
+                                     tag.offset,
+                                     xcorr_offset,
+                                     xcorr_idx,
+                                     src_str));
+            // }
 
             const float scale_factor = get_scale_factor(info);
             if (actual_start < 0) {
                 const int num_prepend_zeros = std::abs(actual_start);
                 memset(out, 0, sizeof(gr_complex) * num_prepend_zeros);
+                // fmt::print(
+                //     "{}\n",
+                //     std::vector<gr_complex>(in, in + d_burst_len - num_prepend_zeros));
                 normalize_power_level(out + num_prepend_zeros,
                                       in,
                                       scale_factor,
                                       d_burst_len - num_prepend_zeros);
             } else {
+                // fmt::print("{}\n",
+                //            std::vector<gr_complex>(in + actual_start,
+                //                                    in + actual_start + d_burst_len));
                 normalize_power_level(out, in + actual_start, scale_factor, d_burst_len);
             }
 
