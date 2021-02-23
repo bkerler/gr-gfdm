@@ -22,4 +22,5 @@ except ImportError:
     from .gfdm_python import *
 
 # import any pure python here
+from .receiver_cc import receiver_cc
 #

@@ -21,7 +21,8 @@ add_subdirectory(bindings)
 ########################################################################
 GR_PYTHON_INSTALL(
     FILES
-    __init__.py DESTINATION ${GR_PYTHON_DIR}/gfdm
+    __init__.py
+    receiver_cc.py DESTINATION ${GR_PYTHON_DIR}/gfdm
 )
 
 add_subdirectory(pygfdm)
@@ -47,3 +48,4 @@ GR_ADD_TEST(qa_channel_estimator_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_
 GR_ADD_TEST(qa_transmitter_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_transmitter_cc.py)
 GR_ADD_TEST(qa_short_burst_shaper ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_short_burst_shaper.py)
 GR_ADD_TEST(qa_python_bindings ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_python_bindings.py)
+GR_ADD_TEST(qa_receiver_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_receiver_cc.py)

@@ -19,5 +19,6 @@ install(FILES
     gfdm_extract_burst_cc.block.yml
     gfdm_channel_estimator_cc.block.yml
     gfdm_transmitter_cc.block.yml
-    gfdm_short_burst_shaper.block.yml DESTINATION share/gnuradio/grc/blocks
+    gfdm_short_burst_shaper.block.yml
+    gfdm_receiver_cc.block.yml DESTINATION share/gnuradio/grc/blocks
 )

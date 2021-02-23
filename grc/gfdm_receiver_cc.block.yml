@@ -1,0 +1,115 @@
+id: gfdm_receiver_cc
+label: GFDM receiver
+category: '[GFDM]'
+
+templates:
+  imports: import gfdm
+  make: |-
+    gfdm.receiver_cc(${timeslots}, ${subcarriers}, ${active_subcarriers},
+        ${overlap}, ${subcarrier_map}, ${cp_len}, ${cs_len}, ${ramp_len},
+        ${frequency_domain_taps}, ${map_resources_per_timeslot}, ${preamble},
+        ${channel_estimator_id}, ${constellation},
+        ${ic_iterations}, ${activate_phase_compensation},
+        ${activate_cfo_compensation}, ${sync_tag_key}
+    )
+  callbacks:
+    - set_activate_cfo_compensation(${activate_cfo_compensation})
+    - set_ic_iterations(${ic_iterations})
+    - set_activate_phase_compensation(${activate_phase_compensation})
+
+#  Make one 'parameters' list entry for every parameter you want settable from the GUI.
+#     Keys include:
+#     * id (makes the value accessible as keyname, e.g. in the make entry)
+#     * label (label shown in the GUI)
+#     * dtype (e.g. int, float, complex, byte, short, xxx_vector, ...)
+parameters:
+  - id: timeslots
+    label: Timeslots
+    dtype: int
+    default: 15
+  - id: subcarriers
+    label: Subcarriers
+    dtype: int
+    default: 64
+  - id: active_subcarriers
+    label: Active subcarriers
+    dtype: int
+    default: 60
+  - id: overlap
+    label: Overlap
+    dtype: int
+    default: 2
+  - id: subcarrier_map
+    label: Subcarrier map
+    dtype: int_vector
+    default: list(range(1, 61))
+  - id: cp_len
+    label: CP length
+    dtype: int
+    default: 16
+  - id: cs_len
+    label: CS length
+    dtype: int
+    default: 8
+  - id: ramp_len
+    label: Ramp length
+    dtype: int
+    default: 8
+  - id: frequency_domain_taps
+    label: Freq. domain taps
+    dtype: complex_vector
+    default: '[1.0 + 0.0j, ] * 30'
+  - id: map_resources_per_timeslot
+    label: Resources per timeslot
+    dtype: bool
+    default: True
+  - id: constellation
+    label: Constellation object
+    dtype: raw
+  - id: preamble
+    label: Core preamble
+    dtype: complex_vector
+    default: '[1.0 + 0.0j, ] * 128'
+  - id: channel_estimator_id
+    label: Channel estimator ID
+    dtype: int
+    default: 1
+  - id: ic_iterations
+    label: IC iterations
+    dtype: int
+    default: 1
+  - id: activate_phase_compensation
+    label: Activate phase compensation
+    dtype: bool
+    default: True
+  - id: activate_cfo_compensation
+    label: Activate CFO compensation
+    dtype: bool
+    default: True
+  - id: sync_tag_key
+    label: Sync tag key
+    dtype: string
+    default: '"frame_start"'
+
+#  Make one 'inputs' list entry per input and one 'outputs' list entry per output.
+#  Keys include:
+#      * label (an identifier for the GUI)
+#      * domain (optional - stream or message. Default is stream)
+#      * dtype (e.g. int, float, complex, byte, short, xxx_vector, ...)
+#      * vlen (optional - data stream vector length. Default is 1)
+#      * optional (optional - set to 1 for optional inputs. Default is 0)
+inputs:
+  - domain: stream
+    dtype: complex
+
+outputs:
+  - domain: stream
+    dtype: complex
+  - label: estimate
+    domain: stream
+    dtype: complex
+    optional: true
+
+#  'file_format' specifies the version of the GRC yml format used in the file
+#  and should usually not be changed.
+file_format: 1

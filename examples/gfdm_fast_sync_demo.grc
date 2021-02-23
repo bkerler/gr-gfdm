@@ -351,6 +351,7 @@ blocks:
     comment: ''
     const_points: '[-0.707-0.707j, -0.707+0.707j, 0.707+0.707j, 0.707-0.707j]'
     dims: '1'
+    normalization: digital.constellation.AMPLITUDE_NORMALIZATION
     precision: '8'
     rot_sym: '4'
     soft_dec_lut: None
@@ -623,6 +624,7 @@ blocks:
     affinity: ''
     alias: ''
     comment: ''
+    en_uvec: 'True'
   states:
     bus_sink: false
     bus_source: false
@@ -991,6 +993,38 @@ blocks:
     coordinate: [800, 452.0]
     rotation: 0
     state: enabled
+- name: gfdm_receiver_cc_0
+  id: gfdm_receiver_cc
+  parameters:
+    activate_cfo_compensation: activate_cfo_compensation
+    activate_phase_compensation: activate_phase_compensation
+    active_subcarriers: active_subcarriers
+    affinity: ''
+    alias: ''
+    channel_estimator_id: '1'
+    comment: ''
+    constellation: gfdm_constellation
+    cp_len: cp_len
+    cs_len: cs_len
+    frequency_domain_taps: rx_f_taps
+    ic_iterations: ic_iter_range
+    map_resources_per_timeslot: 'True'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    overlap: overlap
+    preamble: core_preamble
+    ramp_len: ramp_len
+    subcarrier_map: subcarrier_map
+    subcarriers: fft_len
+    sync_tag_key: '"frame_start"'
+    timeslots: timeslots
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [526, 844]
+    rotation: 0
+    state: enabled
 - name: gfdm_transmitter_cc_0
   id: gfdm_transmitter_cc
   parameters:
@@ -1000,12 +1034,13 @@ blocks:
     comment: ''
     cp_len: cp_len
     cs_len: cs_len
+    cyclic_shifts: '[0, ]'
     frequency_taps: f_taps
     maxoutbuf: '0'
     minoutbuf: '0'
     overlap: overlap
     per_timeslot: 'True'
-    preamble: preamble
+    preambles: '[preamble,]'
     ramp_len: ramp_len
     subcarrier_map: subcarrier_map
     subcarriers: fft_len
@@ -1016,7 +1051,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [400, 372.0]
+    coordinate: [419, 310]
     rotation: 0
     state: enabled
 - name: hier_gfdm_fastsync_0
@@ -1071,7 +1106,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [472, 628.0]
+    coordinate: [471, 612]
     rotation: 0
     state: enabled
 - name: import_cyclic_prefix
@@ -1254,7 +1289,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [728, 684.0]
+    coordinate: [858, 669]
     rotation: 0
     state: enabled
 - name: qtgui_time_sink_x_0_0_0_1
@@ -1351,7 +1386,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [728, 588.0]
+    coordinate: [815, 585]
     rotation: 0
     state: enabled
 - name: qtgui_time_sink_x_0_0_0_2_0
@@ -1701,14 +1736,15 @@ connections:
 - [digital_crc32_async_bb_1_0, out, blocks_pdu_to_tagged_stream_0_1, pdus]
 - [digital_crc32_async_bb_1_0_0, out, blocks_message_debug_0, store]
 - [frame_gap_vector_insert, '0', channels_channel_model_0, '0']
+- [gfdm_receiver_cc_0, '0', digital_constellation_decoder_cb_0, '0']
+- [gfdm_receiver_cc_0, '1', qtgui_time_sink_x_0_0_0_1, '0']
 - [gfdm_transmitter_cc_0, '0', blocks_multiply_const_vxx_0, '0']
 - [hier_gfdm_fastsync_0, '0', hier_gfdm_receiver_tagged_0, '0']
 - [hier_gfdm_fastsync_0, '0', qtgui_time_sink_x_0_0_0_2_0_0, '0']
 - [hier_gfdm_fastsync_0, '1', blocks_tag_debug_0, '0']
+- [hier_gfdm_fastsync_0, '1', gfdm_receiver_cc_0, '0']
 - [hier_gfdm_fastsync_0, '1', qtgui_time_sink_x_0_0_0_2_0, '0']
 - [hier_gfdm_fastsync_0, '2', qtgui_time_sink_x_0_0_0_2_0, '1']
-- [hier_gfdm_receiver_tagged_0, '0', qtgui_time_sink_x_0_0_0_1, '0']
-- [hier_gfdm_receiver_tagged_0, '1', digital_constellation_decoder_cb_0, '0']
 - [hier_gfdm_receiver_tagged_0, '1', qtgui_const_sink_x_0, '1']
 
 metadata:
