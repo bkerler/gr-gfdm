@@ -127,27 +127,12 @@ int extract_burst_cc_impl::general_work(int noutput_items,
     int consumed_items = avail_items;
     int produced_items = 0;
 
-
     std::vector<tag_t> tags;
     get_tags_in_window(tags, 0, 0, avail_items, d_burst_start_tag);
     std::sort(tags.begin(), tags.end(), tag_t::offset_compare);
     const int n_max_bursts = std::min(int(tags.size()), n_out_bursts);
-    // if (tags.size() > 0) {
-    //     std::string offset_str("");
-    //     for (const auto& t : tags) {
-    //         offset_str += std::to_string(t.offset) + "\t";
-    //     }
-    //     GR_LOG_DEBUG(d_logger,
-    //                  "Tags: " + std::to_string(tags.size()) + "/" +
-    //                      std::to_string(n_out_bursts) +
-    //                      " nitems_read=" + std::to_string(nitems_read(0)) +
-    //                      "\tavail=" + std::to_string(avail_items) + "\tnout_items=" +
-    //                      std::to_string(noutput_items) + " offsets: " + offset_str);
-    // }
 
-    // for (int i = 0; i < n_max_bursts; ++i) {
     for (const auto& tag : tags) {
-        // const auto& tag = tags[i];
         const int burst_start = tag.offset - nitems_read(0);
         const int actual_start = burst_start - d_tag_backoff;
 
@@ -161,18 +146,18 @@ int extract_burst_cc_impl::general_work(int noutput_items,
 
         if (avail_items - burst_start >= d_burst_len &&
             produced_items + d_burst_len <= noutput_items) {
-            // if (not tag.offset > d_last_tag_offset) {
-            GR_LOG_DEBUG(d_logger,
-                         fmt::format("DANGER! Burst {}/{}\tburst_idx={} @{} "
-                                     "xcorr_offset={} xcorr_idx: {} src: {}",
-                                     tags.size(),
-                                     n_out_bursts,
-                                     d_frame_counter,
-                                     tag.offset,
-                                     xcorr_offset,
-                                     xcorr_idx,
-                                     src_str));
-            // }
+            if (not tag.offset > d_last_tag_offset) {
+                GR_LOG_DEBUG(d_logger,
+                             fmt::format("DANGER! Burst {}/{}\tburst_idx={} @{} "
+                                         "xcorr_offset={} xcorr_idx: {} src: {}",
+                                         tags.size(),
+                                         n_out_bursts,
+                                         d_frame_counter,
+                                         tag.offset,
+                                         xcorr_offset,
+                                         xcorr_idx,
+                                         src_str));
+            }
 
             const float scale_factor = get_scale_factor(info);
             if (actual_start < 0) {

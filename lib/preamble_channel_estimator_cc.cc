@@ -241,14 +241,13 @@ void preamble_channel_estimator_cc::interpolate_frame(gfdm_complex* frame_estima
     const int n_estimated_taps = d_active_subcarriers + (d_is_dc_free ? 1 : 0);
     const int center = d_fft_len * d_timeslots / 2;
     const int dead_subcarriers = d_fft_len - d_active_subcarriers;
-
-    gfdm_complex step_size = gfdm_complex(1.0f / float(d_timeslots), 0.0f);
+    const gfdm_complex step_size = gfdm_complex(1.0f / float(d_timeslots), 0.0f);
 
     for (int i = center; i < center + d_timeslots * dead_subcarriers / 2; ++i) {
         frame_estimate[i] = estimate[0];
     }
 
-    for (int i = d_timeslots * d_active_subcarriers / 2; i < center; ++i) {
+    for (int i = d_timeslots * d_active_subcarriers / 2 - d_timeslots; i < center; ++i) {
         frame_estimate[i] = estimate[n_estimated_taps - 1];
     }
 
@@ -256,8 +255,9 @@ void preamble_channel_estimator_cc::interpolate_frame(gfdm_complex* frame_estima
         gfdm_complex inc = (estimate[i + 1] - estimate[i]) * step_size;
         gfdm_complex factor = estimate[i];
         for (int j = 0; j < d_timeslots; ++j) {
-            frame_estimate[center + d_timeslots * dead_subcarriers / 2 + i * d_timeslots +
-                           j] = factor;
+            const int pos =
+                center + d_timeslots * dead_subcarriers / 2 + i * d_timeslots + j;
+            frame_estimate[pos] = factor;
             factor += inc;
         }
     }
@@ -267,7 +267,8 @@ void preamble_channel_estimator_cc::interpolate_frame(gfdm_complex* frame_estima
         gfdm_complex inc = (estimate[i + 1] - estimate[i]) * step_size;
         gfdm_complex factor = estimate[i];
         for (int j = 0; j < d_timeslots; ++j) {
-            frame_estimate[offset + j] = factor;
+            const int pos = offset + j;
+            frame_estimate[pos] = factor;
             factor += inc;
         }
     }
@@ -288,6 +289,7 @@ void preamble_channel_estimator_cc::estimate_frame(gfdm_complex* frame_estimate,
     estimate_preamble_channel(d_preamble_estimate.data(), rx_preamble);
     filter_preamble_estimate(d_filtered_estimate.data(), d_preamble_estimate.data());
     interpolate_frame(frame_estimate, d_filtered_estimate.data());
+
     // switch(d_which_estimator){
     //   case 1: prepare_for_zf(frame_estimate, frame_estimate); break;
     // }
