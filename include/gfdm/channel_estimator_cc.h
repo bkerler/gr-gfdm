@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2017 <+YOU OR YOUR COMPANY+>.
+ * Copyright 2017 Johannes Demel.
  *
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,11 @@ namespace gr {
 namespace gfdm {
 
 /*!
- * \brief <+description of block+>
+ * \brief Preamble-based channel estimator
+ *
+ * Estimate current channel realization based on a received preamble.
+ * The output is a channel estimate that one may use directly
+ * to equalize a GFDM frame in the frequency domain.
  * \ingroup gfdm
  *
  */
@@ -51,7 +55,9 @@ public:
                      int active_subcarriers,
                      bool is_dc_free,
                      int which_estimator,
-                     std::vector<gr_complex> preamble);
+                     std::vector<gr_complex> preamble,
+                     const std::string& snr_tag_key = "snr_lin",
+                     const std::string& cnr_tag_key = "cnr");
 };
 
 } // namespace gfdm

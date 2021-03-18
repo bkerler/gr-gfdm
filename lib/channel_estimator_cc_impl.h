@@ -32,13 +32,18 @@ class channel_estimator_cc_impl : public channel_estimator_cc
 private:
     std::unique_ptr<preamble_channel_estimator_cc> d_estimator_kernel;
 
+    const pmt::pmt_t d_snr_tag_key;
+    const pmt::pmt_t d_cnr_vector_tag_key;
+
 public:
     channel_estimator_cc_impl(int timeslots,
                               int fft_len,
                               int active_subcarriers,
                               bool is_dc_free,
                               int which_estimator,
-                              std::vector<gr_complex> preamble);
+                              std::vector<gr_complex> preamble,
+                              const std::string& snr_tag_key = "snr_lin",
+                              const std::string& cnr_tag_key = "cnr");
     ~channel_estimator_cc_impl();
 
     // Where all the action really happens

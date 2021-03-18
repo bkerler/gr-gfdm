@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2017 <+YOU OR YOUR COMPANY+>.
+ * Copyright 2017 Johannes Demel.
  *
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,6 +30,10 @@ namespace gfdm {
 
 /*!
  * \brief Extract burst at tag position
+ *
+ * Burst must have constant size.
+ * CFO correction may be applied if tag provides information.
+ * May update tag key if desired.
  * \ingroup gfdm
  *
  */
@@ -49,7 +53,8 @@ public:
     static sptr make(int burst_len,
                      int tag_backoff,
                      std::string burst_start_tag,
-                     bool activate_cfo_correction = false);
+                     bool activate_cfo_correction = false,
+                     std::string forward_burst_start_tag = "");
 
     virtual void activate_cfo_compensation(bool activate_cfo_compensation) = 0;
     virtual bool cfo_compensation() const = 0;

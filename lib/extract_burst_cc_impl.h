@@ -35,6 +35,7 @@ private:
     const int d_burst_len;
     const int d_tag_backoff;
     const pmt::pmt_t d_burst_start_tag;
+    const pmt::pmt_t d_forward_burst_start_tag;
     bool d_activate_cfo_correction;
 
     uint64_t d_last_tag_offset = 0;
@@ -59,7 +60,8 @@ public:
     extract_burst_cc_impl(int burst_len,
                           int tag_backoff,
                           std::string burst_start_tag,
-                          bool activate_cfo_correction);
+                          bool activate_cfo_correction,
+                          std::string forward_burst_start_tag = "");
     ~extract_burst_cc_impl();
 
     void forecast(int noutput_items, gr_vector_int& ninput_items_required);

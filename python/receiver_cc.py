@@ -46,6 +46,7 @@ class receiver_cc(gr.hier_block2):
         activate_phase_compensation=True,
         activate_cfo_compensation=True,
         sync_tag_key="frame_start",
+        antenna_port=None
     ):
         gr.hier_block2.__init__(
             self,
@@ -53,6 +54,15 @@ class receiver_cc(gr.hier_block2):
             gr.io_signature(1, 1, gr.sizeof_gr_complex),
             gr.io_signature(3, 3, gr.sizeof_gr_complex),
         )
+
+        print(f'antenna port: {antenna_port}')
+        internal_sync_tag_key = sync_tag_key
+        snr_tag_key = "snr_lin"
+        cnr_tag_key = "cnr"
+        if antenna_port is not None:
+            internal_sync_tag_key = f'{sync_tag_key}{antenna_port}'
+            snr_tag_key = f'{snr_tag_key}{antenna_port}'
+            cnr_tag_key = f'{cnr_tag_key}{antenna_port}'
 
         preamble = np.array(preamble)
 
@@ -65,15 +75,15 @@ class receiver_cc(gr.hier_block2):
         sc_map_is_dc_free = subcarrier_map[0] != 0
 
         self.extract_burst = gfdm.extract_burst_cc(
-            frame_len, cp_len, sync_tag_key, activate_cfo_compensation
+            frame_len, cp_len, sync_tag_key, activate_cfo_compensation, internal_sync_tag_key
         )
 
         self.remove_prefix_data = gfdm.remove_prefix_cc(
-            frame_len, block_len, full_preamble_len + cp_len, sync_tag_key
+            frame_len, block_len, full_preamble_len + cp_len, internal_sync_tag_key
         )
 
         self.remove_prefix_preamble = gfdm.remove_prefix_cc(
-            frame_len, preamble_len, cp_len, sync_tag_key
+            frame_len, preamble_len, cp_len, internal_sync_tag_key
         )
 
         self.channel_estimator = gfdm.channel_estimator_cc(
@@ -83,6 +93,8 @@ class receiver_cc(gr.hier_block2):
             sc_map_is_dc_free,
             channel_estimator_id,
             preamble,
+            snr_tag_key,
+            cnr_tag_key
         )
 
         self.advanced_receiver = gfdm.advanced_receiver_sb_cc(
@@ -139,4 +151,5 @@ class receiver_cc(gr.hier_block2):
         return self.advanced_receiver.get_phase_compensation()
 
     def set_activate_phase_compensation(self, activate_phase_compensation):
-        self.advanced_receiver.set_phase_compensation(activate_phase_compensation)
+        self.advanced_receiver.set_phase_compensation(
+            activate_phase_compensation)

@@ -24,6 +24,7 @@
 
 #include "extract_burst_cc_impl.h"
 #include <gnuradio/io_signature.h>
+#include <fmt/core.h>
 #include <volk/volk.h>
 #include <cmath>
 
@@ -33,10 +34,14 @@ namespace gfdm {
 extract_burst_cc::sptr extract_burst_cc::make(int burst_len,
                                               int tag_backoff,
                                               std::string burst_start_tag,
-                                              bool activate_cfo_correction)
+                                              bool activate_cfo_correction,
+                                              std::string forward_burst_start_tag)
 {
-    return gnuradio::make_block_sptr<extract_burst_cc_impl>(
-        burst_len, tag_backoff, burst_start_tag, activate_cfo_correction);
+    return gnuradio::make_block_sptr<extract_burst_cc_impl>(burst_len,
+                                                            tag_backoff,
+                                                            burst_start_tag,
+                                                            activate_cfo_correction,
+                                                            forward_burst_start_tag);
 }
 
 /*
@@ -45,15 +50,18 @@ extract_burst_cc::sptr extract_burst_cc::make(int burst_len,
 extract_burst_cc_impl::extract_burst_cc_impl(int burst_len,
                                              int tag_backoff,
                                              std::string burst_start_tag,
-                                             bool activate_cfo_correction)
+                                             bool activate_cfo_correction,
+                                             std::string forward_burst_start_tag)
     : gr::block("extract_burst_cc",
                 gr::io_signature::make(1, 1, sizeof(gr_complex)),
                 gr::io_signature::make(1, 1, sizeof(gr_complex))),
       d_burst_len(burst_len),
       d_tag_backoff(tag_backoff),
       d_burst_start_tag(pmt::mp(burst_start_tag)),
-      d_activate_cfo_correction(activate_cfo_correction)
+      d_forward_burst_start_tag(pmt::mp(
+          forward_burst_start_tag.empty() ? burst_start_tag : forward_burst_start_tag))
 {
+    activate_cfo_compensation(activate_cfo_correction);
     set_output_multiple(burst_len);
     set_tag_propagation_policy(TPP_DONT);
 }
@@ -99,8 +107,7 @@ void extract_burst_cc_impl::normalize_power_level(gr_complex* p_out,
 
 void extract_burst_cc_impl::activate_cfo_compensation(bool activate_cfo_compensation)
 {
-    std::cout << "activate_cfo_compensation="
-              << (activate_cfo_compensation ? "True" : "False") << std::endl;
+    fmt::print("activate CFO compensation: {}\n", activate_cfo_compensation);
     d_activate_cfo_correction = activate_cfo_compensation;
 }
 
@@ -184,7 +191,7 @@ int extract_burst_cc_impl::general_work(int noutput_items,
                 info, pmt::intern("burst_idx"), pmt::from_uint64(d_frame_counter));
             add_item_tag(0,
                          nitems_written(0) + produced_items,
-                         d_burst_start_tag,
+                         d_forward_burst_start_tag,
                          value,
                          pmt::string_to_symbol(name()));
 

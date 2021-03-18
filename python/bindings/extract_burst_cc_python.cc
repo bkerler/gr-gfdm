@@ -44,6 +44,7 @@ void bind_extract_burst_cc(py::module& m)
              py::arg("tag_backoff"),
              py::arg("burst_start_tag"),
              py::arg("activate_cfo_correction") = false,
+             py::arg("forward_burst_start_tag") = "",
              D(extract_burst_cc, make))
 
 

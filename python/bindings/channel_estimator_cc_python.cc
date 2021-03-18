@@ -13,7 +13,7 @@
 /* If manual edits are made, the following tags should be modified accordingly.    */
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
-/* BINDTOOL_HEADER_FILE(channel_estimator_cc.h)                                        */
+/* BINDTOOL_HEADER_FILE(channel_estimator_cc.h)                                    */
 /* BINDTOOL_HEADER_FILE_HASH(b36d788925392dcd70657aaae856cbe5)                     */
 /***********************************************************************************/
 
@@ -46,6 +46,8 @@ void bind_channel_estimator_cc(py::module& m)
              py::arg("is_dc_free"),
              py::arg("which_estimator"),
              py::arg("preamble"),
+             py::arg("snr_tag_key") = "snr_lin",
+             py::arg("cnr_tag_key") = "cnr",
              D(channel_estimator_cc, make))
 
 
