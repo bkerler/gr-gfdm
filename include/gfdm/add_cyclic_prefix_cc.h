@@ -35,7 +35,7 @@ namespace gfdm {
  *
  */
 
-class add_cyclic_prefix_cc
+class __attribute__((visibility("default"))) add_cyclic_prefix_cc
 {
 public:
     typedef std::complex<float> gfdm_complex;

@@ -51,8 +51,6 @@ advanced_receiver_kernel_cc::advanced_receiver_kernel_cc(
     d_ic_freq_buffer.resize(d_kernel->block_size());
 }
 
-advanced_receiver_kernel_cc::~advanced_receiver_kernel_cc() {}
-
 void advanced_receiver_kernel_cc::perform_ic_iterations(gr_complex* p_out,
                                                         gr_complex* p_freq_block)
 {

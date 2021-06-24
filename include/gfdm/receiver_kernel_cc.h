@@ -49,7 +49,7 @@ namespace gfdm {
  * Domain Processing"
  *
  */
-class receiver_kernel_cc : public gfdm_kernel_utils
+class __attribute__((visibility("default"))) receiver_kernel_cc : public gfdm_kernel_utils
 {
 public:
     receiver_kernel_cc(int n_timeslots,

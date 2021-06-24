@@ -34,7 +34,7 @@ namespace gfdm {
  * Result is a vector which is fed to gfdm_modulator.
  *
  */
-class resource_mapper_kernel_cc
+class __attribute__((visibility("default"))) resource_mapper_kernel_cc
 {
 public:
     typedef std::complex<float> gfdm_complex;

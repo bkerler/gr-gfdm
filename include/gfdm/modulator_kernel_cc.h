@@ -32,13 +32,12 @@
 namespace gr {
 namespace gfdm {
 
-void foobar();
 /*!
  * \brief modulate a GFDM block.
  *  This class initializes and performs all operations necessary to modulate a GFDM block.
  *
  */
-class modulator_kernel_cc : public gfdm_kernel_utils
+class __attribute__((visibility("default"))) modulator_kernel_cc : public gfdm_kernel_utils
 {
 public:
     modulator_kernel_cc(int n_timeslots,

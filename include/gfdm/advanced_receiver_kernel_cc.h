@@ -45,7 +45,7 @@ public:
                                 int ic_iter,
                                 gr::digital::constellation_sptr constellation,
                                 int do_phase_compensation);
-    ~advanced_receiver_kernel_cc();
+    ~advanced_receiver_kernel_cc() = default;
 
     void generic_work(gr_complex* p_out, const gr_complex* p_in);
     void generic_work_equalize(gr_complex* out,
