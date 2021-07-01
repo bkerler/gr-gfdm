@@ -11,8 +11,8 @@
 /* If manual edits are made, the following tags should be modified accordingly.    */
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
-/* BINDTOOL_HEADER_FILE(preamble_channel_estimator_cc.h) */
-/* BINDTOOL_HEADER_FILE_HASH(ec8aa5f5d2062e8f515a0c2ddc6fece8)                     */
+/* BINDTOOL_HEADER_FILE(preamble_channel_estimator_cc.h)                           */
+/* BINDTOOL_HEADER_FILE_HASH(55a86d8f837c5ec136b74bdd0481d359)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
