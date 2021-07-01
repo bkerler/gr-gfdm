@@ -41,7 +41,7 @@ namespace gfdm {
  * for a frame as specified.
  *
  */
-class preamble_channel_estimator_cc : public gfdm_kernel_utils
+class __attribute__((visibility("default"))) preamble_channel_estimator_cc : public gfdm_kernel_utils
 {
 public:
     preamble_channel_estimator_cc(int timeslots,
