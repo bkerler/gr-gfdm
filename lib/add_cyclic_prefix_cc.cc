@@ -84,7 +84,8 @@ void add_cyclic_prefix_cc::add_cyclic_extension(gfdm_complex* out,
     memcpy(out, in + cp_start, sizeof(gfdm_complex) * shifted_cp_len);
 
     memcpy(out + shifted_cp_len, in, sizeof(gfdm_complex) * block_size());
-    const unsigned shifted_cs_len = d_cs_len - cyclic_shift;
+    const unsigned shifted_cs_len =
+        (d_cs_len > cyclic_shift) ? (d_cs_len - cyclic_shift) : 0;
     memcpy(
         out + shifted_cp_len + block_size(), in, sizeof(gfdm_complex) * shifted_cs_len);
 }
