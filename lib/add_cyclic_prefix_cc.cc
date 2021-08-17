@@ -18,11 +18,11 @@
  * Boston, MA 02110-1301, USA.
  */
 
+#include <fmt/core.h>
 #include <gfdm/add_cyclic_prefix_cc.h>
 #include <string.h>
 #include <volk/volk.h>
 #include <algorithm>
-#include <iostream>
 
 namespace gr {
 namespace gfdm {
@@ -42,11 +42,12 @@ add_cyclic_prefix_cc::add_cyclic_prefix_cc(int block_len,
     int window_len = block_len + cp_len + cs_len;
     if (window_taps.size() != (unsigned int)window_len &&
         window_taps.size() != (unsigned int)2 * ramp_len) {
-        std::stringstream sstm;
-        sstm << "number of window taps(" << window_taps.size()
-             << ") MUST be equal to 2*ramp_len(";
-        sstm << 2 * ramp_len << ") OR block_len+cp_len (" << window_len << ")!";
-        throw std::invalid_argument(sstm.str().c_str());
+        auto msg = fmt::format("number of window taps({}) MUST be equal to "
+                               "2*ramp_len({}) OR block_len+cp_len+cs_len ({})!",
+                               window_taps.size(),
+                               2 * ramp_len,
+                               window_len);
+        throw std::invalid_argument(msg.c_str());
     }
 
     d_front_ramp =
