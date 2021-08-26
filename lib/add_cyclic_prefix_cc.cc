@@ -80,15 +80,26 @@ void add_cyclic_prefix_cc::add_cyclic_extension(gfdm_complex* out,
                                                 const gfdm_complex* in,
                                                 const int cyclic_shift)
 {
-    const unsigned cp_start = block_size() - d_cp_len - cyclic_shift;
     const unsigned shifted_cp_len = d_cp_len + cyclic_shift;
-    memcpy(out, in + cp_start, sizeof(gfdm_complex) * shifted_cp_len);
+    const unsigned cp_start = block_size() - shifted_cp_len;
 
-    memcpy(out + shifted_cp_len, in, sizeof(gfdm_complex) * block_size());
+    // memcpy(out, in + cp_start, sizeof(gfdm_complex) * shifted_cp_len);
+    std::copy(in + cp_start, in + block_size(), out);
+
+    // memcpy(out + shifted_cp_len, in, sizeof(gfdm_complex) * block_size());
+    const unsigned full_len = block_size() + d_cp_len + d_cs_len;
+    const unsigned shifted_block_len = block_size() + shifted_cp_len;
+    const unsigned tailcut =
+        (shifted_block_len > full_len) ? shifted_block_len - full_len : 0;
+    const unsigned core_len = block_size() - tailcut;
+    std::copy(in, in + core_len, out + shifted_cp_len);
+
     const unsigned shifted_cs_len =
         (d_cs_len > cyclic_shift) ? (d_cs_len - cyclic_shift) : 0;
-    memcpy(
-        out + shifted_cp_len + block_size(), in, sizeof(gfdm_complex) * shifted_cs_len);
+    // memcpy(
+    //     out + shifted_cp_len + block_size(), in, sizeof(gfdm_complex) *
+    //     shifted_cs_len);
+    std::copy(in, in + shifted_cs_len, out + shifted_cp_len + block_size());
 }
 
 void add_cyclic_prefix_cc::apply_ramp(gfdm_complex* out, const gfdm_complex* in)
