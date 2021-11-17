@@ -33,6 +33,18 @@ add_subdirectory(pygfdm)
 include(GrTest)
 
 set(GR_TEST_TARGET_DEPS gnuradio-gfdm)
+
+add_custom_target(
+  copy_module_for_tests ALL
+  COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}
+          ${CMAKE_BINARY_DIR}/test_modules/gfdm/
+COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/pygfdm/
+          ${CMAKE_BINARY_DIR}/test_modules/gfdm/pygfdm/
+  COMMAND
+    ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_BINARY_DIR}/bindings/
+    ${CMAKE_BINARY_DIR}/test_modules/gfdm/
+  DEPENDS gfdm_python)
+
 set(GR_TEST_PYTHON_DIRS ${CMAKE_BINARY_DIR}/python/bindings)
 GR_ADD_TEST(qa_modulator_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_modulator_cc.py)
 GR_ADD_TEST(qa_cyclic_prefixer_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_cyclic_prefixer_cc.py)
