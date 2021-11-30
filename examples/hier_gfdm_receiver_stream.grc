@@ -11,7 +11,7 @@ options:
     gen_linking: dynamic
     generate_options: hb
     hier_block_src_path: '.:'
-    id: hier_gfdm_transmitter
+    id: hier_gfdm_receiver_stream
     max_nouts: '0'
     output_language: python
     placement: (0,0)
@@ -22,7 +22,7 @@ options:
     run_options: prompt
     sizing_mode: fixed
     thread_safe_setters: ''
-    title: GFDM Transmitter chain
+    title: GFDM Receiver
   states:
     bus_sink: false
     bus_source: false
@@ -41,55 +41,60 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [656, 140]
+    coordinate: [720, 308.0]
     rotation: 0
     state: enabled
 - name: frame_len
   id: variable
   parameters:
     comment: ''
-    value: window_len + preamble_len
+    value: preamble_len + cp_len + cs_len + block_len
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [848, 140]
+    coordinate: [496, 308.0]
     rotation: 0
     state: enabled
-- name: preamble_gap
+- name: internal_frame_start_tag_key
   id: variable
   parameters:
     comment: ''
-    value: '256'
+    value: f"{frame_start_tag_key}{antenna_port}"
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1192, 140]
+    coordinate: [144, 292.0]
     rotation: 0
     state: enabled
 - name: preamble_len
   id: variable
   parameters:
     comment: ''
-    value: len(preamble)
+    value: cp_len + len(preamble) + cs_len
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1032, 140]
+    coordinate: [1136, 300.0]
     rotation: 0
     state: enabled
-- name: window_len
-  id: variable
+- name: activate_cfo_compensation
+  id: parameter
   parameters:
+    alias: ''
     comment: ''
-    value: block_len + cp_len + cs_len
+    hide: none
+    label: Activate CFO compensation
+    short_id: ''
+    type: intx
+    value: '1'
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [736, 140]
+    coordinate: [1152, 28.0]
     rotation: 0
     state: enabled
 - name: active_subcarriers
@@ -98,7 +103,7 @@ blocks:
     alias: ''
     comment: ''
     hide: none
-    label: ''
+    label: Active subcarriers
     short_id: ''
     type: intx
     value: '52'
@@ -106,7 +111,59 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [376, 12]
+    coordinate: [304, 12.0]
+    rotation: 0
+    state: enabled
+- name: antenna_port
+  id: parameter
+  parameters:
+    alias: ''
+    comment: ''
+    hide: none
+    label: Antenna port
+    short_id: ''
+    type: intx
+    value: '0'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [504, 100.0]
+    rotation: 0
+    state: enabled
+- name: chan
+  id: pad_sink
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    label: Channel Estimate
+    num_streams: '1'
+    optional: 'True'
+    type: complex
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1272, 556.0]
+    rotation: 0
+    state: enabled
+- name: compensate_phase
+  id: parameter
+  parameters:
+    alias: ''
+    comment: ''
+    hide: none
+    label: Do phase compensation
+    short_id: ''
+    type: intx
+    value: '0'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [768, 188]
     rotation: 0
     state: enabled
 - name: cp_len
@@ -115,15 +172,15 @@ blocks:
     alias: ''
     comment: ''
     hide: none
-    label: ''
+    label: CP length
     short_id: ''
     type: intx
-    value: '32'
+    value: '16'
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [264, 100]
+    coordinate: [272, 196.0]
     rotation: 0
     state: enabled
 - name: cs_len
@@ -132,18 +189,96 @@ blocks:
     alias: ''
     comment: ''
     hide: none
-    label: ''
+    label: CS length
     short_id: ''
     type: intx
-    value: '16'
+    value: '8'
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [344, 100]
+    coordinate: [368, 196.0]
     rotation: 0
     state: enabled
-- name: filter_taps
+- name: frame_len
+  id: parameter
+  parameters:
+    alias: ''
+    comment: ''
+    hide: none
+    label: Frame length
+    short_id: ''
+    type: intx
+    value: '800'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [200, 100]
+    rotation: 0
+    state: disabled
+- name: frame_start_tag_key
+  id: parameter
+  parameters:
+    alias: ''
+    comment: ''
+    hide: none
+    label: Tag key
+    short_id: ''
+    type: str
+    value: '"frame_start"'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [360, 100]
+    rotation: 0
+    state: enabled
+- name: gfdm_advanced_receiver_sb_cc_0
+  id: gfdm_advanced_receiver_sb_cc
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    constellation: gfdm_constellation
+    do_phase_compensation: compensate_phase
+    frequency_taps: rx_filter_taps
+    ic_iter: ic_iterations
+    maxoutbuf: '0'
+    minoutbuf: block_len
+    overlap: overlap
+    subcarrier_map: subcarrier_map
+    subcarriers: subcarriers
+    timeslots: timeslots
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [816, 404.0]
+    rotation: 0
+    state: enabled
+- name: gfdm_channel_estimator_cc_0
+  id: gfdm_channel_estimator_cc
+  parameters:
+    active_subcarriers: active_subcarriers
+    affinity: ''
+    alias: ''
+    comment: ''
+    fft_len: subcarriers
+    is_dc_free: 'True'
+    maxoutbuf: '0'
+    minoutbuf: block_len
+    preamble: preamble
+    timeslots: timeslots
+    which_estimator: which_estimator
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [616, 516.0]
+    rotation: 0
+    state: enabled
+- name: gfdm_constellation
   id: parameter
   parameters:
     alias: ''
@@ -152,43 +287,81 @@ blocks:
     label: ''
     short_id: ''
     type: ''
-    value: filters.get_frequency_domain_filter('rrc', .2, 9, 64, 2)
+    value: digital.constellation_qpsk().base()
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [752, 12]
+    coordinate: [936, 60]
     rotation: 0
     state: enabled
-- name: gfdm_cyclic_prefixer_cc_0
-  id: gfdm_cyclic_prefixer_cc
+- name: gfdm_extract_burst_cc_0
+  id: gfdm_extract_burst_cc
+  parameters:
+    affinity: ''
+    alias: ''
+    burst_len: frame_len
+    burst_start_tag: frame_start_tag_key
+    comment: ''
+    forward_burst_start_tag: internal_frame_start_tag_key
+    maxoutbuf: '0'
+    minoutbuf: frame_len
+    tag_backoff: cp_len
+    use_cfo_compensation: activate_cfo_compensation
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [136, 412.0]
+    rotation: 0
+    state: enabled
+- name: gfdm_remove_prefix_cc_data
+  id: gfdm_remove_prefix_cc
   parameters:
     affinity: ''
     alias: ''
     block_len: block_len
     comment: ''
-    cp_length: cp_len
-    cs_length: cs_len
+    frame_len: frame_len
+    gfdm_sync_tag_key: internal_frame_start_tag_key
     maxoutbuf: '0'
-    minoutbuf: '0'
-    ramp_len: ramp_len
-    window_taps: window_taps
+    minoutbuf: block_len
+    offset: preamble_len + cp_len
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [800, 252.0]
+    coordinate: [432, 420.0]
     rotation: 0
     state: enabled
-- name: gfdm_resource_mapper_cc_0
-  id: gfdm_resource_mapper_cc
+- name: gfdm_remove_prefix_cc_preamble
+  id: gfdm_remove_prefix_cc
+  parameters:
+    affinity: ''
+    alias: ''
+    block_len: len(preamble)
+    comment: ''
+    frame_len: frame_len
+    gfdm_sync_tag_key: internal_frame_start_tag_key
+    maxoutbuf: '0'
+    minoutbuf: block_len
+    offset: cp_len
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [432, 532.0]
+    rotation: 0
+    state: enabled
+- name: gfdm_resource_demapper_cc_0
+  id: gfdm_resource_demapper_cc
   parameters:
     active_subcarriers: active_subcarriers
     affinity: ''
     alias: ''
     comment: ''
     maxoutbuf: '0'
-    minoutbuf: '0'
+    minoutbuf: timeslots * active_subcarriers
     per_timeslot: 'True'
     subcarrier_map: subcarrier_map
     subcarriers: subcarriers
@@ -197,65 +370,37 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [392, 252]
+    coordinate: [1056, 428.0]
     rotation: 0
     state: enabled
-- name: gfdm_simple_modulator_cc_0
-  id: gfdm_simple_modulator_cc
+- name: ic_iterations
+  id: parameter
   parameters:
-    affinity: ''
     alias: ''
     comment: ''
-    frequency_taps: filter_taps
-    maxoutbuf: '0'
-    minoutbuf: '0'
-    n_subcarriers: subcarriers
-    n_timeslots: timeslots
-    overlap: overlap
+    hide: none
+    label: IC iterations
+    short_id: ''
+    type: intx
+    value: '2'
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [592, 260.0]
+    coordinate: [800, 12.0]
     rotation: 0
     state: enabled
-- name: import_cyclic_prefix
+- name: import_digital
   id: import
   parameters:
     alias: ''
     comment: ''
-    imports: from gfdm.pygfdm import cyclic_prefix
+    imports: from gnuradio import digital
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [8, 332]
-    rotation: 0
-    state: enabled
-- name: import_filters
-  id: import
-  parameters:
-    alias: ''
-    comment: ''
-    imports: from gfdm.pygfdm import filters
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [8, 252]
-    rotation: 0
-    state: enabled
-- name: import_mapping
-  id: import
-  parameters:
-    alias: ''
-    comment: ''
-    imports: from gfdm.pygfdm import mapping
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [8, 212]
+    coordinate: [8, 212.0]
     rotation: 0
     state: enabled
 - name: import_numpy
@@ -268,20 +413,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [8, 156]
-    rotation: 0
-    state: enabled
-- name: import_synchronization
-  id: import
-  parameters:
-    alias: ''
-    comment: ''
-    imports: from gfdm.pygfdm import preamble as pre_module
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [8, 292]
+    coordinate: [8, 156.0]
     rotation: 0
     state: enabled
 - name: overlap
@@ -290,7 +422,7 @@ blocks:
     alias: ''
     comment: ''
     hide: none
-    label: ''
+    label: Overlap
     short_id: ''
     type: intx
     value: '2'
@@ -298,10 +430,10 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [496, 12]
+    coordinate: [560, 12]
     rotation: 0
     state: enabled
-- name: pad_sink_0
+- name: pad_sink_out
   id: pad_sink
   parameters:
     affinity: ''
@@ -316,7 +448,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1144, 284.0]
+    coordinate: [1272, 460.0]
     rotation: 0
     state: enabled
 - name: pad_source_0
@@ -336,7 +468,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [264, 284.0]
+    coordinate: [16, 444]
     rotation: 0
     state: enabled
 - name: preamble
@@ -345,35 +477,15 @@ blocks:
     alias: ''
     comment: ''
     hide: none
-    label: ''
+    label: Core preamble
     short_id: ''
     type: ''
-    value: pre_module.mapped_preamble(471142, 'rrc', .2, 52, 64, mapping.get_subcarrier_map(64,
-      52, dc_free=True), 2, 32, 16)[0]
+    value: np.ones(2 * 64)
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1048, 12]
-    rotation: 0
-    state: enabled
-- name: preamble_vector_insert
-  id: blocks_vector_insert_x
-  parameters:
-    affinity: ''
-    alias: ''
-    comment: ''
-    maxoutbuf: '0'
-    minoutbuf: '0'
-    offset: '0'
-    period: frame_len
-    type: complex
-    vector: preamble
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [1000, 268.0]
+    coordinate: [1112, 180.0]
     rotation: 0
     state: enabled
 - name: ramp_len
@@ -382,15 +494,32 @@ blocks:
     alias: ''
     comment: ''
     hide: none
-    label: ''
+    label: Ramp length
     short_id: ''
     type: intx
-    value: '16'
+    value: '8'
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [424, 100]
+    coordinate: [464, 196.0]
+    rotation: 0
+    state: enabled
+- name: rx_filter_taps
+  id: parameter
+  parameters:
+    alias: ''
+    comment: ''
+    hide: none
+    label: RX filter taps
+    short_id: ''
+    type: ''
+    value: np.ones(10)
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [896, 116]
     rotation: 0
     state: enabled
 - name: subcarrier_map
@@ -399,15 +528,15 @@ blocks:
     alias: ''
     comment: ''
     hide: none
-    label: ''
+    label: Subcarrier map
     short_id: ''
     type: ''
-    value: mapping.get_subcarrier_map(64, 52, dc_free=True)
+    value: np.arange(52)
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [592, 12]
+    coordinate: [640, 12]
     rotation: 0
     state: enabled
 - name: subcarriers
@@ -416,7 +545,7 @@ blocks:
     alias: ''
     comment: ''
     hide: none
-    label: ''
+    label: Subcarriers
     short_id: ''
     type: intx
     value: '64'
@@ -424,7 +553,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [288, 12]
+    coordinate: [448, 12.0]
     rotation: 0
     state: enabled
 - name: timeslots
@@ -433,7 +562,7 @@ blocks:
     alias: ''
     comment: ''
     hide: none
-    label: ''
+    label: Timeslots
     short_id: ''
     type: intx
     value: '15'
@@ -441,33 +570,37 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [208, 12]
+    coordinate: [208, 12.0]
     rotation: 0
     state: enabled
-- name: window_taps
+- name: which_estimator
   id: parameter
   parameters:
     alias: ''
     comment: ''
     hide: none
-    label: ''
+    label: Estimator Type
     short_id: ''
-    type: ''
-    value: cyclic_prefix.get_root_raised_cosine_ramp(16, 624)
+    type: intx
+    value: '0'
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [904, 12]
+    coordinate: [704, 92.0]
     rotation: 0
     state: enabled
 
 connections:
-- [gfdm_cyclic_prefixer_cc_0, '0', preamble_vector_insert, '0']
-- [gfdm_resource_mapper_cc_0, '0', gfdm_simple_modulator_cc_0, '0']
-- [gfdm_simple_modulator_cc_0, '0', gfdm_cyclic_prefixer_cc_0, '0']
-- [pad_source_0, '0', gfdm_resource_mapper_cc_0, '0']
-- [preamble_vector_insert, '0', pad_sink_0, '0']
+- [gfdm_advanced_receiver_sb_cc_0, '0', gfdm_resource_demapper_cc_0, '0']
+- [gfdm_channel_estimator_cc_0, '0', chan, '0']
+- [gfdm_channel_estimator_cc_0, '0', gfdm_advanced_receiver_sb_cc_0, '1']
+- [gfdm_extract_burst_cc_0, '0', gfdm_remove_prefix_cc_data, '0']
+- [gfdm_extract_burst_cc_0, '0', gfdm_remove_prefix_cc_preamble, '0']
+- [gfdm_remove_prefix_cc_data, '0', gfdm_advanced_receiver_sb_cc_0, '0']
+- [gfdm_remove_prefix_cc_preamble, '0', gfdm_channel_estimator_cc_0, '0']
+- [gfdm_resource_demapper_cc_0, '0', pad_sink_out, '0']
+- [pad_source_0, '0', gfdm_extract_burst_cc_0, '0']
 
 metadata:
   file_format: 1

@@ -42,7 +42,7 @@ if(NOT gfdm_sources)
 endif(NOT gfdm_sources)
 
 add_library(gnuradio-gfdm SHARED ${gfdm_sources})
-target_link_libraries(gnuradio-gfdm gnuradio::gnuradio-runtime gnuradio-digital fftw3f::fftw3f fmt::fmt)
+target_link_libraries(gnuradio-gfdm gnuradio::gnuradio-runtime gnuradio::gnuradio-digital fftw3f::fftw3f fmt::fmt)
 target_include_directories(gnuradio-gfdm
     PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
     PUBLIC $<INSTALL_INTERFACE:include>
