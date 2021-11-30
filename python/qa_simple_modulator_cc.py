@@ -75,8 +75,8 @@ class qa_simple_modulator_cc(gr_unittest.TestCase):
         L = 4
         taps = get_frequency_domain_filter('rrc', alpha, M, K, L)
         taps /= np.sqrt(calculate_signal_energy(taps) / M)
-        data = np.array([], dtype=np.complex)
-        ref = np.array([], dtype=np.complex)
+        data = np.array([], dtype=complex)
+        ref = np.array([], dtype=complex)
         for i in range(reps):
             d = get_random_qpsk(M * K)
             D = get_data_matrix(d, K, group_by_subcarrier=False)

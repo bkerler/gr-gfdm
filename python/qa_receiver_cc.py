@@ -72,9 +72,9 @@ class qa_receiver_cc(gr_unittest.TestCase):
             use_zadoff_chu=True,
         )
 
-        data = np.array([], dtype=np.complex)
-        ref = np.array([], dtype=np.complex)
-        frames = np.array([], dtype=np.complex)
+        data = np.array([], dtype=complex)
+        ref = np.array([], dtype=complex)
+        frames = np.array([], dtype=complex)
         tags = []
         for _ in range(n_frames):
             symbols = get_random_qpsk(timeslots * active_subcarriers)

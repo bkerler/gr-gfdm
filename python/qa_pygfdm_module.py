@@ -61,4 +61,4 @@ class qa_pygfdm_module (gr_unittest.TestCase):
 
 
 if __name__ == '__mail__':
-    gr_unittest.run(qa_pygfdm_module, "qa_pygfdm_module.xml")
+    gr_unittest.run(qa_pygfdm_module)

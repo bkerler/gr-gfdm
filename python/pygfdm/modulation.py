@@ -45,9 +45,9 @@ def gfdm_modulation_matrix(filter_taps, M, K, oversampling_factor=1, group_by_su
     N = M * K
 
     filter_taps = np.roll(filter_taps, (N * oversampling_factor) // 2)
-    A = np.zeros((N * oversampling_factor, N), dtype=np.complex)
+    A = np.zeros((N * oversampling_factor, N), dtype=complex)
 
-    n = np.arange(N * oversampling_factor, dtype=np.complex)
+    n = np.arange(N * oversampling_factor, dtype=complex)
     for m in range(M):
         for k in range(K):
             f_mod = np.exp(1j * 2 * np.pi * (float(k) / (K * oversampling_factor)) * n)

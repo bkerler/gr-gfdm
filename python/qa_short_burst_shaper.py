@@ -44,7 +44,7 @@ class qa_short_burst_shaper(gr_unittest.TestCase):
         tag = gr.tag_utils.python_to_tag((0, ptkey, pmt.from_long(128), ptsrc))
 
         data = np.arange(128) + 1
-        data = data.astype(np.complex)
+        data = data.astype(complex)
 
         ref = np.concatenate((np.zeros(pre_padding, dtype=data.dtype),
                               data, np.zeros(post_padding, dtype=data.dtype)))
@@ -72,8 +72,8 @@ class qa_short_burst_shaper(gr_unittest.TestCase):
         tags = []
         burst_len = 128
         offset = 0
-        data = np.array((), dtype=np.complex)
-        ref = np.array((), dtype=np.complex)
+        data = np.array((), dtype=complex)
+        ref = np.array((), dtype=complex)
         for i in range(n_bursts):
             tag = gr.tag_utils.python_to_tag((offset, ptkey,
                                               pmt.from_long(burst_len * (i + 1)), ptsrc))
@@ -114,8 +114,8 @@ class qa_short_burst_shaper(gr_unittest.TestCase):
         tags = []
         burst_len = 128
         offset = 0
-        data = np.array((), dtype=np.complex)
-        ref = np.array((), dtype=np.complex)
+        data = np.array((), dtype=complex)
+        ref = np.array((), dtype=complex)
         for i in range(n_bursts):
             tag = gr.tag_utils.python_to_tag((offset, ptkey,
                                               pmt.from_long(burst_len * (i + 1)), ptsrc))

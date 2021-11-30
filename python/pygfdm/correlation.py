@@ -41,7 +41,7 @@ def cross_correlate_naive(s, p):
     p = np.conjugate(p)
     p_len = len(p)
     buf_len = len(s) - p_len + 1
-    cc = np.zeros(buf_len, dtype=np.complex)
+    cc = np.zeros(buf_len, dtype=complex)
     for i in range(buf_len):
         cc[i] = np.sum(s[i:i + p_len] * p)
     return cc
@@ -82,7 +82,7 @@ def cross_correlate_fft_full(s, p):
     cf = np.fft.ifft(C)
     cf = np.fft.fftshift(cf)
     cf = cf[pad_head:]
-    if s.dtype == np.float:  # in case input was float.
+    if s.dtype == float:  # in case input was float.
         cf = np.real(cf)
     return cf
 
@@ -97,7 +97,7 @@ def cross_correlate_fft_valid(s, p):
     C = S * P
     cf = np.fft.ifft(C)
     cf = cf[0:valid_res_len]
-    if s.dtype == np.float:  # in case input was float.
+    if s.dtype == float:  # in case input was float.
         cf = np.real(cf)
     return cf
 
@@ -160,7 +160,7 @@ def cross_correlate_fft_cyclic(s, p):
     C = S * P
     cf = np.fft.ifft(C)
     # cf = cf[0:valid_res_len]
-    if s.dtype == np.float:  # in case input was float.
+    if s.dtype == float:  # in case input was float.
         cf = np.real(cf)
     return cf
 

@@ -34,7 +34,7 @@ def get_pseudo_random_bytes(bmin, bmax, bnum, seed_str):
     return np.random.randint(bmin, bmax, bnum)
     
 
-def get_random_qpsk(nsamples, seed=None, dtype=np.complex):
+def get_random_qpsk(nsamples, seed=None, dtype=complex):
     if seed:
         np.random.seed(seed)
     d = np.random.randint(0, 2, 2 * nsamples) * -2. + 1.
@@ -51,7 +51,7 @@ def demodulate_qpsk(syms):
     return t.T.flatten()
 
 
-def get_random_samples(nsamples, seed=None, dtype=np.complex):
+def get_random_samples(nsamples, seed=None, dtype=complex):
     if seed:
         np.random.seed(seed)
     d = np.random.standard_normal(2 * nsamples)
@@ -113,6 +113,6 @@ def calculate_awgn_noise_variance(input_signal, snr_dB, rate=1.0):
 # corresponds to 'calculate_awgn_noise_variance.
 def get_complex_noise_vector(nsamples, noise_variance):
     if noise_variance == 0.0:
-        return np.zeros(nsamples, dtype=np.complex)
+        return np.zeros(nsamples, dtype=complex)
     return (np.sqrt(noise_variance) * np.random.randn(nsamples)) + (np.sqrt(noise_variance) * np.random.randn(nsamples) * 1j)
 

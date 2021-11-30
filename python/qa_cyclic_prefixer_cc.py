@@ -48,7 +48,7 @@ class qa_cyclic_prefixer_cc(gr_unittest.TestCase):
         print('simple_cp test')
         block_len = 48
         cp_len = 8
-        data = np.arange(block_len, dtype=np.complex) + 1
+        data = np.arange(block_len, dtype=complex) + 1
         ref = add_cyclic_prefix(data, cp_len)
 
         prefixer = gfdm.cyclic_prefixer_cc(block_len, cp_len, 0, 0,
@@ -70,7 +70,7 @@ class qa_cyclic_prefixer_cc(gr_unittest.TestCase):
         cs_len = ramp_len * 2
         window_len = get_window_len(cp_len, n_timeslots, n_subcarriers, cs_len)
         window_taps = get_raised_cosine_ramp(ramp_len, window_len)
-        data = np.arange(block_len, dtype=np.complex) + 1
+        data = np.arange(block_len, dtype=complex) + 1
         ref = add_cyclic_starfix(data, cp_len, cs_len)
         ref = pinch_block(ref, window_taps)
         data = np.tile(data, n_reps)

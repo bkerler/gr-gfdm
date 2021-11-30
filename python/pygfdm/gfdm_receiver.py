@@ -36,7 +36,7 @@ def gfdm_transform_input_to_fd(R):
     :param R: Received symbols in time domain
     :return: Received symbols in frequency domain (Apply N-length FFT)
     '''
-    return np.fft.fft(R.astype(np.complex))
+    return np.fft.fft(R.astype(complex))
 
 
 def gfdm_extract_subcarriers(R, K, M, L):
@@ -48,7 +48,7 @@ def gfdm_extract_subcarriers(R, K, M, L):
     :return: extracted subcarrier data (length M*L) row-wise in D
 
     '''
-    D = np.empty((K, M * L), np.complex)
+    D = np.empty((K, M * L), complex)
     for k in range(K):
         for l in range(L):
             start_pos = ((k + l + K - 1) % K) * M
@@ -81,7 +81,7 @@ def gfdm_superposition_subcarriers(R, K, M, L):
     :return: L times superpositioned/decimated subcarriers
 
     '''
-    S = np.zeros((K, M), np.complex)
+    S = np.zeros((K, M), complex)
     D = R.T
     for k in range(K):
         S[k] = np.sum(np.reshape(D[k], (L, -1)), axis=0)
@@ -89,7 +89,7 @@ def gfdm_superposition_subcarriers(R, K, M, L):
 
 
 def gfdm_transform_subcarriers_to_tdomain(R, K, M, L):
-    S = np.zeros((K, M), np.complex)
+    S = np.zeros((K, M), complex)
     D = R.T
     for k in range(K):
         S[k] = np.fft.ifft(D[k])
@@ -108,7 +108,7 @@ def gfdm_map_subcarriers(R, K, M, L):
 def gfdm_remove_sc_interference(R, D, K, M, L, H_sic):
     D = D.T
     R = R.T
-    R_new = np.empty((K, M), dtype=np.complex)
+    R_new = np.empty((K, M), dtype=complex)
     for k in xrange(K):
         R_new[k] = R[k] - H_sic * np.fft.fft(D[(k-1) % K] + D[(k+1) % K])
     return R_new.T

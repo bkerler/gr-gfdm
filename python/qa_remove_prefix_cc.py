@@ -55,8 +55,8 @@ class qa_simple_preamble_sync_cc(gr_unittest.TestCase):
         offset = len(preamble) + cp_len
         frame_len = len(preamble) + timeslots * subcarriers + cp_len
 
-        data = np.array([], dtype=np.complex)
-        ref = np.array([], dtype=np.complex)
+        data = np.array([], dtype=complex)
+        ref = np.array([], dtype=complex)
         tags = []
         print('frame_len: ', frame_len)
         for i in range(n_frames):

@@ -100,7 +100,7 @@ def foo(nframes=15,
 
     sigenergy = calculate_energy(core_preamble)
 
-    snrs = np.arange(3, 3 * nframes, 3, dtype=np.float)
+    snrs = np.arange(3, 3 * nframes, 3, dtype=float)
     snrs_lin = db2lin(snrs)
 
     for i, snr in enumerate(snrs):
@@ -109,8 +109,8 @@ def foo(nframes=15,
         nscale = calculate_noise_scale(
             snr_lin, sigenergy, active_ratio, core_preamble.size)
         iterations = 1000
-        snr_lin0 = np.zeros(iterations, dtype=np.float)
-        snr_lin1 = np.zeros(iterations, dtype=np.float)
+        snr_lin0 = np.zeros(iterations, dtype=float)
+        snr_lin1 = np.zeros(iterations, dtype=float)
         for i in range(iterations):
             noise = get_noise_vector(core_preamble.size, nscale)
 

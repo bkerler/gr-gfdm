@@ -39,7 +39,7 @@ def gfdm_transform_subcarriers_to_fd(D, M):
     :param M: number of symbols on a subcarrier and FFT size.
     :return: data on subcarriers in frequency domain representation. DC on 0th bin.
     '''
-    F = np.fft.fft(D.astype(np.complex), M, axis=0)
+    F = np.fft.fft(D.astype(complex), M, axis=0)
     return F
 
 
@@ -91,7 +91,7 @@ def gfdm_combine_subcarriers_in_fd(F, M, K, L, compat_mode=True):
     # FFT-shift necessary here.
     F = np.fft.fftshift(F, axes=0)
     tail_length = (L - 1) * M
-    X = np.zeros(M * K + tail_length, dtype=np.complex)
+    X = np.zeros(M * K + tail_length, dtype=complex)
     for k in range(K):
         X[k * M: k * M + L * M] += F[:, k]
     X[0: tail_length] += X[-tail_length:]
@@ -221,7 +221,7 @@ def validate_subcarrier_location(alpha, M, K, overlap, oversampling_factor):
     taps = gfdm_filter_taps('rrc', alpha, M, K, oversampling_factor)
     A0 = gfdm_modulation_matrix(taps, M, K, oversampling_factor, group_by_subcarrier=goofy_ordering)
 
-    n = np.arange(M * K * oversampling_factor, dtype=np.complex)
+    n = np.arange(M * K * oversampling_factor, dtype=complex)
     for k in range(K):
         f = np.exp(1j * 2 * np.pi * (float(k) / (K * oversampling_factor)) * n)
         F = abs(np.fft.fft(f))
@@ -244,7 +244,7 @@ def compare_subcarrier_location(alpha, M, K, overlap, oversampling_factor):
     goofy_ordering = False
     taps = gfdm_filter_taps('rrc', alpha, M, K, oversampling_factor)
     A0 = gfdm_modulation_matrix(taps, M, K, oversampling_factor, group_by_subcarrier=goofy_ordering)
-    n = np.arange(M * K * oversampling_factor, dtype=np.complex)
+    n = np.arange(M * K * oversampling_factor, dtype=complex)
     colors = iter(cm.rainbow(np.linspace(0, 1, K)))
 
     for k in range(K):
@@ -281,9 +281,9 @@ def compare_subcarrier_combination():
 
     X0 = np.real(gfdm_combine_subcarriers_in_fd(F, M, K, overlap))
     print(X0)
-    X = np.zeros(M * K, dtype=np.complex)
+    X = np.zeros(M * K, dtype=complex)
     for k in range(K):
-        s = np.zeros(M * K, dtype=np.complex)
+        s = np.zeros(M * K, dtype=complex)
         s[0:M * overlap] = F[:, k]
         s = np.roll(s, k * M - M / 2)
         X += s

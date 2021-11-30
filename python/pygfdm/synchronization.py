@@ -132,7 +132,7 @@ def get_gfdm_frame(data, alpha, M, K, L, cp_len, ramp_len):
 def auto_correlate_signal(signal, K):
     plen = K * 2
     slen = len(signal)
-    ac = np.zeros(slen - plen, dtype=np.complex)
+    ac = np.zeros(slen - plen, dtype=complex)
 
     for i in range(slen - plen):
         # calc auto-correlation

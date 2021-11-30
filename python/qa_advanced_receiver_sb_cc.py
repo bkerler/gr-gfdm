@@ -51,8 +51,8 @@ class qa_advanced_receiver_sb_cc(gr_unittest.TestCase):
         K = 16
         L = 2
         taps = filters.get_frequency_domain_filter('rrc', alpha, M, K, L)
-        data = np.array([], dtype=np.complex)
-        ref = np.array([], dtype=np.complex)
+        data = np.array([], dtype=complex)
+        ref = np.array([], dtype=complex)
         for _11 in range(reps):
             d = utils.get_random_qpsk(M * K)
             ref = np.append(ref, gfdm_demodulate_block(d, taps, K, M, L))
@@ -62,7 +62,7 @@ class qa_advanced_receiver_sb_cc(gr_unittest.TestCase):
         # print "MAXIMUM ref value: ", np.max(abs(ref))
 
         src = blocks.vector_source_c(data)
-        est_data = np.ones(len(data), dtype=np.complex)
+        est_data = np.ones(len(data), dtype=complex)
         est_src = blocks.vector_source_c(est_data)
         gfdm_constellation = digital.constellation_qpsk().base()
         mod = gfdm.advanced_receiver_sb_cc(M, K, L, 0,
@@ -177,5 +177,4 @@ class qa_advanced_receiver_sb_cc(gr_unittest.TestCase):
 
 
 if __name__ == '__main__':
-    # gr_unittest.run(qa_advanced_receiver_sb_cc, "qa_advanced_receiver_sb_cc.xml")
     gr_unittest.run(qa_advanced_receiver_sb_cc)

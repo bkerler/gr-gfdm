@@ -40,7 +40,7 @@ class qa_extract_burst_cc(gr_unittest.TestCase):
         tag_key = "energy_start"
 
         data = np.arange(burst_len)
-        ref = np.array([], dtype=np.complex)
+        ref = np.array([], dtype=complex)
         tags = []
         for i in range(n_frames):
             frame = np.ones(burst_len) * (i + 1)

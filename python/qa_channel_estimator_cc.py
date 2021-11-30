@@ -101,7 +101,7 @@ class qa_channel_estimator_cc(gr_unittest.TestCase):
                                     subcarrier_map, overlap, cp_len, ramp_len)
         full_preamble = preambles[0]
         core_preamble = preambles[1]
-        h = np.array([1., .5, .1j, .1+.05j], dtype=np.complex)
+        h = np.array([1., .5, .1j, .1+.05j], dtype=complex)
         data = np.convolve(full_preamble, h, 'full')[0:full_preamble.size]
         data = data[cp_len:-ramp_len]
         self.assertEqual(data.size, core_preamble.size)
@@ -145,7 +145,7 @@ class qa_channel_estimator_cc(gr_unittest.TestCase):
         sigenergy = calculate_energy(core_preamble)
 
         data = np.copy(core_preamble)
-        snrs = np.arange(3, 3 * nframes, 3, dtype=np.float)
+        snrs = np.arange(3, 3 * nframes, 3, dtype=float)
         snrs_lin = 10. ** (snrs / 10.)
         expected_snrs_lin = np.concatenate(((np.inf,), snrs_lin))
 

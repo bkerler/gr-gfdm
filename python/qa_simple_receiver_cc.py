@@ -63,8 +63,8 @@ class qa_simple_receiver_cc(gr_unittest.TestCase):
         K = 16
         L = 2
         taps = get_frequency_domain_filter('rrc', alpha, M, K, L)
-        data = np.array([], dtype=np.complex)
-        ref = np.array([], dtype=np.complex)
+        data = np.array([], dtype=complex)
+        ref = np.array([], dtype=complex)
         for i in range(reps):
             d = get_random_qpsk(M * K)
             ref = np.append(ref, gfdm_demodulate_block(d, taps, K, M, L))

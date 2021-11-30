@@ -59,8 +59,8 @@ class qa_transmitter_chain_cc(gr_unittest.TestCase):
         preamble = get_sync_symbol(pn_symbols, H_preamble, K, L, cp_len, ramp_len)[0]
         smap = get_subcarrier_map(K, active, dc_free=True)
 
-        ref = np.array([], dtype=np.complex)
-        data = np.array([], dtype=np.complex)
+        ref = np.array([], dtype=complex)
+        data = np.array([], dtype=complex)
         frame_len = window_len + len(preamble)
         frame_gap = np.zeros(frame_len)
         for i in range(n_frames):
@@ -96,8 +96,8 @@ class qa_transmitter_chain_cc(gr_unittest.TestCase):
     #     K = 16
     #     L = 4
     #     taps = get_frequency_domain_filter('rrc', alpha, M, K, L)
-    #     data = np.array([], dtype=np.complex)
-    #     ref = np.array([], dtype=np.complex)
+    #     data = np.array([], dtype=complex)
+    #     ref = np.array([], dtype=complex)
     #     for i in range(reps):
     #         d = get_random_qpsk(M * K)
     #         D = get_data_matrix(d, K, group_by_subcarrier=False)
@@ -123,5 +123,4 @@ class qa_transmitter_chain_cc(gr_unittest.TestCase):
 
 
 if __name__ == '__main__':
-    # gr_unittest.run(qa_simple_modulator_cc, "qa_simple_modulator_cc.xml")
     gr_unittest.run(qa_transmitter_chain_cc)

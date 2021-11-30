@@ -67,7 +67,7 @@ class BindingTests(gr_unittest.TestCase):
         timeslots = 15
         subcarriers = 32
         active_subcarriers = 24
-        subcarrier_map = np.arange(4, 28, dtype=np.int)
+        subcarrier_map = np.arange(4, 28, dtype=int)
         mapper = Resource_mapper(timeslots, subcarriers,
                                  active_subcarriers,
                                  subcarrier_map,
@@ -91,7 +91,7 @@ class BindingTests(gr_unittest.TestCase):
         timeslots = 15
         subcarriers = 32
         active_subcarriers = 24
-        subcarrier_map = np.arange(4, 28, dtype=np.int)
+        subcarrier_map = np.arange(4, 28, dtype=int)
         mapper = Resource_mapper(timeslots, subcarriers,
                                  active_subcarriers,
                                  subcarrier_map,
@@ -118,7 +118,7 @@ class BindingTests(gr_unittest.TestCase):
         subcarrier_map = get_subcarrier_map(subcarriers,
                                             active_subcarriers,
                                             True)
-        # subcarrier_map = np.arange(4, 28, dtype=np.int)
+        # subcarrier_map = np.arange(4, 28, dtype=int)
         mapper = Resource_mapper(timeslots, subcarriers,
                                  active_subcarriers,
                                  subcarrier_map,
@@ -143,7 +143,7 @@ class BindingTests(gr_unittest.TestCase):
         timeslots = 15
         subcarriers = 32
         active_subcarriers = 24
-        subcarrier_map = np.arange(4, 28, dtype=np.int)
+        subcarrier_map = np.arange(4, 28, dtype=int)
         mapper = Resource_mapper(timeslots, subcarriers,
                                  active_subcarriers,
                                  subcarrier_map,
@@ -183,7 +183,7 @@ class PrefixerTests(gr_unittest.TestCase):
         window_len = get_window_len(cp_len, timeslots, subcarriers,
                                     cs_len)
         window_taps = get_raised_cosine_ramp(ramp_len, window_len)
-        data = np.arange(block_len, dtype=np.complex) + 1
+        data = np.arange(block_len, dtype=complex) + 1
         ref = add_cyclic_starfix(data, cp_len, cs_len)
         ref = pinch_block(ref, window_taps)
         ref = ref.astype(np.complex64)
@@ -206,7 +206,7 @@ class PrefixerTests(gr_unittest.TestCase):
         window_len = get_window_len(cp_len, timeslots, subcarriers,
                                     cs_len)
         window_taps = get_raised_cosine_ramp(ramp_len, window_len)
-        data = np.arange(block_len, dtype=np.complex) + 1
+        data = np.arange(block_len, dtype=complex) + 1
         ref = add_cyclic_starfix(data, cp_len, cs_len)
         ref = np.concatenate(
             (data[-(cp_len + cyclic_shift):], data, data[0:cs_len - cyclic_shift]))
@@ -465,7 +465,7 @@ class EstimatorTests(gr_unittest.TestCase):
                                     subcarrier_map, overlap, cp_len, ramp_len)
         full_preamble = preambles[0]
         core_preamble = preambles[1]
-        h = np.array([1., .5, .1j, .1+.05j], dtype=np.complex)
+        h = np.array([1., .5, .1j, .1+.05j], dtype=complex)
         data = np.convolve(full_preamble, h, 'full')[0:full_preamble.size]
         data = data[cp_len:-ramp_len]
         self.assertEqual(data.size, core_preamble.size)

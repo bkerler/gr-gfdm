@@ -85,5 +85,4 @@ class qa_resource_mapper_cc(gr_unittest.TestCase):
 
 
 if __name__ == '__main__':
-    # gr_unittest.run(qa_resource_mapper_cc, "qa_resource_mapper_cc.xml")
     gr_unittest.run(qa_resource_mapper_cc)

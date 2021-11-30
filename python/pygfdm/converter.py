@@ -43,8 +43,8 @@ def convert_to_sc16(signal):
 
 
 def convert_from_sc16(signal):
-    i = signal[0::2].astype(np.float)
-    q = signal[1::2].astype(np.float)
+    i = signal[0::2].astype(float)
+    q = signal[1::2].astype(float)
     return i + 1j * q
 
 

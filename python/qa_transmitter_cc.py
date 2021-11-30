@@ -98,8 +98,8 @@ class qa_transmitter_cc (gr_unittest.TestCase):
 
         frame_size = preambles[0].size + cp_len + timeslots * subcarriers + cs_len
 
-        ref = np.array([], dtype=np.complex)
-        data = np.array([], dtype=np.complex)
+        ref = np.array([], dtype=complex)
+        data = np.array([], dtype=complex)
 
         for i in range(n_frames):
             d = get_random_qpsk(active_subcarriers * timeslots)
@@ -148,8 +148,8 @@ class qa_transmitter_cc (gr_unittest.TestCase):
 
         frame_size = preambles[0].size + cp_len + timeslots * subcarriers + cs_len
 
-        ref = [np.array([], dtype=np.complex) for _ in cyclic_shifts]
-        data = np.array([], dtype=np.complex)
+        ref = [np.array([], dtype=complex) for _ in cyclic_shifts]
+        data = np.array([], dtype=complex)
 
         for i in range(n_frames):
             d = get_random_qpsk(active_subcarriers * timeslots)
