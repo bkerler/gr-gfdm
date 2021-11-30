@@ -59,7 +59,11 @@ Requirements
   - Commpy (`pip3 install scikit-commpy`)
   - Matplotlib
 
-
+- Conda
+  - pyind11
+  - fmt
+If you want to install gr-gfdm within a Conda installed GNU Radio, these packages need to be installed.
+`conda install -c conda-forge pybind11 fmt`.
 
 Build/Install instructions
 ------------------------------------
