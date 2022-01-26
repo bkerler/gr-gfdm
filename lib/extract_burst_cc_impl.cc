@@ -97,6 +97,16 @@ std::string cd_to_string(const gr_complexd value)
     return fmt::format("{}{:+}i", value.real(), value.imag());
 }
 
+double convert_freq2phase(const double freq, const double samp_rate)
+{
+    return 2.0f * M_PI * freq / samp_rate;
+}
+
+double convert_phase2freq(const double phase, const double samp_rate)
+{
+    return phase * samp_rate / (2.0f * M_PI);
+}
+
 gr_complex extract_burst_cc_impl::get_phase_rotation(const pmt::pmt_t& info) const
 {
     const auto phase_rotation = pmt::to_complex(pmt::dict_ref(

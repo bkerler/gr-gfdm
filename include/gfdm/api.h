@@ -36,7 +36,7 @@
  * https://github.com/fmtlib/fmt/issues/1467#issuecomment-563287076
  *
  * So: welcome to this niche!
- * 
+ *
  * This is getting better... it is broken as of fmtlib 8.x ...
  */
 
