@@ -89,12 +89,12 @@ float extract_burst_cc_impl::get_scale_factor(const pmt::pmt_t& info) const
 
 std::string cf_to_string(const gr_complex value)
 {
-    return fmt::format("{}{:+}i", value.real(), value.imag());
+    return fmt::format("{:.6f}{:+.6f}j", value.real(), value.imag());
 }
 
 std::string cd_to_string(const gr_complexd value)
 {
-    return fmt::format("{}{:+}i", value.real(), value.imag());
+    return fmt::format("{:.6f}{:+.6f}j", value.real(), value.imag());
 }
 
 double convert_freq2phase(const double freq, const double samp_rate)
@@ -114,12 +114,19 @@ gr_complex extract_burst_cc_impl::get_phase_rotation(const pmt::pmt_t& info) con
     const auto scale = 1.0 / std::abs(phase_rotation);
     const auto value =
         gr_complex(scale * phase_rotation.real(), -1.0f * scale * phase_rotation.imag());
-    fmt::print("key={}, value={}, scale={}, return={}\n",
+    const auto phase = std::arg(phase_rotation);
+    const auto freq = convert_phase2freq(phase, 30.72e6);
+    fmt::print("key={}, value={}, phase={:.5e}, freq={:.3f}Hz\n",
                pmt::write_string(d_phase_rotation_key),
                cd_to_string(phase_rotation),
-               scale,
-               cd_to_string(value));
-    return value;
+               phase,
+               freq);
+    if (std::abs(phase) > 1.0e-4) {
+
+        return value;
+    } else {
+        return gr_complex(1.0f, 0.0f);
+    }
 }
 
 void extract_burst_cc_impl::normalize_power_level(gr_complex* p_out,
