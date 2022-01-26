@@ -25,11 +25,10 @@ def get_padding_configuration(frame_len):
         padded_frame_len *= 2
     padded_len = padded_frame_len - frame_len
     pre_padding_len = 256
-    post_padding_len = 128
+    post_padding_len = 64
     while pre_padding_len + post_padding_len < padded_len:
         pre_padding_len += 128
-        post_padding_len += 128
-    post_padding_len -= pre_padding_len + post_padding_len - padded_len
+    pre_padding_len -= pre_padding_len + post_padding_len - padded_len
     return pre_padding_len, post_padding_len
 
 

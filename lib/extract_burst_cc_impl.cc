@@ -87,13 +87,29 @@ float extract_burst_cc_impl::get_scale_factor(const pmt::pmt_t& info) const
     return scale_factor;
 }
 
+std::string cf_to_string(const gr_complex value)
+{
+    return fmt::format("{}{:+}i", value.real(), value.imag());
+}
+
+std::string cd_to_string(const gr_complexd value)
+{
+    return fmt::format("{}{:+}i", value.real(), value.imag());
+}
+
 gr_complex extract_burst_cc_impl::get_phase_rotation(const pmt::pmt_t& info) const
 {
     const auto phase_rotation = pmt::to_complex(pmt::dict_ref(
         info, d_phase_rotation_key, pmt::from_complex(gr_complex(1.0f, 0.0f))));
     const auto scale = 1.0 / std::abs(phase_rotation);
-    return gr_complex(scale * phase_rotation.real(),
-                      -1.0f * scale * phase_rotation.imag());
+    const auto value =
+        gr_complex(scale * phase_rotation.real(), -1.0f * scale * phase_rotation.imag());
+    fmt::print("key={}, value={}, scale={}, return={}\n",
+               pmt::write_string(d_phase_rotation_key),
+               cd_to_string(phase_rotation),
+               scale,
+               cd_to_string(value));
+    return value;
 }
 
 void extract_burst_cc_impl::normalize_power_level(gr_complex* p_out,
