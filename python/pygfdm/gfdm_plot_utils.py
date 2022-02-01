@@ -27,30 +27,35 @@ from matplotlib import cm
 
 
 def plot_gfdm_matrix(A):
-    '''
+    """
     Use this function for a 3D absolute value plot of the GFDM modulation matrix.
     Maybe helpful for debugging or for educational purposes.
     :param A: GFDM modulation matrix
     :return: None
-    '''
+    """
     (Nx, Ny) = np.shape(A)
 
-    ax = plt.figure().gca(projection='3d')
+    ax = plt.figure().gca(projection="3d")
     X = np.arange(Nx)
     Y = np.arange(Ny)
     X, Y = np.meshgrid(X, Y)
     Z = A
 
-    ax.plot_trisurf(X.flatten(), Y.flatten(), np.abs(Z).flatten(),  # rstride=1, cstride=1,
-                    cmap=cm.viridis,
-                    linewidth=0, antialiased=True)
+    ax.plot_trisurf(
+        X.flatten(),
+        Y.flatten(),
+        np.abs(Z).flatten(),  # rstride=1, cstride=1,
+        cmap=cm.viridis,
+        linewidth=0,
+        antialiased=True,
+    )
 
     ax.set_zlim(0.0, 1.0)
     ax.zaxis.set_major_locator(ticker.LinearLocator(10))
-    ax.zaxis.set_major_formatter(ticker.FormatStrFormatter('%.02f'))
-    ax.set_xlabel('MxN samples')
-    ax.set_ylabel('MxK samples')
-    ax.set_zlabel('abs(A)')
+    ax.zaxis.set_major_formatter(ticker.FormatStrFormatter("%.02f"))
+    ax.set_xlabel("MxN samples")
+    ax.set_ylabel("MxK samples")
+    ax.set_zlabel("abs(A)")
     plt.tight_layout()
     # plt.savefig('gfdm_matrix.png')
     # plt.show()
@@ -58,7 +63,7 @@ def plot_gfdm_matrix(A):
 
 def plot_complex(data, lc):
     plt.plot(np.real(data), lc)
-    plt.plot(np.imag(data), lc + '--')
+    plt.plot(np.imag(data), lc + "--")
 
 
 def plotFFT(x):
@@ -72,10 +77,10 @@ def plotFFT(x):
 
 def plotTransmitMatrix(A):
     fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
+    ax = fig.add_subplot(111, projection="3d")
     x, y = np.meshgrid(np.arange(A.shape[-1]), np.arange(A.shape[-2]))
     ax.plot_wireframe(x, y, np.abs(A), cstride=1, rstride=1)
-    #ax.plot_surface(x, y, np.abs(A), rstride=1, cstride=1, cmap=cm.Greys, linewidth=0, antialiased=False)
+    # ax.plot_surface(x, y, np.abs(A), rstride=1, cstride=1, cmap=cm.Greys, linewidth=0, antialiased=False)
     fig.show()
 
 
@@ -99,62 +104,79 @@ def compareRx(*args):
     fig.show()
 
 
-def plotScatter(ax,x):
-    ax.scatter(x.real,x.imag)
+def plotScatter(ax, x):
+    ax.scatter(x.real, x.imag)
 
 
 def plotBER(x):
-    '''
+    """
     nested dict - structure (see testsuite.py)
-    '''
+    """
     fig = plt.figure()
     ax = fig.add_subplot(111)
     for m in x:
         for k in x[m]:
             for qam in x[m][k]:
-                ax.plot(x[m][k][qam][0],x[m][k][qam][1], label="M:{},K:{},QAM:{}".format(m,k,qam))
-    ax.legend(bbox_to_anchor=(0.95, 1), loc=2, borderaxespad=0.)
+                ax.plot(
+                    x[m][k][qam][0],
+                    x[m][k][qam][1],
+                    label="M:{},K:{},QAM:{}".format(m, k, qam),
+                )
+    ax.legend(bbox_to_anchor=(0.95, 1), loc=2, borderaxespad=0.0)
     fig.show()
 
 
-def plot_sc_int(x,k_range,m_range,qam_range,j):
+def plot_sc_int(x, k_range, m_range, qam_range, j):
     fig = plt.figure()
     ax = fig.add_subplot(111)
     for k in k_range:
         for m in m_range:
             for qam in qam_range:
-                ax.plot([x[k][m][qam][j_it] for j_it in xrange(j)], label="K:{}, M:{},\n QAM:{}".format(k,m,qam))
-    ax.legend(bbox_to_anchor=(0.95,1), loc=2, borderaxespad=0.)
+                ax.plot(
+                    [x[k][m][qam][j_it] for j_it in xrange(j)],
+                    label="K:{}, M:{},\n QAM:{}".format(k, m, qam),
+                )
+    ax.legend(bbox_to_anchor=(0.95, 1), loc=2, borderaxespad=0.0)
     fig.show()
 
 
-def plot_waterfall(symbols, fft_len, overlap=-1, cmap=plt.get_cmap('gnuplot2'), fftshift=True):
+def plot_waterfall(
+    symbols, fft_len, overlap=-1, cmap=plt.get_cmap("gnuplot2"), fftshift=True
+):
     if overlap < 0:
         overlap = fft_len / 4
-    Pxx, freqs, bins, im = plt.specgram(symbols, NFFT=fft_len, Fs=fft_len, noverlap=overlap)
+    Pxx, freqs, bins, im = plt.specgram(
+        symbols, NFFT=fft_len, Fs=fft_len, noverlap=overlap
+    )
 
     if fftshift:
         Pxx = np.fft.fftshift(Pxx, axes=0)
     plt.imshow(10 * np.log10(Pxx.T), cmap=cmap)
-    plt.xlabel('FFT bins')
-    plt.ylabel('time slots')
+    plt.xlabel("FFT bins")
+    plt.ylabel("time slots")
 
 
-def plot_magnitude_phase(f, frequency_taps, ext_label=''):
+def plot_magnitude_phase(f, frequency_taps, ext_label=""):
     ax = plt.gca()
-    p, = ax.plot(f, np.abs(frequency_taps), label='magnitude' + ext_label)
-    ax.plot(f, np.angle(frequency_taps), label='phase' + ext_label, linestyle='--', color=p.get_color())
+    (p,) = ax.plot(f, np.abs(frequency_taps), label="magnitude" + ext_label)
+    ax.plot(
+        f,
+        np.angle(frequency_taps),
+        label="phase" + ext_label,
+        linestyle="--",
+        color=p.get_color(),
+    )
 
 
 def get_default_colormap():
     # viridis is desired but not always available
     maps = get_available_colormaps()
-    if 'viridis' in maps:
-        return 'viridis'
-    elif 'jet' in maps:
-        return 'jet'
+    if "viridis" in maps:
+        return "viridis"
+    elif "jet" in maps:
+        return "jet"
     else:
-        return 'gnuplot2'
+        return "gnuplot2"
 
 
 def get_available_colormaps():
