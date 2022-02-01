@@ -42,14 +42,20 @@ class qa_modulator_cc(gr_unittest.TestCase):
         filter_alpha = 0.35
         tag_key = "frame_len"
         fft_length = nsubcarrier * ntimeslots
-        taps = get_frequency_domain_filter('rrc', filter_alpha, ntimeslots, nsubcarrier, 2)
+        taps = get_frequency_domain_filter(
+            "rrc", filter_alpha, ntimeslots, nsubcarrier, 2
+        )
 
         data = get_random_qpsk(nsubcarrier * ntimeslots)
         D = get_data_matrix(data, nsubcarrier, group_by_subcarrier=False)
         print(D)
 
-        md = gfdms.modulator_cc(nsubcarrier, ntimeslots, filter_alpha, fft_length, 1, tag_key)
-        tagger = blocks.stream_to_tagged_stream(gr.sizeof_gr_complex, 1, fft_length, tag_key)
+        md = gfdms.modulator_cc(
+            nsubcarrier, ntimeslots, filter_alpha, fft_length, 1, tag_key
+        )
+        tagger = blocks.stream_to_tagged_stream(
+            gr.sizeof_gr_complex, 1, fft_length, tag_key
+        )
         src = blocks.vector_source_c(data)
         dst = blocks.vector_sink_c()
         self.tb.connect(src, tagger, md, dst)
@@ -58,10 +64,10 @@ class qa_modulator_cc(gr_unittest.TestCase):
         res = np.array(dst.data())
         print(res)
         ref = gfdm_modulate_block(D, taps, ntimeslots, nsubcarrier, 2, True)
-        print (ref)
+        print(ref)
 
         self.assertComplexTuplesAlmostEqual(ref, res, 2)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     gr_unittest.run(qa_modulator_cc)

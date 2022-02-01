@@ -35,20 +35,11 @@ def test_transceiver_legacy_00():
 
     tests = 100
     for t in xrange(tests):
-        d = get_random_qpsk(M*K)
-        tx = gfdm_gr_modulator(d, 'rrc', alpha, M, K, overlap)
-        rx = gfdm_rx_fft2(
-            tx,
-            'rrc',
-            alpha,
-            M,
-            K,
-            overlap,
-            oversampling_factor,
-            4,
-            16)
-        if not (np.max(np.abs(d-rx)) < 1e-2):
-            raise RuntimeError('Input and Output deviate')
+        d = get_random_qpsk(M * K)
+        tx = gfdm_gr_modulator(d, "rrc", alpha, M, K, overlap)
+        rx = gfdm_rx_fft2(tx, "rrc", alpha, M, K, overlap, oversampling_factor, 4, 16)
+        if not (np.max(np.abs(d - rx)) < 1e-2):
+            raise RuntimeError("Input and Output deviate")
 
 
 def test_transceiver_legacy_01():
@@ -60,34 +51,27 @@ def test_transceiver_legacy_01():
 
     tests = 100
     for t in xrange(tests):
-        d = get_random_qpsk(M*K)
-        tx = gfdm_gr_modulator(
-            d, 'rrc', alpha, M, K, overlap, compat_mode=False)
-        rx = gfdm_rx_fft2(
-            tx,
-            'rrc',
-            alpha,
-            M,
-            K,
-            overlap,
-            oversampling_factor,
-            4,
-            16)
-        if not (np.max(np.abs(d-rx)) < 1e-2):
-            raise RuntimeError('Input and Output deviate')
+        d = get_random_qpsk(M * K)
+        tx = gfdm_gr_modulator(d, "rrc", alpha, M, K, overlap, compat_mode=False)
+        rx = gfdm_rx_fft2(tx, "rrc", alpha, M, K, overlap, oversampling_factor, 4, 16)
+        if not (np.max(np.abs(d - rx)) < 1e-2):
+            raise RuntimeError("Input and Output deviate")
 
 
 def test_transceiver_00():
     import matplotlib.pyplot as plt
+
     K = 32
     M = 8
     overlap = 2
     alpha = 0.5
-    d = get_random_qpsk(M*K)
-    tx = gfdm_gr_modulator(d, 'rrc', alpha, M, K, overlap,
-                           compat_mode=False)/(float(K))
-    rx = gfdm_gr_receiver(tx, 'rrc', alpha, M, K, overlap,
-                          compat_mode=False)/(float(K))
+    d = get_random_qpsk(M * K)
+    tx = gfdm_gr_modulator(d, "rrc", alpha, M, K, overlap, compat_mode=False) / (
+        float(K)
+    )
+    rx = gfdm_gr_receiver(tx, "rrc", alpha, M, K, overlap, compat_mode=False) / (
+        float(K)
+    )
     plt.plot(d)
     plt.plot(rx)
     plt.show()
@@ -95,17 +79,20 @@ def test_transceiver_00():
 
 def test_transceiver_01():
     import matplotlib.pyplot as plt
+
     K = 32
     M = 8
     overlap = 3
     alpha = 0.5
-    d = get_random_qpsk(M*K)
-    tx = gfdm_gr_modulator(d, 'rrc', alpha, M, K, overlap,
-                           compat_mode=False)/(float(K))
+    d = get_random_qpsk(M * K)
+    tx = gfdm_gr_modulator(d, "rrc", alpha, M, K, overlap, compat_mode=False) / (
+        float(K)
+    )
     plt.plot(np.real(tx))
     plt.show()
-    rx = gfdm_gr_receiver(tx, 'rrc', alpha, M, K, overlap,
-                          compat_mode=False)/(float(K))
+    rx = gfdm_gr_receiver(tx, "rrc", alpha, M, K, overlap, compat_mode=False) / (
+        float(K)
+    )
     plt.plot(d)
     plt.plot(rx)
     plt.show()

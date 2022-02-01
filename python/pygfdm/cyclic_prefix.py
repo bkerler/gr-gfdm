@@ -19,14 +19,14 @@
 # Boston, MA 02110-1301, USA.
 #
 
-'''
+"""
 This file holds functions necessary for cyclic prefix/suffix insertion. Also, it provides tools for block pinching.
 
 [0] Generalized Frequency Division Multiplexing for 5th Generation Cellular Networks
 [1] https://en.wikipedia.org/wiki/Raised-cosine_filter
 [2] https://en.wikipedia.org/wiki/Root-raised-cosine_filter
 [3] A Survey on Multicarrier Communications: Prototype Filters, Lattice Structures and Implementation Aspects
-'''
+"""
 
 import numpy as np
 import scipy.signal as signal
@@ -44,12 +44,12 @@ def window_ramp(ramp_len, window_len):
     if ramp_len < 1:
         r = np.array([])
     else:
-        r = np.arange(0, 1, 1. / ramp_len)
-    return np.concatenate((1. - r, np.zeros(window_len - 2 * ramp_len), r))
+        r = np.arange(0, 1, 1.0 / ramp_len)
+    return np.concatenate((1.0 - r, np.zeros(window_len - 2 * ramp_len), r))
 
 
 def calculate_raised_cosine(r):
-    return .5 * (1. + np.cos(np.pi * r))
+    return 0.5 * (1.0 + np.cos(np.pi * r))
 
 
 def get_raised_cosine_ramp(ramp_len, window_len):
@@ -92,22 +92,25 @@ def pinch_cp_add_block(data, timeslots, subcarriers, cp_len, ramp_len):
 
 def plot_window_ramps():
     import matplotlib.pyplot as plt
+
     n_subcarriers = 16
     n_timeslots = 15
-    cp_len = n_subcarriers # / 2
-    ramp_len = cp_len #/ 2
+    cp_len = n_subcarriers  # / 2
+    ramp_len = cp_len  # / 2
     window_len = get_window_len(cp_len, n_timeslots, n_subcarriers)
 
     d = window_ramp(ramp_len, window_len)
-    plt.plot(d, label='window ramp')
+    plt.plot(d, label="window ramp")
     df = fourth_order_polynomial(d)
-    plt.plot(df, label='fourth order ramp')
+    plt.plot(df, label="fourth order ramp")
     d = get_raised_cosine_ramp(ramp_len, window_len)
-    plt.plot(d, label='RC ramp')
-    plt.plot(get_fourth_order_raised_cosine_ramp(ramp_len, window_len), label='4th RC ramp')
-    plt.plot(get_root_raised_cosine_ramp(ramp_len, window_len), label='RRC ramp')
+    plt.plot(d, label="RC ramp")
+    plt.plot(
+        get_fourth_order_raised_cosine_ramp(ramp_len, window_len), label="4th RC ramp"
+    )
+    plt.plot(get_root_raised_cosine_ramp(ramp_len, window_len), label="RRC ramp")
 
-    plt.plot(np.arange(-1, 2), np.ones(3) * .5)
+    plt.plot(np.arange(-1, 2), np.ones(3) * 0.5)
     plt.grid()
     plt.legend()
     plt.show()
@@ -117,5 +120,5 @@ def main():
     plot_window_ramps()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

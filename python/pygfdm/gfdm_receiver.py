@@ -22,50 +22,55 @@
 import numpy as np
 from .modulation import gfdm_modulation_matrix
 from .mapping import get_data_stream
-from .filters import get_frequency_domain_filter, gfdm_freq_taps, gfdm_filter_taps, gfdm_freq_taps_sparse
+from .filters import (
+    get_frequency_domain_filter,
+    gfdm_freq_taps,
+    gfdm_filter_taps,
+    gfdm_freq_taps_sparse,
+)
 from .gfdm_modulation import get_random_GFDM_block
 from .utils import get_random_qpsk, calculate_average_signal_energy, map_qpsk_stream
 
-'''
+"""
 [0] Low Complexity GFDM Receiver Based On Sparse Frequency Domain Processing
-'''
+"""
 
 
 def gfdm_transform_input_to_fd(R):
-    '''
+    """
     :param R: Received symbols in time domain
     :return: Received symbols in frequency domain (Apply N-length FFT)
-    '''
+    """
     return np.fft.fft(R.astype(complex))
 
 
 def gfdm_extract_subcarriers(R, K, M, L):
-    '''
+    """
     :param R: Received symbols in frequency domain (DC on 0th bin)
     :param K: number of subcarriers
     :param M: number of symbols per subcarrier
     :param L: overlapping factor
     :return: extracted subcarrier data (length M*L) row-wise in D
 
-    '''
+    """
     D = np.empty((K, M * L), complex)
     for k in range(K):
         for l in range(L):
             start_pos = ((k + l + K - 1) % K) * M
             copy_pos = ((l + L // 2) % L) * M
-            D[k][copy_pos:copy_pos + M] = R[start_pos:start_pos + M]
+            D[k][copy_pos : copy_pos + M] = R[start_pos : start_pos + M]
     return D
 
 
 def gfdm_filter_subcarriers(R, H, K, M, L):
-    '''
+    """
     :param R: data matrix with row-wise subcarrier data
     :param H: filter taps in frequency domain (length M*L) (DC on 0th bin)
     :param K: number of subcarriers
     :param M: number of symbols per subcarrier
     :param L: overlapping factor
     :return: filtered subcarriers in fd
-    '''
+    """
     # H = H / float(K)
     D = R.flatten()
     F = D * np.tile(H, K)
@@ -73,14 +78,14 @@ def gfdm_filter_subcarriers(R, H, K, M, L):
 
 
 def gfdm_superposition_subcarriers(R, K, M, L):
-    '''
+    """
     :param R: filtered subcarriers in fd
     :param K: number of subcarriers
     :param M: number of symbols per subcarrier
     :param L: overlapping factor
     :return: L times superpositioned/decimated subcarriers
 
-    '''
+    """
     S = np.zeros((K, M), complex)
     D = R.T
     for k in range(K):
@@ -110,7 +115,7 @@ def gfdm_remove_sc_interference(R, D, K, M, L, H_sic):
     R = R.T
     R_new = np.empty((K, M), dtype=complex)
     for k in xrange(K):
-        R_new[k] = R[k] - H_sic * np.fft.fft(D[(k-1) % K] + D[(k+1) % K])
+        R_new[k] = R[k] - H_sic * np.fft.fft(D[(k - 1) % K] + D[(k + 1) % K])
     return R_new.T
 
 
@@ -131,7 +136,7 @@ def gfdm_demodulate_block_sic(R, H, K, M, L, J=0):
     D_3 = gfdm_superposition_subcarriers(D_2, K, M, L)
     D_4 = gfdm_transform_subcarriers_to_tdomain(D_3, K, M, L)
     for j in range(J):
-        print('IC iter', j)
+        print("IC iter", j)
         D_5 = gfdm_map_subcarriers(D_4, K, M, L)
         D_6 = gfdm_remove_sc_interference(D_3, D_5, K, M, L, H_sic)
         D_4 = gfdm_transform_subcarriers_to_tdomain(D_6, K, M, L)
@@ -144,14 +149,14 @@ def gfdm_gr_receiver(data, filtertype, alpha, M, K, overlap, compat_mode=True):
 
 
 def gfdm_demodulate_fft(data, alpha, M, K, overlap, sic_rounds=0):
-    H = get_frequency_domain_filter('rrc', alpha, M, K, overlap)
+    H = get_frequency_domain_filter("rrc", alpha, M, K, overlap)
     return gfdm_demodulate_block_sic(data, H.conj(), K, M, overlap, sic_rounds)
 
 
 def get_repetition_matrix(timeslots, overlap):
-    '''
+    """
     [0] has a good representation of the matrices.
-    '''
+    """
     im = np.identity(timeslots)
     r = np.tile(im, overlap)
     r = r.T
@@ -160,7 +165,9 @@ def get_repetition_matrix(timeslots, overlap):
 
 def get_permutation_matrix(timeslots, subcarriers, overlap):
     im = np.identity(overlap * timeslots / 2)
-    zm = np.zeros((overlap * timeslots / 2, (subcarriers - 1) * overlap * timeslots / 2))
+    zm = np.zeros(
+        (overlap * timeslots / 2, (subcarriers - 1) * overlap * timeslots / 2)
+    )
     p0 = np.hstack((im, zm))
     p1 = np.hstack((zm, im))
     p = np.vstack((p0, p1))
@@ -179,7 +186,7 @@ def gfdm_rx_to_fd(rx):
 
 def gfdm_rx_sc_bins(rx, sc_num, timeslots, overlap):
     sc = np.roll(rx, int(overlap * timeslots // 2 - timeslots * sc_num))
-    return np.fft.fftshift(sc[:overlap * timeslots])
+    return np.fft.fftshift(sc[: overlap * timeslots])
 
 
 def gfdm_downsample_fft(rx, overlap):
@@ -192,7 +199,7 @@ def gfdm_demodulate_fft_loop(rx, timeslots, subcarriers, overlap, sparse_freq_ta
     rxdata = np.zeros((subcarriers, timeslots), dtype=rx.dtype)
     for sc in range(subcarriers):
         sc_syms = gfdm_rx_sc_bins(frx, sc, timeslots, overlap)
-        filtered = sc_syms * sparse_freq_taps / (1. * subcarriers)
+        filtered = sc_syms * sparse_freq_taps / (1.0 * subcarriers)
         downsampled = gfdm_downsample_fft(filtered, overlap)
         downsampled *= overlap  # this is weird, but GR compat please!
         rxdata[sc, :] = downsampled
@@ -200,16 +207,16 @@ def gfdm_demodulate_fft_loop(rx, timeslots, subcarriers, overlap, sparse_freq_ta
 
 
 def main():
-    '''
+    """
     This is a comparison for 3 different demodulation approaches.
     matched filter matrix being the 'benchmark'
     The other two should converge towards the matrix approach for overlap -> subcarriers
     Actually, there's a bug in the 'GR' approach, thus it only works for overlap==2
-    '''
+    """
     timeslots = 25
     subcarriers = 16
     overlap = 2
-    time_taps = gfdm_filter_taps('rrc', .5, timeslots, subcarriers, 1)
+    time_taps = gfdm_filter_taps("rrc", 0.5, timeslots, subcarriers, 1)
     freq_taps = gfdm_freq_taps(time_taps)
     sparse_freq_taps = gfdm_freq_taps_sparse(freq_taps, timeslots, overlap)
     A = gfdm_modulation_matrix(time_taps, timeslots, subcarriers, 1, True)
@@ -221,21 +228,38 @@ def main():
 
     mf_matrix_rx = Amf.dot(rx_syms)
     inv_matrix_rx = Ainv.dot(rx_syms)
-    gr_res = gfdm_demodulate_block(rx_syms, sparse_freq_taps, subcarriers, timeslots, overlap)
-    fft_res = gfdm_demodulate_fft_loop(rx_syms, timeslots, subcarriers, overlap, sparse_freq_taps)
+    gr_res = gfdm_demodulate_block(
+        rx_syms, sparse_freq_taps, subcarriers, timeslots, overlap
+    )
+    fft_res = gfdm_demodulate_fft_loop(
+        rx_syms, timeslots, subcarriers, overlap, sparse_freq_taps
+    )
 
-    mf_matrix_rx *= np.sqrt(calculate_average_signal_energy(fft_res) / calculate_average_signal_energy(mf_matrix_rx))
-    inv_matrix_rx *= np.sqrt(calculate_average_signal_energy(fft_res) / calculate_average_signal_energy(inv_matrix_rx))
-    gr_res *= np.sqrt(calculate_average_signal_energy(fft_res) / calculate_average_signal_energy(gr_res))
+    mf_matrix_rx *= np.sqrt(
+        calculate_average_signal_energy(fft_res)
+        / calculate_average_signal_energy(mf_matrix_rx)
+    )
+    inv_matrix_rx *= np.sqrt(
+        calculate_average_signal_energy(fft_res)
+        / calculate_average_signal_energy(inv_matrix_rx)
+    )
+    gr_res *= np.sqrt(
+        calculate_average_signal_energy(fft_res)
+        / calculate_average_signal_energy(gr_res)
+    )
 
-    print('compare demodulation accuracy for different approaches')
+    print("compare demodulation accuracy for different approaches")
     for e in range(11):
-        em = 10 ** (-1. * e)
+        em = 10 ** (-1.0 * e)
         matrixvsloop = np.all(np.abs(fft_res - mf_matrix_rx) < em)
         grvsmatrix = np.all(np.abs(gr_res - mf_matrix_rx) < em)
         grvsloop = np.all(np.abs(gr_res - fft_res) < em)
-        print('error margin {:.1e}\tMFmatriXvsGR: {}\tMFmatriXvsLoop: {}\tGRvsLoop: {}'.format(em, grvsmatrix, matrixvsloop, grvsloop))
+        print(
+            "error margin {:.1e}\tMFmatriXvsGR: {}\tMFmatriXvsLoop: {}\tGRvsLoop: {}".format(
+                em, grvsmatrix, matrixvsloop, grvsloop
+            )
+        )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

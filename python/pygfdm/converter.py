@@ -17,7 +17,7 @@ except ImportError:
 def load_frame(filename):
     f = np.load(filename)
     f = f.item()
-    frame = f['frame']
+    frame = f["frame"]
     return frame
 
 
@@ -33,7 +33,7 @@ def convert_to_sc16(signal):
     ii16 = np.iinfo(np.int16)
     max_i16 = ii16.max
     max_i16 = min(max_i16, 2 ** 11)
-    sig_max = max_i16 * .9
+    sig_max = max_i16 * 0.9
     s_max = get_iq_max(signal)
     signal *= sig_max / s_max
     i16 = signal.real.astype(np.int16)
@@ -58,10 +58,10 @@ def load_gr_iq_file(filename):
 
 def main():
     np.set_printoptions(precision=2, linewidth=150)
-    filename = '/home/demel/iq_samples/gfdm_samples_part0.dat'
+    filename = "/home/demel/iq_samples/gfdm_samples_part0.dat"
     subcarriers = 64
     frame = np.fromfile(filename, dtype=np.complex64)[25000:225000]
-    print('M * K', 9 * 64, ' + 2 * K', 2 * 64, ' + 2CP + 2CS', 2 * 64 + 2 * 16)
+    print("M * K", 9 * 64, " + 2 * K", 2 * 64, " + 2CP + 2CS", 2 * 64 + 2 * 16)
     print(len(frame))
     ac = sync.auto_correlate_signal(frame, subcarriers)
 
@@ -72,5 +72,6 @@ def main():
     #
     plt.show()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

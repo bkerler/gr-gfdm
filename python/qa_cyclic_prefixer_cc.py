@@ -23,7 +23,13 @@ from gnuradio import gr, gr_unittest
 from gnuradio import blocks
 import gfdm_python as gfdm
 import numpy as np
-from pygfdm.cyclic_prefix import add_cyclic_prefix, pinch_block, get_raised_cosine_ramp, get_window_len, add_cyclic_starfix
+from pygfdm.cyclic_prefix import (
+    add_cyclic_prefix,
+    pinch_block,
+    get_raised_cosine_ramp,
+    get_window_len,
+    add_cyclic_starfix,
+)
 
 
 class qa_cyclic_prefixer_cc(gr_unittest.TestCase):
@@ -39,20 +45,21 @@ class qa_cyclic_prefixer_cc(gr_unittest.TestCase):
         prefixer = gfdm.cyclic_prefixer_cc(16 * 8, 4, 0, 4, np.arange(16 * 8 + 4))
         try:
             prefixer = gfdm.cyclic_prefixer_cc(16 * 8, 4, 0, 4, np.arange(16 * 8))
-            raise ValueError('invalid parameter set, but passed anyway!')
+            raise ValueError("invalid parameter set, but passed anyway!")
         except:
             # expected behavior!
             pass
 
     def test_002_simple_cp(self):
-        print('simple_cp test')
+        print("simple_cp test")
         block_len = 48
         cp_len = 8
         data = np.arange(block_len, dtype=complex) + 1
         ref = add_cyclic_prefix(data, cp_len)
 
-        prefixer = gfdm.cyclic_prefixer_cc(block_len, cp_len, 0, 0,
-                                           np.ones(block_len + cp_len))
+        prefixer = gfdm.cyclic_prefixer_cc(
+            block_len, cp_len, 0, 0, np.ones(block_len + cp_len)
+        )
         src = blocks.vector_source_c(data)
         dst = blocks.vector_sink_c()
         self.tb.connect(src, prefixer, dst)
@@ -75,10 +82,11 @@ class qa_cyclic_prefixer_cc(gr_unittest.TestCase):
         ref = pinch_block(ref, window_taps)
         data = np.tile(data, n_reps)
         ref = np.tile(ref, n_reps)
-        print("input is: ", len(data), " -> " , len(ref))
+        print("input is: ", len(data), " -> ", len(ref))
         # short_window = np.concatenate((window_taps[0:ramp_len], window_taps[-ramp_len:]))
-        prefixer = gfdm.cyclic_prefixer_cc(block_len, cp_len, cs_len, ramp_len,
-                                           window_taps)
+        prefixer = gfdm.cyclic_prefixer_cc(
+            block_len, cp_len, cs_len, ramp_len, window_taps
+        )
         src = blocks.vector_source_c(data)
         dst = blocks.vector_sink_c()
         self.tb.connect(src, prefixer, dst)
@@ -91,5 +99,5 @@ class qa_cyclic_prefixer_cc(gr_unittest.TestCase):
         self.assertComplexTuplesAlmostEqual(res, ref, 4)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     gr_unittest.run(qa_cyclic_prefixer_cc)

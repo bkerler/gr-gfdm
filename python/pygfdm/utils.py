@@ -32,15 +32,15 @@ def get_pseudo_random_bytes(bmin, bmax, bnum, seed_str):
     seed = generate_seed(seed_str)
     np.random.seed(seed)
     return np.random.randint(bmin, bmax, bnum)
-    
+
 
 def get_random_qpsk(nsamples, seed=None, dtype=complex):
     if seed:
         np.random.seed(seed)
-    d = np.random.randint(0, 2, 2 * nsamples) * -2. + 1.
+    d = np.random.randint(0, 2, 2 * nsamples) * -2.0 + 1.0
     d = np.reshape(d, (2, -1))
-    energy = 1./np.sqrt(2)
-    d = (d[0] + 1j * d[1])*energy
+    energy = 1.0 / np.sqrt(2)
+    d = (d[0] + 1j * d[1]) * energy
     return d.astype(dtype=dtype)
 
 
@@ -61,30 +61,35 @@ def get_random_samples(nsamples, seed=None, dtype=complex):
 
 
 def randomQAMSymbols(length, M):
-    '''
-     length: number of symbols to generate
-     M: M-QAM - Order (4,16,64,...)
-    '''
+    """
+    length: number of symbols to generate
+    M: M-QAM - Order (4,16,64,...)
+    """
     n = np.sqrt(M / 4)
     if np.around(n) - n > 1e-10:
-        raise Exception('M must be power of 4')
+        raise Exception("M must be power of 4")
     n = int(n)
     n_M_pos = np.array([1 + 2 * i for i in xrange(n)])
     n_M_neg = np.array([-1 - 2 * i for i in xrange(n)])
     choices = np.concatenate((n_M_pos, n_M_neg))
     return np.array(
-        [np.random.choice(choices) + 1j * np.random.choice
-        (choices) for i in xrange(length)])
+        [
+            np.random.choice(choices) + 1j * np.random.choice(choices)
+            for i in xrange(length)
+        ]
+    )
 
 
 def map_qpsk_stream(data):
-    energy = 1./np.sqrt(2)
-    return list(map(lambda x: energy*(np.sign(x.real)+1j*np.sign(x.imag)),data.flatten()))
+    energy = 1.0 / np.sqrt(2)
+    return list(
+        map(lambda x: energy * (np.sign(x.real) + 1j * np.sign(x.imag)), data.flatten())
+    )
 
 
 def get_zero_f_data(k, K, M):
     data = np.zeros(K)
-    data[k] = 1.
+    data[k] = 1.0
     # data = np.tile(data, M)
     data = np.repeat(data, M)
     return data
@@ -105,8 +110,8 @@ def calculate_average_signal_energy(input_signal):
 # function adopted from scikit-commpy. Separated noise variance calculation and noise vector generation.
 def calculate_awgn_noise_variance(input_signal, snr_dB, rate=1.0):
     avg_energy = calculate_average_signal_energy(input_signal)
-    snr_linear = 10. ** (snr_dB / 10.0)
-    noise_variance = avg_energy/(2*rate*snr_linear)
+    snr_linear = 10.0 ** (snr_dB / 10.0)
+    noise_variance = avg_energy / (2 * rate * snr_linear)
     return noise_variance
 
 
@@ -114,5 +119,6 @@ def calculate_awgn_noise_variance(input_signal, snr_dB, rate=1.0):
 def get_complex_noise_vector(nsamples, noise_variance):
     if noise_variance == 0.0:
         return np.zeros(nsamples, dtype=complex)
-    return (np.sqrt(noise_variance) * np.random.randn(nsamples)) + (np.sqrt(noise_variance) * np.random.randn(nsamples) * 1j)
-
+    return (np.sqrt(noise_variance) * np.random.randn(nsamples)) + (
+        np.sqrt(noise_variance) * np.random.randn(nsamples) * 1j
+    )

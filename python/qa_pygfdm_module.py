@@ -24,16 +24,17 @@ from gnuradio import gr, gr_unittest
 import gfdm_python as gfdm
 from gfdm.pygfdm import gfdm_modulation, gfdm_receiver, utils, receiver
 
-class qa_pygfdm_module (gr_unittest.TestCase):
 
-    def setUp (self):
+class qa_pygfdm_module(gr_unittest.TestCase):
+    def setUp(self):
         return 0
 
-    def tearDown (self):
+    def tearDown(self):
         return 0
 
     def test_001_transceiver_legacy_00(self):
         return 0
+
     def test_transceiver_legacy_00():
         K = 32
         M = 8
@@ -43,22 +44,14 @@ class qa_pygfdm_module (gr_unittest.TestCase):
 
         tests = 100
         for t in xrange(tests):
-            d = utils.get_random_qpsk(M*K)
-            tx = gfdm_modulation.gfdm_gr_modulator(d, 'rrc', alpha, M, K, overlap)
+            d = utils.get_random_qpsk(M * K)
+            tx = gfdm_modulation.gfdm_gr_modulator(d, "rrc", alpha, M, K, overlap)
             rx = receiver.gfdm_rx_fft2(
-                tx,
-                'rrc',
-                alpha,
-                M,
-                K,
-                overlap,
-                oversampling_factor,
-                4,
-                16)
-            if not (np.max(np.abs(d-rx)) < 1e-2):
-                raise RuntimeError('Input and Output deviate')
+                tx, "rrc", alpha, M, K, overlap, oversampling_factor, 4, 16
+            )
+            if not (np.max(np.abs(d - rx)) < 1e-2):
+                raise RuntimeError("Input and Output deviate")
 
 
-
-if __name__ == '__mail__':
+if __name__ == "__mail__":
     gr_unittest.run(qa_pygfdm_module)

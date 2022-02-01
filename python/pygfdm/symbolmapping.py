@@ -6,19 +6,21 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
-'''
+"""
 This file exists for debug/testing/QA!
 
 If you want something flexible and fast:
 - gr-symbolmapping
 
-'''
+"""
 import numpy as np
 
 
 # dict key is constellation order
-constellations = {1: np.array([1.+0.j, -1.+0.j]),
-                  2: np.array([1+1j, 1-1j, -1+1j, -1-1j]) / np.sqrt(2)}
+constellations = {
+    1: np.array([1.0 + 0.0j, -1.0 + 0.0j]),
+    2: np.array([1 + 1j, 1 - 1j, -1 + 1j, -1 - 1j]) / np.sqrt(2),
+}
 
 
 def generate_constellation(constellation_order):
@@ -42,7 +44,9 @@ def bits2symbols(bits, constellation):
 
 def symbols2bits(symbols, constellation):
     constellation_order = int(np.log2(len(constellation)))
-    points = np.array([np.argmin(np.abs(s - constellation) ** 2) for s in symbols], dtype=np.uint8)
+    points = np.array(
+        [np.argmin(np.abs(s - constellation) ** 2) for s in symbols], dtype=np.uint8
+    )
     bits = np.array([np.unpackbits(p)[-constellation_order:] for p in points]).flatten()
     return bits
 
@@ -57,8 +61,8 @@ def main():
     print(bits)
     print(rx_bits)
 
-    assert(np.all(bits == rx_bits))
+    assert np.all(bits == rx_bits)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

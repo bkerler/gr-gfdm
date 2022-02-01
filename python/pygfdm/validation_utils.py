@@ -30,15 +30,18 @@ from .cyclic_prefix import pinch_block, get_window_len
 from .filters import get_frequency_domain_filter
 
 
-class frame_estimator():
+class frame_estimator:
     def __init__(self, x_preamble, fft_len, timeslots, active_subcarriers):
         self._x_preamble = x_preamble
         self._fft_len = fft_len
         self._timeslots = timeslots
-        self._inv_freq_x_preamble0 = 1. / np.fft.fft(x_preamble[0:fft_len])
-        self._inv_freq_x_preamble1 = 1. / np.fft.fft(x_preamble[fft_len:])
+        self._inv_freq_x_preamble0 = 1.0 / np.fft.fft(x_preamble[0:fft_len])
+        self._inv_freq_x_preamble1 = 1.0 / np.fft.fft(x_preamble[fft_len:])
 
-        active_sc = np.arange((self._fft_len - active_subcarriers)//2, (self._fft_len + active_subcarriers)//2+1)
+        active_sc = np.arange(
+            (self._fft_len - active_subcarriers) // 2,
+            (self._fft_len + active_subcarriers) // 2 + 1,
+        )
         # active_sc = active_sc[3:-3]
         freqs = np.fft.fftfreq(fft_len)
         freqs = np.fft.fftshift(freqs)
@@ -53,13 +56,13 @@ class frame_estimator():
         self._p_filter = g
 
     def _estimate_preamble(self, rx_preamble):
-        e0 = np.fft.fft(rx_preamble[0:self._fft_len]) * self._inv_freq_x_preamble0
-        e1 = np.fft.fft(rx_preamble[self._fft_len:]) * self._inv_freq_x_preamble1
+        e0 = np.fft.fft(rx_preamble[0 : self._fft_len]) * self._inv_freq_x_preamble0
+        e1 = np.fft.fft(rx_preamble[self._fft_len :]) * self._inv_freq_x_preamble1
         H = (e0 + e1) / 2
         return H
 
     def _filter_preamble_estimate(self, H):
-        H[0] = (H[1] + H[-1]) / 2.
+        H[0] = (H[1] + H[-1]) / 2.0
         H = np.fft.fftshift(H)
 
         Ha = H[self._active_sc]
@@ -70,7 +73,9 @@ class frame_estimator():
     def _interpolate_frame(self, H):
         Hg = self._filter_preamble_estimate(H)
 
-        H_frame = np.interp(self._frame_freqs, self._active_preamble_freqs, Hg.real) + 1j * np.interp(self._frame_freqs, self._active_preamble_freqs, Hg.imag)
+        H_frame = np.interp(
+            self._frame_freqs, self._active_preamble_freqs, Hg.real
+        ) + 1j * np.interp(self._frame_freqs, self._active_preamble_freqs, Hg.imag)
         return np.fft.fftshift(H_frame)
 
     def estimate_frame(self, rx_preamble):
@@ -78,51 +83,101 @@ class frame_estimator():
         return self._interpolate_frame(H)
 
 
-def generate_reference_frame(timeslots, subcarriers, active_subcarriers,
-                             cp_len, cs_len, alpha=.2):
-    p_seed = generate_seed('awesome preamble')
-    f_seed = generate_seed('awesome frame')
+def generate_reference_frame(
+    timeslots, subcarriers, active_subcarriers, cp_len, cs_len, alpha=0.2
+):
+    p_seed = generate_seed("awesome preamble")
+    f_seed = generate_seed("awesome frame")
     subcarrier_map = get_subcarrier_map(subcarriers, active_subcarriers, dc_free=True)
     overlap = 2
-    frame_preamble, x_preamble = mapped_preamble(p_seed, 'rrc', alpha, active_subcarriers, subcarriers, subcarrier_map, overlap, cp_len, cs_len)
+    frame_preamble, x_preamble = mapped_preamble(
+        p_seed,
+        "rrc",
+        alpha,
+        active_subcarriers,
+        subcarriers,
+        subcarrier_map,
+        overlap,
+        cp_len,
+        cs_len,
+    )
     d = get_random_qpsk(timeslots * active_subcarriers, f_seed)
-    d_frame = mod_frame = modulate_mapped_gfdm_block(d, timeslots, subcarriers, active_subcarriers, overlap, alpha, dc_free=True)
+    d_frame = mod_frame = modulate_mapped_gfdm_block(
+        d, timeslots, subcarriers, active_subcarriers, overlap, alpha, dc_free=True
+    )
     symbol = add_cyclic_starfix(d_frame, cp_len, cs_len)
-    window_ramp = get_raised_cosine_ramp(cs_len, get_window_len(cp_len, timeslots, subcarriers, cs_len))
+    window_ramp = get_raised_cosine_ramp(
+        cs_len, get_window_len(cp_len, timeslots, subcarriers, cs_len)
+    )
     d_frame = pinch_block(symbol, window_ramp)
 
-    H = get_frequency_domain_filter('rrc', alpha, timeslots, subcarriers, overlap)
+    H = get_frequency_domain_filter("rrc", alpha, timeslots, subcarriers, overlap)
     return np.concatenate((frame_preamble, d_frame)), mod_frame, x_preamble, d, H
 
 
-def generate_sc_qpsk_frame(timeslots, subcarriers, active_subcarriers, cp_len, cs_len, alpha=.2):
-    p_seed = generate_seed('awesome preamble')
-    f_seed = generate_seed('awesome frame')
+def generate_sc_qpsk_frame(
+    timeslots, subcarriers, active_subcarriers, cp_len, cs_len, alpha=0.2
+):
+    p_seed = generate_seed("awesome preamble")
+    f_seed = generate_seed("awesome frame")
     subcarrier_map = get_subcarrier_map(subcarriers, active_subcarriers, dc_free=True)
     overlap = 2
-    frame_preamble, x_preamble = mapped_preamble(p_seed, 'rrc', alpha, active_subcarriers, subcarriers, subcarrier_map, overlap, cp_len, cs_len)
-    d = .2 * get_random_qpsk(timeslots * subcarriers // 4, f_seed)
+    frame_preamble, x_preamble = mapped_preamble(
+        p_seed,
+        "rrc",
+        alpha,
+        active_subcarriers,
+        subcarriers,
+        subcarrier_map,
+        overlap,
+        cp_len,
+        cs_len,
+    )
+    d = 0.2 * get_random_qpsk(timeslots * subcarriers // 4, f_seed)
     d = signal.resample(d, len(d) * 4)
     # d_frame = mod_frame = modulate_mapped_gfdm_block(d, timeslots, subcarriers, active_subcarriers, overlap, alpha, dc_free=True)
     symbol = add_cyclic_starfix(d, cp_len, cs_len)
 
-    window_ramp = get_raised_cosine_ramp(cs_len, get_window_len(cp_len, timeslots, subcarriers, cs_len))
+    window_ramp = get_raised_cosine_ramp(
+        cs_len, get_window_len(cp_len, timeslots, subcarriers, cs_len)
+    )
     d_frame = pinch_block(symbol, window_ramp)
 
-    H = get_frequency_domain_filter('rrc', alpha, timeslots, subcarriers, overlap)
+    H = get_frequency_domain_filter("rrc", alpha, timeslots, subcarriers, overlap)
     return np.concatenate((frame_preamble, d_frame)), d, x_preamble, d, H
 
 
-def generate_integrated_frame(timeslots, subcarriers, active_subcarriers,
-                              cp_len, cs_len, alpha=.2):
-    p_seed = generate_seed('awesome preamble')
-    f_seed = generate_seed('awesome frame')
+def generate_integrated_frame(
+    timeslots, subcarriers, active_subcarriers, cp_len, cs_len, alpha=0.2
+):
+    p_seed = generate_seed("awesome preamble")
+    f_seed = generate_seed("awesome frame")
     subcarrier_map = get_subcarrier_map(subcarriers, active_subcarriers, dc_free=True)
     overlap = 2
-    p, p_vals = symmetric_mapped_preamble(p_seed, 'rrc', alpha, active_subcarriers, subcarriers, subcarrier_map, overlap, cp_len, cs_len)
+    p, p_vals = symmetric_mapped_preamble(
+        p_seed,
+        "rrc",
+        alpha,
+        active_subcarriers,
+        subcarriers,
+        subcarrier_map,
+        overlap,
+        cp_len,
+        cs_len,
+    )
     frame_preamble, x_preamble = p
-    p = modulate_mapped_gfdm_block(np.concatenate((p_vals, p_vals, np.zeros((timeslots - 2) * active_subcarriers))), timeslots, subcarriers, active_subcarriers, overlap, alpha, dc_free=True)
-    x_preamble = p[0:len(x_preamble)]
+    p = modulate_mapped_gfdm_block(
+        np.concatenate(
+            (p_vals, p_vals, np.zeros((timeslots - 2) * active_subcarriers))
+        ),
+        timeslots,
+        subcarriers,
+        active_subcarriers,
+        overlap,
+        alpha,
+        dc_free=True,
+    )
+    x_preamble = p[0 : len(x_preamble)]
 
     d = get_random_qpsk((timeslots - 4) * active_subcarriers, f_seed)
     d = np.tile(p_vals, timeslots)
@@ -130,30 +185,43 @@ def generate_integrated_frame(timeslots, subcarriers, active_subcarriers,
     # d = get_random_qpsk((timeslots - 2) * active_subcarriers, f_seed)
     # d = np.concatenate((p_vals, p_vals, d))
 
-    d_frame = mod_frame = modulate_mapped_gfdm_block(d, timeslots, subcarriers, active_subcarriers, overlap, alpha, dc_free=True)
+    d_frame = mod_frame = modulate_mapped_gfdm_block(
+        d, timeslots, subcarriers, active_subcarriers, overlap, alpha, dc_free=True
+    )
 
     symbol = add_cyclic_starfix(d_frame, cp_len, cs_len)
 
-    window_ramp = get_raised_cosine_ramp(cs_len, get_window_len(cp_len, timeslots, subcarriers, cs_len))
+    window_ramp = get_raised_cosine_ramp(
+        cs_len, get_window_len(cp_len, timeslots, subcarriers, cs_len)
+    )
     # d_frame = pinch_block(symbol, window_ramp)
 
-    H = get_frequency_domain_filter('rrc', alpha, timeslots, subcarriers, overlap)
+    H = get_frequency_domain_filter("rrc", alpha, timeslots, subcarriers, overlap)
     return p, mod_frame, x_preamble, d, H
 
 
 def main():
     np.set_printoptions(precision=2, linewidth=150)
-    alpha = .2
+    alpha = 0.2
     active_subcarriers = 52
     timeslots = 9
     fft_len = 64
     cp_len = fft_len // 2
     cs_len = cp_len // 2
     subcarrier_map = get_subcarrier_map(fft_len, active_subcarriers, dc_free=True)
-    ref_frame, modulated_frame, x_preamble, data, freq_filter_taps = generate_integrated_frame(timeslots, fft_len, active_subcarriers, cp_len, cs_len, alpha)
-    test_frame = np.concatenate((.001 * get_random_samples(1000), ref_frame, .001 * get_random_samples(1000)))
+    (
+        ref_frame,
+        modulated_frame,
+        x_preamble,
+        data,
+        freq_filter_taps,
+    ) = generate_integrated_frame(
+        timeslots, fft_len, active_subcarriers, cp_len, cs_len, alpha
+    )
+    test_frame = np.concatenate(
+        (0.001 * get_random_samples(1000), ref_frame, 0.001 * get_random_samples(1000))
+    )
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

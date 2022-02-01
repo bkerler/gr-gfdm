@@ -37,24 +37,24 @@ def calculate_element_energy(vec):
 
 
 def get_noise_vector(size, scale):
-    noise = np.random.randn(size) + 1.j * np.random.randn(size)
+    noise = np.random.randn(size) + 1.0j * np.random.randn(size)
     noise /= np.abs(noise)
     return noise * scale
 
 
-def calculate_noise_scale(snr_lin, signalenergy,
-                          activecarrier_ratio, noise_vector_length):
-    nscale = 1. / np.sqrt(snr_lin)
-    nscale *= np.sqrt(activecarrier_ratio * 2. *
-                      signalenergy / noise_vector_length)
+def calculate_noise_scale(
+    snr_lin, signalenergy, activecarrier_ratio, noise_vector_length
+):
+    nscale = 1.0 / np.sqrt(snr_lin)
+    nscale *= np.sqrt(activecarrier_ratio * 2.0 * signalenergy / noise_vector_length)
     return nscale
 
 
 class qa_channel_estimator_cc(gr_unittest.TestCase):
     def setUp(self):
         self.tb = gr.top_block()
-        self.filtertype = 'rrc'
-        self.filteralpha = .5
+        self.filtertype = "rrc"
+        self.filteralpha = 0.5
         self.seed = int(3660365253)
 
     def tearDown(self):
@@ -68,22 +68,32 @@ class qa_channel_estimator_cc(gr_unittest.TestCase):
         cp_len = subcarriers // 2
         ramp_len = cp_len // 2
 
-        subcarrier_map = get_subcarrier_map(subcarriers, active_subcarriers,
-                                            dc_free=True)
-        preambles = mapped_preamble(self.seed, self.filtertype, self.filteralpha, active_subcarriers,
-                                    subcarriers, subcarrier_map, overlap, cp_len, ramp_len)
+        subcarrier_map = get_subcarrier_map(
+            subcarriers, active_subcarriers, dc_free=True
+        )
+        preambles = mapped_preamble(
+            self.seed,
+            self.filtertype,
+            self.filteralpha,
+            active_subcarriers,
+            subcarriers,
+            subcarrier_map,
+            overlap,
+            cp_len,
+            ramp_len,
+        )
         core_preamble = preambles[1]
 
         dut = gfdm.channel_estimator_cc(
-            timeslots, subcarriers, active_subcarriers, True, 1, core_preamble)
+            timeslots, subcarriers, active_subcarriers, True, 1, core_preamble
+        )
         src = blocks.vector_source_c(core_preamble)
         snk = blocks.vector_sink_c()
         self.tb.connect(src, dut, snk)
         self.tb.run()
 
         res = np.array(snk.data())
-        self.assertComplexTuplesAlmostEqual(
-            res, np.ones(res.size, dtype=res.dtype), 6)
+        self.assertComplexTuplesAlmostEqual(res, np.ones(res.size, dtype=res.dtype), 6)
 
     def test_002_selective(self):
         timeslots = 5
@@ -94,32 +104,42 @@ class qa_channel_estimator_cc(gr_unittest.TestCase):
         ramp_len = cp_len // 2
         active_symbols = timeslots * active_subcarriers
 
-        subcarrier_map = get_subcarrier_map(subcarriers, active_subcarriers,
-                                            dc_free=True)
-        preambles = mapped_preamble(self.seed, self.filtertype, self.filteralpha,
-                                    active_subcarriers, subcarriers,
-                                    subcarrier_map, overlap, cp_len, ramp_len)
+        subcarrier_map = get_subcarrier_map(
+            subcarriers, active_subcarriers, dc_free=True
+        )
+        preambles = mapped_preamble(
+            self.seed,
+            self.filtertype,
+            self.filteralpha,
+            active_subcarriers,
+            subcarriers,
+            subcarrier_map,
+            overlap,
+            cp_len,
+            ramp_len,
+        )
         full_preamble = preambles[0]
         core_preamble = preambles[1]
-        h = np.array([1., .5, .1j, .1+.05j], dtype=complex)
-        data = np.convolve(full_preamble, h, 'full')[0:full_preamble.size]
+        h = np.array([1.0, 0.5, 0.1j, 0.1 + 0.05j], dtype=complex)
+        data = np.convolve(full_preamble, h, "full")[0 : full_preamble.size]
         data = data[cp_len:-ramp_len]
         self.assertEqual(data.size, core_preamble.size)
 
         dut = gfdm.channel_estimator_cc(
-            timeslots, subcarriers, active_subcarriers, True, 1, core_preamble)
+            timeslots, subcarriers, active_subcarriers, True, 1, core_preamble
+        )
         src = blocks.vector_source_c(data)
         snk = blocks.vector_sink_c()
         self.tb.connect(src, dut, snk)
         self.tb.run()
 
         res = np.array(snk.data())
-        lowres = res[0:active_symbols // 2]
-        hires = res[-active_symbols // 2:]
+        lowres = res[0 : active_symbols // 2]
+        hires = res[-active_symbols // 2 :]
 
         fh = np.fft.fft(h, timeslots * subcarriers)
-        lowfh = fh[0:active_symbols // 2]
-        hifh = fh[-active_symbols // 2:]
+        lowfh = fh[0 : active_symbols // 2]
+        hifh = fh[-active_symbols // 2 :]
 
         self.assertComplexTuplesAlmostEqual(lowres, lowfh, 1)
         self.assertComplexTuplesAlmostEqual(hires, hifh, 1)
@@ -134,11 +154,20 @@ class qa_channel_estimator_cc(gr_unittest.TestCase):
         ramp_len = cp_len // 2
         active_ratio = subcarriers / active_subcarriers
 
-        subcarrier_map = get_subcarrier_map(subcarriers, active_subcarriers,
-                                            dc_free=True)
-        preambles = mapped_preamble(self.seed, self.filtertype, self.filteralpha,
-                                    active_subcarriers, subcarriers,
-                                    subcarrier_map, overlap, cp_len, ramp_len)
+        subcarrier_map = get_subcarrier_map(
+            subcarriers, active_subcarriers, dc_free=True
+        )
+        preambles = mapped_preamble(
+            self.seed,
+            self.filtertype,
+            self.filteralpha,
+            active_subcarriers,
+            subcarriers,
+            subcarrier_map,
+            overlap,
+            cp_len,
+            ramp_len,
+        )
 
         core_preamble = preambles[1]
 
@@ -146,19 +175,21 @@ class qa_channel_estimator_cc(gr_unittest.TestCase):
 
         data = np.copy(core_preamble)
         snrs = np.arange(3, 3 * nframes, 3, dtype=float)
-        snrs_lin = 10. ** (snrs / 10.)
+        snrs_lin = 10.0 ** (snrs / 10.0)
         expected_snrs_lin = np.concatenate(((np.inf,), snrs_lin))
 
         for i, snr_lin in enumerate(snrs_lin):
             nscale = calculate_noise_scale(
-                snr_lin, sigenergy, active_ratio, core_preamble.size)
+                snr_lin, sigenergy, active_ratio, core_preamble.size
+            )
             noise = get_noise_vector(core_preamble.size, nscale)
 
             d = core_preamble + noise
             data = np.concatenate((data, d))
 
         dut = gfdm.channel_estimator_cc(
-            timeslots, subcarriers, active_subcarriers, True, 1, core_preamble)
+            timeslots, subcarriers, active_subcarriers, True, 1, core_preamble
+        )
         src = blocks.vector_source_c(data)
         snk = blocks.vector_sink_c()
         self.tb.connect(src, dut, snk)
@@ -173,13 +204,13 @@ class qa_channel_estimator_cc(gr_unittest.TestCase):
         for i, t in enumerate(snr_tags):
             self.assertEqual(t.offset, i * timeslots * subcarriers)
             res_lin = pmt.to_float(t.value)
-            res_db = 10. * np.log10(res_lin)
-            ref_db = 10. * np.log10(expected_snrs_lin[i])
+            res_db = 10.0 * np.log10(res_lin)
+            ref_db = 10.0 * np.log10(expected_snrs_lin[i])
             # print(f"Reference: {ref_db:6.3f}dB\t{res_db:6.3f}dB")
 
             if np.isfinite(ref_db):
-                self.assertTrue(np.abs(res_db - ref_db) < 1.)
+                self.assertTrue(np.abs(res_db - ref_db) < 1.0)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     gr_unittest.run(qa_channel_estimator_cc)
