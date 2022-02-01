@@ -22,7 +22,9 @@
 """Misc utilities used at build time
 """
 
-import re, os, os.path
+import re
+import os
+
 from build_utils_codes import *
 
 
