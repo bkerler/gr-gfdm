@@ -164,15 +164,7 @@ int extract_burst_cc_impl::general_work(int noutput_items,
     std::sort(tags.begin(), tags.end(), tag_t::offset_compare);
     const int n_max_bursts = std::min(int(tags.size()), n_out_bursts);
 
-    fmt::print("extract: nout={}, written={}, #bursts={}, burst_len={}\n",
-               noutput_items,
-               nitems_written(0),
-               n_out_bursts,
-               d_burst_len);
-
     for (const auto& tag : tags) {
-        pmt::print(tag.key);
-        pmt::print(tag.value);
         const int burst_start = tag.offset - nitems_read(0);
         const int actual_start = burst_start - d_tag_backoff;
 
@@ -203,25 +195,21 @@ int extract_burst_cc_impl::general_work(int noutput_items,
             if (actual_start < 0) {
                 const int num_prepend_zeros = std::abs(actual_start);
                 memset(out, 0, sizeof(gr_complex) * num_prepend_zeros);
-                // fmt::print(
-                //     "{}\n",
-                //     std::vector<gr_complex>(in, in + d_burst_len - num_prepend_zeros));
+
                 normalize_power_level(out + num_prepend_zeros,
                                       in,
                                       scale_factor,
                                       d_burst_len - num_prepend_zeros);
             } else {
-                // fmt::print("{}\n",
-                //            std::vector<gr_complex>(in + actual_start,
-                //                                    in + actual_start + d_burst_len));
                 normalize_power_level(out, in + actual_start, scale_factor, d_burst_len);
             }
 
             if (d_activate_cfo_correction) {
                 const gr_complex phase_rotation = get_phase_rotation(info);
-                if (std::abs(phase_rotation.imag()) > 0.001) {
-                    compensate_cfo(out, out, phase_rotation, d_burst_len);
-                }
+                compensate_cfo(out, out, phase_rotation, d_burst_len);
+                // if (std::abs(phase_rotation.imag()) > 0.001) {
+
+                // }
             }
             auto value = pmt::dict_add(
                 info, pmt::intern("burst_idx"), pmt::from_uint64(d_frame_counter));
@@ -264,10 +252,7 @@ int extract_burst_cc_impl::general_work(int noutput_items,
     //                      "\tconsumed=" + std::to_string(consumed_items) +
     //                      "\tproduced=" + std::to_string(produced_items));
     // }
-    fmt::print("extract end: con={} prod={}\n", consumed_items, produced_items);
-    for (auto t : tags) {
-        pmt::print(t.key);
-    }
+
     consume_each(consumed_items);
     return produced_items;
 }

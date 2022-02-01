@@ -6,19 +6,15 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
+import pmt
+import numpy as np
+from pygfdm.configurator import get_gfdm_configuration
+from pygfdm.cyclic_prefix import add_cyclic_starfix
+from pygfdm.gfdm_modulation import modulate_mapped_gfdm_block
+from pygfdm.utils import get_random_qpsk
 from gnuradio import gr, gr_unittest
 from gnuradio import blocks
 from receiver_cc import receiver_cc
-from pygfdm.preamble import mapped_preamble
-from pygfdm.mapping import get_subcarrier_map
-from pygfdm.filters import get_frequency_domain_filter
-from pygfdm.utils import get_random_qpsk
-from pygfdm.gfdm_modulation import modulate_mapped_gfdm_block
-from pygfdm.cyclic_prefix import add_cyclic_starfix
-from pygfdm.configurator import get_gfdm_configuration
-import numpy as np
-import pmt
-import unittest
 
 
 def create_frame(config, tag_key):
