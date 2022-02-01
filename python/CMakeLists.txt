@@ -45,19 +45,18 @@ COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/pygfdm/
     ${CMAKE_BINARY_DIR}/test_modules/gfdm/
   DEPENDS gfdm_python)
 
+file(GLOB py_qa_test_files "qa_*.py")
+
+list(REMOVE_ITEM py_qa_test_files
+      ${CMAKE_CURRENT_SOURCE_DIR}/qa_pygfdm_module.py
+      ${CMAKE_CURRENT_SOURCE_DIR}/qa_vc_compatibility_check.py
+)
+
 set(GR_TEST_PYTHON_DIRS ${CMAKE_BINARY_DIR}/python/bindings)
-GR_ADD_TEST(qa_modulator_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_modulator_cc.py)
-GR_ADD_TEST(qa_cyclic_prefixer_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_cyclic_prefixer_cc.py)
-GR_ADD_TEST(qa_simple_modulator_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_simple_modulator_cc.py)
-GR_ADD_TEST(qa_transmitter_chain_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_transmitter_chain_cc.py)
-GR_ADD_TEST(qa_simple_receiver_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_simple_receiver_cc.py)
-GR_ADD_TEST(qa_advanced_receiver_sb_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_advanced_receiver_sb_cc.py)
-GR_ADD_TEST(qa_resource_mapper_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_resource_mapper_cc.py)
-GR_ADD_TEST(qa_resource_demapper_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_resource_demapper_cc.py)
-GR_ADD_TEST(qa_remove_prefix_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_remove_prefix_cc.py)
-GR_ADD_TEST(qa_extract_burst_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_extract_burst_cc.py)
-GR_ADD_TEST(qa_channel_estimator_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_channel_estimator_cc.py)
-GR_ADD_TEST(qa_transmitter_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_transmitter_cc.py)
-GR_ADD_TEST(qa_short_burst_shaper ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_short_burst_shaper.py)
-GR_ADD_TEST(qa_python_bindings ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_python_bindings.py)
-GR_ADD_TEST(qa_receiver_cc ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_receiver_cc.py)
+foreach(py_qa_test_file ${py_qa_test_files})
+get_filename_component(py_qa_test_name ${py_qa_test_file} NAME_WE)
+if (CMAKE_CROSSCOMPILING)
+    get_filename_component(py_qa_test_file ${py_qa_test_file} NAME)
+endif(CMAKE_CROSSCOMPILING)
+GR_ADD_TEST(${py_qa_test_name} ${QA_PYTHON_EXECUTABLE} -B ${py_qa_test_file})
+endforeach(py_qa_test_file)

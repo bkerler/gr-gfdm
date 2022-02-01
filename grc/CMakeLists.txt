@@ -6,19 +6,5 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
-install(FILES
-    gfdm_modulator_cc.block.yml
-    gfdm_cyclic_prefixer_cc.block.yml
-    gfdm_preamble_generator.block.yml
-    gfdm_remove_prefix_cc.block.yml
-    gfdm_simple_modulator_cc.block.yml
-    gfdm_simple_receiver_cc.block.yml
-    gfdm_advanced_receiver_sb_cc.block.yml
-    gfdm_resource_mapper_cc.block.yml
-    gfdm_resource_demapper_cc.block.yml
-    gfdm_extract_burst_cc.block.yml
-    gfdm_channel_estimator_cc.block.yml
-    gfdm_transmitter_cc.block.yml
-    gfdm_short_burst_shaper.block.yml
-    gfdm_receiver_cc.block.yml DESTINATION share/gnuradio/grc/blocks
-)
+file(GLOB yml_files "*.yml")
+install(FILES ${yml_files} DESTINATION share/gnuradio/grc/blocks)

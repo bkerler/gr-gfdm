@@ -111,22 +111,14 @@ gr_complex extract_burst_cc_impl::get_phase_rotation(const pmt::pmt_t& info) con
 {
     const auto phase_rotation = pmt::to_complex(pmt::dict_ref(
         info, d_phase_rotation_key, pmt::from_complex(gr_complex(1.0f, 0.0f))));
+
     const auto scale = 1.0 / std::abs(phase_rotation);
     const auto value =
         gr_complex(scale * phase_rotation.real(), -1.0f * scale * phase_rotation.imag());
-    const auto phase = std::arg(phase_rotation);
-    const auto freq = convert_phase2freq(phase, 30.72e6);
-    fmt::print("key={}, value={}, phase={:.5e}, freq={:.3f}Hz\n",
-               pmt::write_string(d_phase_rotation_key),
-               cd_to_string(phase_rotation),
-               phase,
-               freq);
-    if (std::abs(phase) > 1.0e-4) {
 
-        return value;
-    } else {
-        return gr_complex(1.0f, 0.0f);
-    }
+    const auto phase = -1.0 * std::arg(phase_rotation);
+    const auto val = gr_complexd(1.0 * cos(phase), 1.0 * sin(phase));
+    return gr_complex(val);
 }
 
 void extract_burst_cc_impl::normalize_power_level(gr_complex* p_out,
@@ -172,7 +164,15 @@ int extract_burst_cc_impl::general_work(int noutput_items,
     std::sort(tags.begin(), tags.end(), tag_t::offset_compare);
     const int n_max_bursts = std::min(int(tags.size()), n_out_bursts);
 
+    fmt::print("extract: nout={}, written={}, #bursts={}, burst_len={}\n",
+               noutput_items,
+               nitems_written(0),
+               n_out_bursts,
+               d_burst_len);
+
     for (const auto& tag : tags) {
+        pmt::print(tag.key);
+        pmt::print(tag.value);
         const int burst_start = tag.offset - nitems_read(0);
         const int actual_start = burst_start - d_tag_backoff;
 
@@ -218,7 +218,10 @@ int extract_burst_cc_impl::general_work(int noutput_items,
             }
 
             if (d_activate_cfo_correction) {
-                compensate_cfo(out, out, get_phase_rotation(info), d_burst_len);
+                const gr_complex phase_rotation = get_phase_rotation(info);
+                if (std::abs(phase_rotation.imag()) > 0.001) {
+                    compensate_cfo(out, out, phase_rotation, d_burst_len);
+                }
             }
             auto value = pmt::dict_add(
                 info, pmt::intern("burst_idx"), pmt::from_uint64(d_frame_counter));
@@ -261,7 +264,10 @@ int extract_burst_cc_impl::general_work(int noutput_items,
     //                      "\tconsumed=" + std::to_string(consumed_items) +
     //                      "\tproduced=" + std::to_string(produced_items));
     // }
-
+    fmt::print("extract end: con={} prod={}\n", consumed_items, produced_items);
+    for (auto t : tags) {
+        pmt::print(t.key);
+    }
     consume_each(consumed_items);
     return produced_items;
 }

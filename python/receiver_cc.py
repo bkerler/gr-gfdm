@@ -55,7 +55,6 @@ class receiver_cc(gr.hier_block2):
             gr.io_signature(3, 3, gr.sizeof_gr_complex),
         )
 
-        print(f'antenna port: {antenna_port}')
         internal_sync_tag_key = sync_tag_key
         snr_tag_key = "snr_lin"
         cnr_tag_key = "cnr"
@@ -63,12 +62,13 @@ class receiver_cc(gr.hier_block2):
             internal_sync_tag_key = f'{sync_tag_key}{antenna_port}'
             snr_tag_key = f'{snr_tag_key}{antenna_port}'
             cnr_tag_key = f'{cnr_tag_key}{antenna_port}'
-
+        print(
+            f"GFDM receiver tags: in={sync_tag_key}\tinternal={internal_sync_tag_key}\tsnr={snr_tag_key}\tcnr={cnr_tag_key}")
         preamble = np.array(preamble)
 
         block_len = timeslots * subcarriers
         full_block_len = block_len + cp_len + cs_len
-        preamble_len = len(preamble)
+        preamble_len = preamble.size
         full_preamble_len = cp_len + preamble_len + cs_len
         # frame_len includes preamble, payload and CP+CS for both
         frame_len = full_preamble_len + full_block_len

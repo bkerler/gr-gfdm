@@ -15,8 +15,31 @@ from pygfdm.filters import get_frequency_domain_filter
 from pygfdm.utils import get_random_qpsk
 from pygfdm.gfdm_modulation import modulate_mapped_gfdm_block
 from pygfdm.cyclic_prefix import add_cyclic_starfix
+from pygfdm.configurator import get_gfdm_configuration
 import numpy as np
 import pmt
+import unittest
+
+
+def create_frame(config, tag_key):
+    symbols = get_random_qpsk(config.timeslots * config.active_subcarriers)
+    d_block = modulate_mapped_gfdm_block(
+        symbols, config.timeslots, config.subcarriers, config.active_subcarriers, 2, 0.2, dc_free=True
+    )
+    preamble = config.full_preambles[0]
+    frame = add_cyclic_starfix(d_block, config.cp_len, config.cs_len)
+    frame = np.concatenate((preamble, frame))
+
+    tag = gr.tag_t()
+    tag.key = pmt.string_to_symbol(tag_key)
+    d = pmt.make_dict()
+    d = pmt.dict_add(d, pmt.mp("xcorr_idx"), pmt.from_uint64(42))
+    d = pmt.dict_add(d, pmt.mp("xcorr_offset"), pmt.from_uint64(4711))
+    d = pmt.dict_add(d, pmt.mp("sc_rot"), pmt.from_complex(1.0 + 0.0j))
+    # tag.offset = data.size + cp_len
+    tag.srcid = pmt.string_to_symbol("qa")
+    tag.value = d
+    return frame, symbols, tag
 
 
 class qa_receiver_cc(gr_unittest.TestCase):
@@ -55,47 +78,28 @@ class qa_receiver_cc(gr_unittest.TestCase):
         cs_len = cp_len // 2
         ramp_len = cs_len
         overlap = 2
-        seed = 0
-        subcarrier_map = get_subcarrier_map(subcarriers, active_subcarriers)
-        taps = get_frequency_domain_filter("rrc", 0.2, timeslots, subcarriers, overlap)
+        config = get_gfdm_configuration(
+            timeslots, subcarriers, active_subcarriers, overlap, cp_len, cs_len)
+
+        taps = config.rx_filter_taps
         tag_key = "frame_start"
-        preamble, x_preamble = mapped_preamble(
-            seed,
-            "rrc",
-            0.2,
-            active_subcarriers,
-            subcarriers,
-            subcarrier_map,
-            2,
-            cp_len,
-            cp_len // 2,
-            use_zadoff_chu=True,
-        )
+        x_preamble = config.core_preamble
 
         data = np.array([], dtype=complex)
         ref = np.array([], dtype=complex)
         frames = np.array([], dtype=complex)
         tags = []
         for _ in range(n_frames):
-            symbols = get_random_qpsk(timeslots * active_subcarriers)
-            ref = np.concatenate((ref, symbols))
-            d_block = modulate_mapped_gfdm_block(
-                symbols, timeslots, subcarriers, active_subcarriers, 2, 0.2
-            )
-
-            frame = add_cyclic_starfix(d_block, cp_len, cs_len)
-            frame = np.concatenate((preamble, frame))
-            frames = np.concatenate((frames, frame))
-
-            tag = gr.tag_t()
-            tag.key = pmt.string_to_symbol(tag_key)
+            frame, symbols, tag = create_frame(config, tag_key)
             tag.offset = data.size + cp_len
-            tag.srcid = pmt.string_to_symbol("qa")
-            tag.value = pmt.from_long(timeslots * subcarriers)
-            tag.value = pmt.make_dict()
+
+            ref = np.concatenate((ref, symbols))
+            frames = np.concatenate((frames, frame))
             tags.append(tag)
             data = np.concatenate((data, frame))
-        data = np.concatenate((data, np.zeros(2 * cp_len, dtype=data.dtype)))
+
+        data = np.concatenate(
+            (data, np.zeros(n_frames * cp_len, dtype=data.dtype)))
 
         src = blocks.vector_source_c(data, False, 1, tags)
         instance = receiver_cc(
@@ -103,7 +107,7 @@ class qa_receiver_cc(gr_unittest.TestCase):
             subcarriers,
             active_subcarriers,
             overlap,
-            subcarrier_map,
+            config.subcarrier_map,
             cp_len,
             cs_len,
             ramp_len,
@@ -134,7 +138,8 @@ class qa_receiver_cc(gr_unittest.TestCase):
 
         estimates = np.array(estimate_snk.data())
         self.assertEqual(estimates.size, n_frames * timeslots * subcarriers)
-        self.assertComplexTuplesAlmostEqual(estimates, np.ones_like(estimates), 5)
+        self.assertComplexTuplesAlmostEqual(
+            estimates, np.ones_like(estimates), 5)
 
         rxtags = snk.tags()
         print(len(rxtags))
