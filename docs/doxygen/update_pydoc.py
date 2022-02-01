@@ -15,7 +15,11 @@ The file instructs Pybind11 to transfer the doxygen comments into the
 python docstrings.
 
 """
-import os, sys, time, glob, re, json
+import os
+import sys
+import glob
+import re
+import json
 from argparse import ArgumentParser
 
 from doxyxml import DoxyIndex, DoxyClass, DoxyFriend, DoxyFunction, DoxyFile
