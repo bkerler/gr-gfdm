@@ -23,4 +23,5 @@ except ImportError:
 
 # import any pure python here
 from .receiver_cc import receiver_cc
+from .multi_port_receiver_cc import multi_port_receiver_cc
 #

@@ -22,7 +22,8 @@ add_subdirectory(bindings)
 GR_PYTHON_INSTALL(
     FILES
     __init__.py
-    receiver_cc.py DESTINATION ${GR_PYTHON_DIR}/gfdm
+    receiver_cc.py
+    multi_port_receiver_cc.py DESTINATION ${GR_PYTHON_DIR}/gfdm
 )
 
 add_subdirectory(pygfdm)
