@@ -31,6 +31,7 @@ class extract_burst_cc_impl : public extract_burst_cc
 private:
     const pmt::pmt_t d_scale_factor_key = pmt::mp("scale_factor");
     const pmt::pmt_t d_phase_rotation_key = pmt::mp("sc_rot");
+    const pmt::pmt_t d_phase_rotation_default = pmt::from_complex(gr_complexd(1.0, 0.0));
 
     const int d_burst_len;
     const int d_tag_backoff;

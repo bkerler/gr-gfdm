@@ -99,6 +99,78 @@ int resource_demapper_cc_impl::general_work(int noutput_items,
         in += d_kernel->input_vector_size();
     }
 
+    // std::vector<tag_t> tags;
+    // const uint64_t nsamps = n_frames * d_kernel->input_vector_size();
+    // get_tags_in_window(tags, 0, 0, nsamps);
+    // std::string tagstr;
+    // for (const auto& tag : tags) {
+    //     auto keystr = pmt::write_string(tag.key);
+    //     if (keystr.find("cnr") != std::string::npos) {
+    //         continue;
+    //     }
+    //     auto meta = fmt::format("id={}, key={:16}", identifier(), keystr);
+    //     if (keystr.find("snr_lin") != std::string::npos) {
+    //         auto snr_lin = pmt::to_double(tag.value);
+    //         auto snr_db = 10.0 * std::log10(snr_lin);
+    //         meta += fmt::format("value={:8.2f}\t\t\t{:5.2f}dB\n", snr_lin, snr_db);
+    //     } else if (keystr.find("frame_start") != std::string::npos) {
+    //         auto rx_timestamp = pmt::to_uint64(
+    //             pmt::dict_ref(tag.value, pmt::mp("rx_time"), pmt::from_uint64(0)));
+    //         auto time = std::chrono::nanoseconds(rx_timestamp);
+    //         auto hours = std::chrono::duration_cast<std::chrono::hours>(time);
+    //         auto minutes = std::chrono::duration_cast<std::chrono::minutes>(time -
+    //         hours); auto seconds =
+    //             std::chrono::duration_cast<std::chrono::seconds>(time - hours -
+    //             minutes);
+    //         auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(
+    //             time - hours - minutes - seconds);
+    //         auto micros = std::chrono::duration_cast<std::chrono::microseconds>(
+    //             time - hours - minutes - seconds - millis);
+    //         auto nanos = std::chrono::duration_cast<std::chrono::nanoseconds>(
+    //             time - hours - minutes - seconds - millis - micros);
+    //         // auto timestr = fmt::format("{:02}:{:02}:{:02}.{:03},{:03},{:03}",
+    //         //                            hours.count() % 24,
+    //         //                            minutes.count(),
+    //         //                            seconds.count(),
+    //         //                            millis.count(),
+    //         //                            micros.count(),
+    //         //                            nanos.count());
+    //         auto timestr = fmt::format("{:02}.{:03},{:03},{:03}",
+    //                                    seconds.count(),
+    //                                    millis.count(),
+    //                                    micros.count(),
+    //                                    nanos.count());
+    //         auto sc_offset = pmt::to_uint64(pmt::dict_ref(tag.value,
+    //         pmt::mp("sc_offset"), pmt::from_uint64(0))); auto xc_offset =
+    //         pmt::to_uint64(pmt::dict_ref(tag.value, pmt::mp("xcorr_offset"),
+    //         pmt::from_uint64(0))); auto diff_offset = int64_t(sc_offset) -
+    //         int64_t(xc_offset); auto sc_rot = pmt::dict_ref(tag.value,
+    //         pmt::mp("sc_rot"), pmt::from_complex(gr_complex(1.0, 0.0))); auto phase =
+    //         std::arg(pmt::to_complex(sc_rot)); meta += fmt::format(
+    //             "value={:22}{:.6f}rad {}\tsc={}\txc={}, delta={}\n",
+    //             pmt::write_string(sc_rot), phase, timestr, sc_offset, xc_offset,
+    //             diff_offset);
+    //     } else if (pmt::is_dict(tag.value)) {
+    //         auto keys = pmt::dict_keys(tag.value);
+    //         for (unsigned i = 0; i < pmt::length(keys); i++) {
+    //             auto dk = pmt::nth(i, keys);
+    //             auto dv = pmt::dict_ref(tag.value, dk, pmt::get_PMT_F());
+    //             meta += fmt::format(
+    //                 "\nkey={:<18}value={}", pmt::write_string(dk),
+    //                 pmt::write_string(dv));
+    //         }
+    //         meta += "\n";
+    //     } else {
+    //         meta += fmt::format(", value={}\n", pmt::write_string(tag.value));
+    //     }
+    //     tagstr += meta;
+    //     // fmt::print(meta);
+    // }
+    // if (tagstr.size() > 0) {
+    //     fmt::print(tagstr);
+    // }
+
+
     consume_each(n_frames * d_kernel->input_vector_size());
 
     // Tell runtime system how many output items we produced.

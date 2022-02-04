@@ -109,14 +109,17 @@ double convert_phase2freq(const double phase, const double samp_rate)
 
 gr_complex extract_burst_cc_impl::get_phase_rotation(const pmt::pmt_t& info) const
 {
-    const auto phase_rotation = pmt::to_complex(pmt::dict_ref(
-        info, d_phase_rotation_key, pmt::from_complex(gr_complex(1.0f, 0.0f))));
+    const auto phase_rotation = pmt::to_complex(
+        pmt::dict_ref(info, d_phase_rotation_key, d_phase_rotation_default));
 
     const auto scale = 1.0 / std::abs(phase_rotation);
     const auto value =
         gr_complex(scale * phase_rotation.real(), -1.0f * scale * phase_rotation.imag());
 
     const auto phase = -1.0 * std::arg(phase_rotation);
+    if (std::abs(phase) < 0.002) {
+        return gr_complex(1.0f, 0.0f);
+    }
     const auto val = gr_complexd(1.0 * cos(phase), 1.0 * sin(phase));
     return gr_complex(val);
 }
