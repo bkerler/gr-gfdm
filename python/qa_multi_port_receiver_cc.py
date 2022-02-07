@@ -165,5 +165,6 @@ class qa_multi_port_receiver_cc(gr_unittest.TestCase):
         res = np.array(snk1.data())
         self.assertComplexTuplesAlmostEqual(res, ref, 0)
 
+
 if __name__ == "__main__":
     gr_unittest.run(qa_multi_port_receiver_cc)
