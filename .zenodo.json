@@ -22,7 +22,15 @@
             "orcid": "0000-0002-5434-7232"
         },
         {
-            "name": "Rode, Andrej"
+            "affiliation": "Communications Engineering Lab (CEL), Karlsruhe Institute of Technology, Karlsruhe, Germany",
+            "name": "Rode, Andrej",
+            "orcid": "0000-0002-6101-7485"
+        },
+        {
+            "name": "Kielstein, Alma"
+        },
+        {
+            "name": "Koslowski, Sebastian"
         }
     ]
 }
