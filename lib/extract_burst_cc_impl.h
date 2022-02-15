@@ -21,8 +21,8 @@
 #ifndef INCLUDED_GFDM_EXTRACT_BURST_CC_IMPL_H
 #define INCLUDED_GFDM_EXTRACT_BURST_CC_IMPL_H
 
-#include <gfdm/extract_burst_cc.h>
 #include <fmt/core.h>
+#include <gfdm/extract_burst_cc.h>
 
 namespace gr {
 namespace gfdm {
@@ -79,8 +79,10 @@ public:
                      gr_vector_const_void_star& input_items,
                      gr_vector_void_star& output_items);
 
-    void set_fixed_phase_increment(double phase_increment, bool activate){
-        fmt::print("set_fixed_phase_increment {} activate={}\n", phase_increment, activate);
+    void set_fixed_phase_increment(double phase_increment, bool activate)
+    {
+        fmt::print(
+            "set_fixed_phase_increment {} activate={}\n", phase_increment, activate);
         d_phase_increment = phase_increment;
         d_active_fixed_phase_inrement = activate;
     }
