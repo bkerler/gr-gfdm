@@ -23,8 +23,8 @@
 #define INCLUDED_GFDM_API_H
 
 #include <gnuradio/attributes.h>
-#include <fmt/format.h>
-#include <fmt/ranges.h>
+// #include <fmt/format.h>
+// #include <fmt/ranges.h>
 
 /*
  * fmtlib lacks a std::complex formatter.

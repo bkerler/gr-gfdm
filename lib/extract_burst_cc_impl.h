@@ -22,6 +22,7 @@
 #define INCLUDED_GFDM_EXTRACT_BURST_CC_IMPL_H
 
 #include <gfdm/extract_burst_cc.h>
+#include <fmt/core.h>
 
 namespace gr {
 namespace gfdm {
@@ -38,6 +39,9 @@ private:
     const pmt::pmt_t d_burst_start_tag;
     const pmt::pmt_t d_forward_burst_start_tag;
     bool d_activate_cfo_correction;
+
+    bool d_active_fixed_phase_inrement = false;
+    double d_phase_increment = 0.0;
 
     uint64_t d_last_tag_offset = 0;
     uint64_t d_last_xcorr_offset = 0;
@@ -74,6 +78,12 @@ public:
                      gr_vector_int& ninput_items,
                      gr_vector_const_void_star& input_items,
                      gr_vector_void_star& output_items);
+
+    void set_fixed_phase_increment(double phase_increment, bool activate){
+        fmt::print("set_fixed_phase_increment {} activate={}\n", phase_increment, activate);
+        d_phase_increment = phase_increment;
+        d_active_fixed_phase_inrement = activate;
+    }
 };
 
 } // namespace gfdm

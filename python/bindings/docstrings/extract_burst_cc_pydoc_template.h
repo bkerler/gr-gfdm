@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Free Software Foundation, Inc.
+ * Copyright 2022 Free Software Foundation, Inc.
  *
  * This file is part of GNU Radio
  *
@@ -31,3 +31,6 @@ static const char* __doc_gr_gfdm_extract_burst_cc_activate_cfo_compensation = R"
 
 
 static const char* __doc_gr_gfdm_extract_burst_cc_cfo_compensation = R"doc()doc";
+
+
+static const char* __doc_gr_gfdm_extract_burst_cc_set_fixed_phase_increment = R"doc()doc";

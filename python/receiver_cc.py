@@ -146,6 +146,9 @@ class receiver_cc(gr.hier_block2):
     def set_activate_cfo_compensation(self, activate_cfo_compensation):
         self.extract_burst.activate_cfo_compensation(activate_cfo_compensation)
 
+    def set_fixed_phase_increment(self, phase_increment, activate):
+        self.extract_burst.set_fixed_phase_increment(phase_increment, activate)
+
     def get_ic_iterations(self):
         return self.advanced_receiver.get_ic()
 

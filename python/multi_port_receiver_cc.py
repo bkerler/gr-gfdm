@@ -95,6 +95,10 @@ class multi_port_receiver_cc(gr.hier_block2):
         for r in self.receivers:
             r.set_activate_cfo_compensation(activate_cfo_compensation)
 
+    def set_fixed_phase_increment(self, phase_increment, activate):
+        for r in self.receivers:
+            r.set_fixed_phase_increment(phase_increment, activate)
+
     def get_ic_iterations(self):
         vals = np.array([r.get_ic_iterations() for r in self.receivers])
         uvals = np.unique(vals)

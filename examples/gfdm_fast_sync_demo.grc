@@ -1001,6 +1001,7 @@ blocks:
     active_subcarriers: active_subcarriers
     affinity: ''
     alias: ''
+    antenna_port: '1'
     channel_estimator_id: '1'
     comment: ''
     constellation: gfdm_constellation

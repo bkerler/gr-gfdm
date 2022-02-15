@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Free Software Foundation, Inc.
+ * Copyright 2022 Free Software Foundation, Inc.
  *
  * This file is part of GNU Radio
  *
@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(extract_burst_cc.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(c6b67e0038db44e9a7c88d91a562bdda)                     */
+/* BINDTOOL_HEADER_FILE_HASH(8c18a0416d00ccac96c54f013cd16636)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -57,6 +57,13 @@ void bind_extract_burst_cc(py::module& m)
         .def("cfo_compensation",
              &extract_burst_cc::cfo_compensation,
              D(extract_burst_cc, cfo_compensation))
+
+
+        .def("set_fixed_phase_increment",
+             &extract_burst_cc::set_fixed_phase_increment,
+             py::arg("phase_increment"),
+             py::arg("activate"),
+             D(extract_burst_cc, set_fixed_phase_increment))
 
         ;
 }

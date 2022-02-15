@@ -58,6 +58,7 @@ public:
 
     virtual void activate_cfo_compensation(bool activate_cfo_compensation) = 0;
     virtual bool cfo_compensation() const = 0;
+    virtual void set_fixed_phase_increment(double phase_increment, bool activate) = 0;
 };
 
 } // namespace gfdm

@@ -115,13 +115,10 @@ gr_complex extract_burst_cc_impl::get_phase_rotation(const pmt::pmt_t& info) con
     const auto scale = 1.0 / std::abs(phase_rotation);
     const auto value =
         gr_complex(scale * phase_rotation.real(), -1.0f * scale * phase_rotation.imag());
-
-    const auto phase = -1.0 * std::arg(phase_rotation);
-    if (std::abs(phase) < 0.002) {
-        return gr_complex(1.0f, 0.0f);
-    }
-    const auto val = gr_complexd(1.0 * cos(phase), 1.0 * sin(phase));
-    return gr_complex(val);
+    return value;
+    // const auto phase = -1.0 * std::arg(phase_rotation);
+    // const auto val = gr_complexd(1.0 * cos(phase), 1.0 * sin(phase));
+    // return gr_complex(val);
 }
 
 void extract_burst_cc_impl::normalize_power_level(gr_complex* p_out,
@@ -144,9 +141,15 @@ void extract_burst_cc_impl::compensate_cfo(gr_complex* p_out,
                                            const gr_complex phase_increment,
                                            const int ninput_size)
 {
+    gr_complex phase_inc = phase_increment;
+    if (d_active_fixed_phase_inrement) {
+        phase_inc = gr_complex(std::cos(d_phase_increment), std::sin(d_phase_increment));
+        // fmt::print("tag_phase_inc={:+.6f},\tfixed_phase_inc={:+.6f}\n",
+        // std::arg(phase_increment), d_phase_increment);
+    }
+
     gr_complex initial_phase = gr_complex(1.0f, 0.0f);
-    volk_32fc_s32fc_x2_rotator_32fc(
-        p_out, p_in, phase_increment, &initial_phase, ninput_size);
+    volk_32fc_s32fc_x2_rotator_32fc(p_out, p_in, phase_inc, &initial_phase, ninput_size);
 }
 
 int extract_burst_cc_impl::general_work(int noutput_items,
@@ -210,9 +213,6 @@ int extract_burst_cc_impl::general_work(int noutput_items,
             if (d_activate_cfo_correction) {
                 const gr_complex phase_rotation = get_phase_rotation(info);
                 compensate_cfo(out, out, phase_rotation, d_burst_len);
-                // if (std::abs(phase_rotation.imag()) > 0.001) {
-
-                // }
             }
             auto value = pmt::dict_add(
                 info, pmt::intern("burst_idx"), pmt::from_uint64(d_frame_counter));
