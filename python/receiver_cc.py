@@ -54,6 +54,7 @@ class receiver_cc(gr.hier_block2):
             gr.io_signature(1, 1, gr.sizeof_gr_complex),
             gr.io_signature(3, 3, gr.sizeof_gr_complex),
         )
+        self.logger = gr.logger(f"gr_log.{self.symbol_name()}")
 
         internal_sync_tag_key = sync_tag_key
         snr_tag_key = "snr_lin"
@@ -62,9 +63,14 @@ class receiver_cc(gr.hier_block2):
             internal_sync_tag_key = f"{sync_tag_key}{antenna_port}"
             snr_tag_key = f"{snr_tag_key}{antenna_port}"
             cnr_tag_key = f"{cnr_tag_key}{antenna_port}"
-        print(
-            f"GFDM receiver tags: in='{sync_tag_key}'\tinternal='{internal_sync_tag_key}'\tsnr='{snr_tag_key}'\tcnr='{cnr_tag_key}'"
+
+        self.logger.debug(
+            f"{sync_tag_key=}, {internal_sync_tag_key=}, {snr_tag_key=}, {cnr_tag_key=}"
         )
+        self.logger.debug(
+            f"{activate_cfo_compensation=}, {activate_phase_compensation=}"
+        )
+
         preamble = np.array(preamble)
 
         block_len = timeslots * subcarriers
@@ -144,6 +150,7 @@ class receiver_cc(gr.hier_block2):
         return self.extract_burst.cfo_compensation()
 
     def set_activate_cfo_compensation(self, activate_cfo_compensation):
+        self.logger.debug(f"set_activate_cfo_compensation({activate_cfo_compensation})")
         self.extract_burst.activate_cfo_compensation(activate_cfo_compensation)
 
     def set_fixed_phase_increment(self, phase_increment, activate):

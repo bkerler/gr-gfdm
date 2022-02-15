@@ -45,6 +45,10 @@ class multi_port_receiver_cc(gr.hier_block2):
                 3 * num_antenna_ports, 3 * num_antenna_ports, gr.sizeof_gr_complex
             ),
         )  # Output signature
+        self.logger = gr.logger(f"gr_log.{self.symbol_name()}")
+        self.logger.debug(
+            f"{activate_cfo_compensation=}, {activate_phase_compensation=}"
+        )
 
         self.receivers = [
             receiver_cc(
@@ -92,6 +96,7 @@ class multi_port_receiver_cc(gr.hier_block2):
             return vals
 
     def set_activate_cfo_compensation(self, activate_cfo_compensation):
+        self.logger.debug(f"set_activate_cfo_compensation({activate_cfo_compensation})")
         for r in self.receivers:
             r.set_activate_cfo_compensation(activate_cfo_compensation)
 

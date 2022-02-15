@@ -87,12 +87,8 @@ float extract_burst_cc_impl::get_scale_factor(const pmt::pmt_t& info) const
     return scale_factor;
 }
 
-std::string cf_to_string(const gr_complex value)
-{
-    return fmt::format("{:.6f}{:+.6f}j", value.real(), value.imag());
-}
-
-std::string cd_to_string(const gr_complexd value)
+template <class T = float>
+std::string complex_to_string(const std::complex<T> value)
 {
     return fmt::format("{:.6f}{:+.6f}j", value.real(), value.imag());
 }
@@ -132,7 +128,8 @@ void extract_burst_cc_impl::normalize_power_level(gr_complex* p_out,
 
 void extract_burst_cc_impl::activate_cfo_compensation(bool activate_cfo_compensation)
 {
-    fmt::print("activate CFO compensation: {}\n", activate_cfo_compensation);
+    GR_LOG_DEBUG(d_logger,
+                 fmt::format("activate_cfo_compensation({})", activate_cfo_compensation));
     d_activate_cfo_correction = activate_cfo_compensation;
 }
 
