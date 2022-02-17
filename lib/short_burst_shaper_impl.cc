@@ -173,7 +173,6 @@ int short_burst_shaper_impl::work(int noutput_items,
     const gr_complex* in = (const gr_complex*)input_items[0];
     gr_complex* out = (gr_complex*)output_items[0];
 
-    // const auto nexpected_input_items = ninput_items[0];
     for (unsigned port = 0; port < input_items.size(); ++port) {
         const gr_complex* in = (const gr_complex*)input_items[port];
         gr_complex* out = (gr_complex*)output_items[port];
@@ -193,6 +192,7 @@ int short_burst_shaper_impl::work(int noutput_items,
         // uint64_t fts = pc_clock_ticks();
         // uint64_t ticks = fts;
         uint64_t fts = d_time_ticks;
+        const uint64_t time_ticks = fts;
 
         fts -= fts % d_cycle_interval_ticks;
         fts += d_cycle_interval_ticks;
@@ -204,11 +204,11 @@ int short_burst_shaper_impl::work(int noutput_items,
 
         fts += d_timing_advance_ticks;
 
-        uint64_t full_secs = ticks2fullsecs(fts);
-        double frac_secs = ticks2fracsecs(fts);
+        const uint64_t full_secs = ticks2fullsecs(fts);
+        const double frac_secs = ticks2fracsecs(fts);
 
         if (d_enable_dsp_latency_reporting) {
-            uint64_t now = pc_clock_ticks();
+            const uint64_t now = pc_clock_ticks();
             std::vector<gr::tag_t> tags;
             get_tags_in_range(tags,
                               0,
@@ -216,8 +216,8 @@ int short_burst_shaper_impl::work(int noutput_items,
                               nitems_read(0) + ninput_items[0],
                               d_dsp_time_key);
             for (const auto& tag : tags) {
-                uint64_t time = pmt::to_uint64(tag.value);
-                uint64_t dsp_latency_ticks = now - time;
+                const uint64_t time = pmt::to_uint64(tag.value);
+                const uint64_t dsp_latency_ticks = now - time;
                 const float dsp_latency_ms = 1.0e-6 * dsp_latency_ticks;
 
                 GR_LOG_DEBUG(d_logger,
@@ -228,12 +228,10 @@ int short_burst_shaper_impl::work(int noutput_items,
         }
 
         for (unsigned port = 0; port < input_items.size(); ++port) {
+            const auto tag_value =
+                pmt::make_tuple(pmt::from_uint64(full_secs), pmt::from_double(frac_secs));
             add_item_tag(
-                port,
-                nitems_written(port),
-                d_tx_time_key,
-                pmt::make_tuple(pmt::from_uint64(full_secs), pmt::from_double(frac_secs)),
-                d_src_id_key);
+                port, nitems_written(port), d_tx_time_key, tag_value, d_src_id_key);
         }
 
         d_has_new_time_tag = false;
