@@ -83,7 +83,9 @@ private:
             .count();
     }
 
+    const pmt::pmt_t d_src_id_key;
     const pmt::pmt_t d_tx_time_key = pmt::intern("tx_time");
+    const pmt::pmt_t d_rx_time_key = pmt::intern("rx_time");
     const pmt::pmt_t d_command_time_key = pmt::mp("time");
     const pmt::pmt_t d_command_gain_key = pmt::mp("gain");
 

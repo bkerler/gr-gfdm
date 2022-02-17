@@ -24,6 +24,7 @@
 
 #include "short_burst_shaper_impl.h"
 #include <gnuradio/io_signature.h>
+#include <fmt/core.h>
 #include <volk/volk.h>
 #include <chrono>
 #include <cstring>
@@ -73,18 +74,22 @@ short_burst_shaper_impl::short_burst_shaper_impl(int pre_padding,
       d_timing_advance(timing_advance),
       d_timing_advance_ticks(double2ticks(timing_advance)),
       d_cycle_interval(cycle_interval),
-      d_cycle_interval_ticks(double2ticks(cycle_interval))
+      d_cycle_interval_ticks(double2ticks(cycle_interval)),
+      d_src_id_key(pmt::mp(symbol_name()))
 {
     if (d_pre_padding < 0) {
-        throw std::invalid_argument("Pre-padding length MUST be >= 0!");
+        throw std::invalid_argument(
+            fmt::format("Pre-padding length MUST be >= 0!, but is: {}", d_pre_padding));
     }
     if (d_post_padding < 0) {
-        throw std::invalid_argument("Post-padding length MUST be >= 0!");
+        throw std::invalid_argument(
+            fmt::format("Post-padding length MUST be >= 0!, but is: {}", d_post_padding));
     }
 
     GR_LOG_DEBUG(d_logger,
-                 "cycle interval: " + std::to_string(d_cycle_interval) +
-                     ", ticks: " + std::to_string(d_cycle_interval_ticks));
+                 fmt::format("cycle interval: {}, ticks: {}",
+                             d_cycle_interval,
+                             d_cycle_interval_ticks));
 
     enable_update_rate(true);
 
@@ -144,7 +149,7 @@ void short_burst_shaper_impl::handle_msg(pmt::pmt_t time_msg)
         (pmt::equal(pmt::dict_ref(time_msg, pmt::mp("src"), pmt::from_long(-1)),
                     pmt::from_long(0)))) {
         d_rx_time =
-            pmt::to_long(pmt::dict_ref(time_msg, pmt::mp("rx_time"), pmt::from_long(0)));
+            pmt::to_long(pmt::dict_ref(time_msg, d_rx_time_key, pmt::from_long(0)));
 
     } else if (d_use_timed_commands && pmt::is_tuple(time_msg)) {
         d_full_secs = pmt::to_uint64(pmt::tuple_ref(time_msg, 0));
@@ -171,14 +176,14 @@ int short_burst_shaper_impl::work(int noutput_items,
         const gr_complex* in = (const gr_complex*)input_items[port];
         gr_complex* out = (gr_complex*)output_items[port];
 
-        std::memset(out, 0, sizeof(gr_complex) * d_pre_padding);
+        std::fill(out, out + d_pre_padding, gr_complex(0.0f, 0.0f));
 
         volk_32fc_s32fc_multiply_32fc(
             out + d_pre_padding, in, d_scale, ninput_items[port]);
 
-        std::memset(out + d_pre_padding + ninput_items[port],
-                    0,
-                    sizeof(gr_complex) * d_post_padding);
+        std::fill(out + d_pre_padding + ninput_items[port],
+                  out + d_pre_padding + ninput_items[port] + d_post_padding,
+                  gr_complex(0.0f, 0.0f));
     }
 
     if (d_use_timed_commands) {
@@ -200,36 +205,34 @@ int short_burst_shaper_impl::work(int noutput_items,
         uint64_t full_secs = ticks2fullsecs(fts);
         double frac_secs = ticks2fracsecs(fts);
 
-        // uint64_t heartbeat_counter = timespec2ticks(d_full_secs, d_frac_secs);
-        // uint64_t tx_counter = timespec2ticks(full_secs, frac_secs);
-        // if (heartbeat_counter > tx_counter) {
-        //     GR_LOG_DEBUG(d_logger,
-        //                  "timestamp: " + std::to_string(d_full_secs) + " . " +
-        //                      std::to_string(1000.0 * d_frac_secs) +
-        //                      " / system: " + std::to_string(full_secs) + " . " +
-        //                      std::to_string(1000.0 * frac_secs));
-        // }
+        /*
+        uint64_t now = pc_clock_ticks();
+        std::vector<gr::tag_t> tags;
+        get_tags_in_range(
+            tags, 0, nitems_read(0), nitems_read(0) + ninput_items[0], pmt::mp("time"));
+        for (const auto& tag : tags) {
+            uint64_t time = pmt::to_uint64(tag.value);
+            fmt::print("key={}\tvalue={},\ttxtime={},\tlast_ticks={},\tdiff={}\n",
+                       pmt::write_string(tag.key),
+                       pmt::write_string(tag.value),
+                       fts,
+                       d_time_ticks,
+                       now - time);
+        }
+        */
 
         for (unsigned port = 0; port < input_items.size(); ++port) {
-            add_item_tag(port,
-                         nitems_written(port),
-                         d_tx_time_key,
-                         pmt::make_tuple(pmt::from_uint64(full_secs),
-                                         pmt::from_double(frac_secs)));
+            add_item_tag(
+                port,
+                nitems_written(port),
+                d_tx_time_key,
+                pmt::make_tuple(pmt::from_uint64(full_secs), pmt::from_double(frac_secs)),
+                d_src_id_key);
         }
-        // send_rx_gain_command(full_secs, frac_secs, 0.0f);
-        // const uint64_t eob_ticks = fts + noutput_items + d_pre_padding +
-        // d_post_padding; send_rx_gain_command(ticks2fullsecs(eob_ticks),
-        // ticks2fracsecs(eob_ticks), 65.0f);
 
         d_has_new_time_tag = false;
         d_last_full_secs = full_secs;
         d_last_frac_secs = frac_secs;
-
-        // GR_LOG_DEBUG(d_logger, "Timestamp: " + std::to_string(tx_timestamp) + " PC
-        // timestamp: " + std::to_string(ticks) + " TX timestamp: " +
-        // std::to_string(fts)); GR_LOG_DEBUG(d_logger, "TX timestamp: " +
-        // std::to_string(fts));
     }
 
     // Tell runtime system how many output items we produced.
