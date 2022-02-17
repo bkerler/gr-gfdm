@@ -36,6 +36,7 @@ private:
     const int d_post_padding;
     gr_complex d_scale;
     const bool d_use_timed_commands;
+    const bool d_enable_dsp_latency_reporting;
     bool d_has_new_time_tag = false;
 
     double d_timing_advance;
@@ -88,6 +89,7 @@ private:
     const pmt::pmt_t d_rx_time_key = pmt::intern("rx_time");
     const pmt::pmt_t d_command_time_key = pmt::mp("time");
     const pmt::pmt_t d_command_gain_key = pmt::mp("gain");
+    const pmt::pmt_t d_dsp_time_key = pmt::intern("time");
 
     void send_rx_gain_commands(const int packet_len);
     void send_rx_gain_command(const uint64_t full_secs,
@@ -105,7 +107,8 @@ public:
                             const std::string& length_tag_name,
                             bool use_timed_commands,
                             double timing_advance,
-                            double cycle_interval);
+                            double cycle_interval,
+                            bool enable_dsp_latency_reporting = true);
     ~short_burst_shaper_impl();
 
     gr_complex scale() const { return d_scale; }

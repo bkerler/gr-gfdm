@@ -62,7 +62,8 @@ short_burst_shaper_impl::short_burst_shaper_impl(int pre_padding,
                                                  const std::string& length_tag_name,
                                                  bool use_timed_commands,
                                                  double timing_advance,
-                                                 double cycle_interval)
+                                                 double cycle_interval,
+                                                 bool enable_dsp_latency_reporting)
     : gr::tagged_stream_block("short_burst_shaper",
                               gr::io_signature::make(nports, nports, sizeof(gr_complex)),
                               gr::io_signature::make(nports, nports, sizeof(gr_complex)),
@@ -71,6 +72,7 @@ short_burst_shaper_impl::short_burst_shaper_impl(int pre_padding,
       d_post_padding(post_padding),
       d_scale(scale),
       d_use_timed_commands(use_timed_commands),
+      d_enable_dsp_latency_reporting(enable_dsp_latency_reporting),
       d_timing_advance(timing_advance),
       d_timing_advance_ticks(double2ticks(timing_advance)),
       d_cycle_interval(cycle_interval),
@@ -205,21 +207,25 @@ int short_burst_shaper_impl::work(int noutput_items,
         uint64_t full_secs = ticks2fullsecs(fts);
         double frac_secs = ticks2fracsecs(fts);
 
-        /*
-        uint64_t now = pc_clock_ticks();
-        std::vector<gr::tag_t> tags;
-        get_tags_in_range(
-            tags, 0, nitems_read(0), nitems_read(0) + ninput_items[0], pmt::mp("time"));
-        for (const auto& tag : tags) {
-            uint64_t time = pmt::to_uint64(tag.value);
-            fmt::print("key={}\tvalue={},\ttxtime={},\tlast_ticks={},\tdiff={}\n",
-                       pmt::write_string(tag.key),
-                       pmt::write_string(tag.value),
-                       fts,
-                       d_time_ticks,
-                       now - time);
+        if (d_enable_dsp_latency_reporting) {
+            uint64_t now = pc_clock_ticks();
+            std::vector<gr::tag_t> tags;
+            get_tags_in_range(tags,
+                              0,
+                              nitems_read(0),
+                              nitems_read(0) + ninput_items[0],
+                              d_dsp_time_key);
+            for (const auto& tag : tags) {
+                uint64_t time = pmt::to_uint64(tag.value);
+                uint64_t dsp_latency_ticks = now - time;
+                const float dsp_latency_ms = 1.0e-6 * dsp_latency_ticks;
+
+                GR_LOG_DEBUG(d_logger,
+                             fmt::format("TX DSP latency:\tticks={}\t{:.4f}ms",
+                                         dsp_latency_ticks,
+                                         dsp_latency_ms));
+            }
         }
-        */
 
         for (unsigned port = 0; port < input_items.size(); ++port) {
             add_item_tag(
