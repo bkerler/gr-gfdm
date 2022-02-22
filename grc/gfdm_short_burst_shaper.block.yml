@@ -37,6 +37,10 @@ parameters:
       label: Cycle interval
       dtype: float
       default: 250.0e-6
+    - id: enable_dsp_latency_reporting
+      label: Enable DSP latency reporting
+      dtype: bool
+      default: False
 
 asserts:
     - ${ pre_padding >= 0 }
@@ -61,7 +65,7 @@ outputs:
 
 templates:
     imports: import gfdm
-    make: gfdm.short_burst_shaper(${pre_padding}, ${post_padding}, ${scale}, ${nports}, ${length_tag_name}, ${use_timed_commands}, ${timing_advance}, ${cycle_interval})
+    make: gfdm.short_burst_shaper(${pre_padding}, ${post_padding}, ${scale}, ${nports}, ${length_tag_name}, ${use_timed_commands}, ${timing_advance}, ${cycle_interval}, ${enable_dsp_latency_reporting})
     callbacks:
         - set_scale(${scale})
         - set_timing_advance(${timing_advance})

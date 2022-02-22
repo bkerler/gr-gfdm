@@ -1,6 +1,6 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2019 Johannes Demel.
+ * Copyright 2019, 2022 Johannes Demel.
  *
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,6 +32,14 @@ namespace gfdm {
  * \brief Add Padding and Scale Burst.
  * \ingroup gfdm
  *
+ * In its simplest form, this block adds zero padding around every frame.
+ * Besides, it scales the input according to the scale value.
+ *
+ * However, this block received some more optional features.
+ * It is possible to emit time tags for a UHD sink to control TX time.
+ * It is possible to calculate a DSP latency time if a tag with key "time" is found.
+ * This key needs to carry a uint64 pmt value with nanosecs from std::chrono.
+ *
  */
 class GFDM_API short_burst_shaper : virtual public gr::tagged_stream_block
 {
@@ -53,7 +61,8 @@ public:
                      const std::string& length_tag_name = "packet_len",
                      bool use_timed_commands = false,
                      double timing_advance = 1.0e-3,
-                     double cycle_interval = 250e-6);
+                     double cycle_interval = 250e-6,
+                     bool enable_dsp_latency_reporting = false);
 
     /*!
      * \brief Return multiplicative constant

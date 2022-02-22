@@ -90,6 +90,7 @@ private:
     const pmt::pmt_t d_command_time_key = pmt::mp("time");
     const pmt::pmt_t d_command_gain_key = pmt::mp("gain");
     const pmt::pmt_t d_dsp_time_key = pmt::intern("time");
+    const pmt::pmt_t d_dsp_latency_key = pmt::intern("dsp_latency");
 
     void send_rx_gain_commands(const int packet_len);
     void send_rx_gain_command(const uint64_t full_secs,

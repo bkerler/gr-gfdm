@@ -40,16 +40,19 @@ short_burst_shaper::sptr short_burst_shaper::make(int pre_padding,
                                                   const std::string& length_tag_name,
                                                   bool use_timed_commands,
                                                   double timing_advance,
-                                                  double cycle_interval)
+                                                  double cycle_interval,
+                                                  bool enable_dsp_latency_reporting)
 {
-    return gnuradio::make_block_sptr<short_burst_shaper_impl>(pre_padding,
-                                                              post_padding,
-                                                              scale,
-                                                              nports,
-                                                              length_tag_name,
-                                                              use_timed_commands,
-                                                              timing_advance,
-                                                              cycle_interval);
+    return gnuradio::make_block_sptr<short_burst_shaper_impl>(
+        pre_padding,
+        post_padding,
+        scale,
+        nports,
+        length_tag_name,
+        use_timed_commands,
+        timing_advance,
+        cycle_interval,
+        enable_dsp_latency_reporting);
 }
 
 /*
@@ -207,26 +210,6 @@ int short_burst_shaper_impl::work(int noutput_items,
         const uint64_t full_secs = ticks2fullsecs(fts);
         const double frac_secs = ticks2fracsecs(fts);
 
-        if (d_enable_dsp_latency_reporting) {
-            const uint64_t now = pc_clock_ticks();
-            std::vector<gr::tag_t> tags;
-            get_tags_in_range(tags,
-                              0,
-                              nitems_read(0),
-                              nitems_read(0) + ninput_items[0],
-                              d_dsp_time_key);
-            for (const auto& tag : tags) {
-                const uint64_t time = pmt::to_uint64(tag.value);
-                const uint64_t dsp_latency_ticks = now - time;
-                const float dsp_latency_ms = 1.0e-6 * dsp_latency_ticks;
-
-                GR_LOG_DEBUG(d_logger,
-                             fmt::format("TX DSP latency:\tticks={}\t{:.4f}ms",
-                                         dsp_latency_ticks,
-                                         dsp_latency_ms));
-            }
-        }
-
         for (unsigned port = 0; port < input_items.size(); ++port) {
             const auto tag_value =
                 pmt::make_tuple(pmt::from_uint64(full_secs), pmt::from_double(frac_secs));
@@ -237,6 +220,24 @@ int short_burst_shaper_impl::work(int noutput_items,
         d_has_new_time_tag = false;
         d_last_full_secs = full_secs;
         d_last_frac_secs = frac_secs;
+    }
+
+    if (d_enable_dsp_latency_reporting) {
+        const uint64_t now = pc_clock_ticks();
+        std::vector<gr::tag_t> tags;
+        get_tags_in_range(
+            tags, 0, nitems_read(0), nitems_read(0) + ninput_items[0], d_dsp_time_key);
+        uint64_t dsp_latency_ticks = 0;
+        for (const auto& tag : tags) {
+            const uint64_t time = pmt::to_uint64(tag.value);
+            dsp_latency_ticks = now - time;
+        }
+
+        for (unsigned port = 0; port < input_items.size(); ++port) {
+            const auto tag_value = pmt::from_uint64(dsp_latency_ticks);
+            add_item_tag(
+                port, nitems_written(port), d_dsp_latency_key, tag_value, d_src_id_key);
+        }
     }
 
     // Tell runtime system how many output items we produced.
