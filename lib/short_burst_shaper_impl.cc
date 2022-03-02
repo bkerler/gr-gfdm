@@ -92,7 +92,8 @@ short_burst_shaper_impl::short_burst_shaper_impl(int pre_padding,
     }
 
     GR_LOG_DEBUG(d_logger,
-                 fmt::format("cycle interval: {}, ticks: {}",
+                 fmt::format("use_timed_commands: {}, cycle interval: {}, ticks: {}",
+                             d_use_timed_commands,
                              d_cycle_interval,
                              d_cycle_interval_ticks));
 
