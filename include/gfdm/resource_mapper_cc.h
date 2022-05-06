@@ -21,11 +21,13 @@ namespace gfdm {
  *
  * This block prepares the input vector for the GFDM modulator.
  *
+ * See: gr::gfdm::resource_mapper_kernel_cc
+ *
  * \param timeslots Number of timeslots in a GFDM frame
  * \param subcarriers Number of subcarriers in a GFDM frame
- * \param active_subcarriers Number of occupied subcarriers smaller or equal to \p subcarriers
- * \param subcarrier_map Indices of occupied subcarriers
- * \param per_timeslot Fill vector timeslot-wise or subcarrier-wise
+ * \param active_subcarriers Number of occupied subcarriers smaller or equal to \p
+ * subcarriers \param subcarrier_map Indices of occupied subcarriers \param per_timeslot
+ * Fill vector timeslot-wise or subcarrier-wise
  */
 class GFDM_API resource_mapper_cc : virtual public gr::block
 {

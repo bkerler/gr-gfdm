@@ -20,8 +20,9 @@ namespace gfdm {
  * \ingroup gfdm
  *
  * Extract a burst, or block, or frame with a fixed length.
- * A tag indicates the start of a burst and CFO compensation may be applied if this burst start tag carries such information.
- * The \p burst_start_tag info may be forwarded with a different key.
+ * A tag indicates the start of a burst and CFO compensation may be applied if this burst
+ * start tag carries such information. The \p burst_start_tag info may be forwarded with a
+ * different key.
  *
  * \param burst_len Number of samples to extract for each tag
  * \param tag_backoff Number of samples before the tag to extract

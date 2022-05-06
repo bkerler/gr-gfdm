@@ -22,8 +22,8 @@ namespace gfdm {
  * \brief Advanced GFDM demodulator GR block
  * \ingroup gfdm
  *
- * This block integrates the gr::gfdm::advanced_receiver_kernel_cc into the GNU Radio streaming API.
- * All parameters are forwarded to gr::gfdm::advanced_receiver_kernel_cc.
+ * This block integrates the gr::gfdm::advanced_receiver_kernel_cc into the GNU Radio
+ * streaming API. All parameters are forwarded to gr::gfdm::advanced_receiver_kernel_cc.
  *
  */
 class GFDM_API advanced_receiver_sb_cc : virtual public gr::sync_block
