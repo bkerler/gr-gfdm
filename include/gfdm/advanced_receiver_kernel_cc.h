@@ -1,21 +1,8 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2016 Johannes Demel.
+ * Copyright 2017 - 2022 Johannes Demel.
  *
- * This is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3, or (at your option)
- * any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.  If not, write to
- * the Free Software Foundation, Inc., 51 Franklin Street,
- * Boston, MA 02110-1301, USA.
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 
@@ -31,7 +18,23 @@ namespace gr {
 namespace gfdm {
 
 /*!
- * \brief Hold config and functions for advanced IC kernel.
+ * \brief Advanced GFDM demodulator kernel
+ * \ingroup gfdm
+ *
+ * The advanced GFDM demodulator kernel holds all functions and buffers that are required
+ * to demodulate with Interference Cancellation (IC). Computational complexity is mostly
+ * steered with \p overlap, \p ic_iter, and \p do_phase_compensation. This kernel uses the
+ * gr::gfdm::receiver_kernel_cc internally.
+ *
+ * \param timeslots Number of timeslots in a GFDM frame
+ * \param subcarriers Number of subcarriers in a GFDM frame. occupied an unoccupied.
+ * \param overlap Overlap factor. 2 is sufficient in most cases.
+ * \param frequency_taps Filter taps in the frequency domain
+ * \param subcarrier_map vector with indices of used subcarriers
+ * \param ic_iter Number of IC iterations. 2 iterations is sufficient.
+ * \param constellation GR constellation object. Usually PSK/QAM
+ * \param do_phase_compensation Estimate and equalize residual phase error in first IC
+ * iteration.
  *
  */
 class GFDM_API advanced_receiver_kernel_cc

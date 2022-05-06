@@ -1,22 +1,9 @@
 /* -*- c++ -*- */
 /*
  * Copyright 2016 Andrej Rode
- * Copyright 2020, 2021 Johannes Demel
+ * Copyright 2016, 2017, 2019 - 2022 Johannes Demel
  *
- * GNU Radio is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3, or (at your option)
- * any later version.
- *
- * GNU Radio is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with GNU Radio; see the file COPYING.  If not, write to
- * the Free Software Foundation, Inc., 51 Franklin Street,
- * Boston, MA 02110-1301, USA.
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 #ifndef INCLUDED_GFDM_RECEIVER_KERNEL_CC_H
@@ -33,20 +20,25 @@ namespace gr {
 namespace gfdm {
 
 /*!
- * \brief Demodulate a GFDM block
+ * \brief GFDM demodulator kernel
  *  This class initializes and performs all operations necessary to demodulate a GFDM
  * block.
  *
- */
-/*!
  * \details
  * The GFDM receiver kernel class provides all necessary operations to blocks which
  * instantiate it. Further functions and methods not depending on GNU Radio should be
  * implemented here. This receiver implementation is based on [Gas+13]. It is recommended
- * to use overlap = 2 to make use of sparse frequency domain processing.
+ * to use \p overlap = 2 to make use of sparse frequency domain processing.
  *
  * [Gas+13] I.S. Gaspar et al. "Low Complexity GFDM Receiver Based on Sparse Frequency
  * Domain Processing"
+ *
+ * See gr::gfdm::modulator_kernel_cc
+ *
+ * \param n_timeslots Number of timeslots in a GFDM frame
+ * \param n_subcarriers Number of subcarriers in a GFDM frame
+ * \param overlap Steers modulation complexity and accuracy. 2 is usually sufficient.
+ * \param frequency_taps Subcarrier filter taps in frequency domain
  *
  */
 class __attribute__((visibility("default"))) receiver_kernel_cc : public gfdm_kernel_utils

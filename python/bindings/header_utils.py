@@ -2,11 +2,14 @@
 
 from argparse import ArgumentParser
 import re
+import pathlib
 
 
 class PybindHeaderParser:
     def __init__(self, pathname):
-        with open(pathname, "r") as f:
+        path = pathlib.Path(pathname)
+        path = path.resolve()
+        with path.open(mode="r") as f:
             self.file_txt = f.read()
 
     def get_flag_automatic(self):

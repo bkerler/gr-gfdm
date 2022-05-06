@@ -1,21 +1,8 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2017 Johannes Demel.
+ * Copyright 2017 - 2022 Johannes Demel.
  *
- * This is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3, or (at your option)
- * any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.  If not, write to
- * the Free Software Foundation, Inc., 51 Franklin Street,
- * Boston, MA 02110-1301, USA.
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 
@@ -30,12 +17,22 @@ namespace gfdm {
 
 /*!
  * \brief Preamble-based channel estimator
+ * \ingroup gfdm
  *
  * Estimate current channel realization based on a received preamble.
  * The output is a channel estimate that one may use directly
  * to equalize a GFDM frame in the frequency domain.
- * \ingroup gfdm
  *
+ * See gr::gfdm::preamble_channel_estimator_cc for details.
+ *
+ * \param timeslots Number of timeslots in a GFDM frame
+ * \param fft_len Number of subcarriers in a GFDM frame. occupied an unoccupied.
+ * \param active_subcarriers Number of occupied/used subcarriers.
+ * \param is_dc_free true if the DC carrier is unoccupied.
+ * \param which_estimator Select estimator by integer.
+ * \param preamble Known transmitted preamble.
+ * \param snr_tag_key key for sample tag that carries SNR info.
+ * \param cnr_tag_key key for sample tag that carries CNR values.
  */
 class GFDM_API channel_estimator_cc : virtual public gr::block
 {

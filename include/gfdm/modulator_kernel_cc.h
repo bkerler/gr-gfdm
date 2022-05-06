@@ -1,21 +1,8 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2016 Johannes Demel.
+ * Copyright 2016, 2019 - 2022 Johannes Demel.
  *
- * This is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3, or (at your option)
- * any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.  If not, write to
- * the Free Software Foundation, Inc., 51 Franklin Street,
- * Boston, MA 02110-1301, USA.
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 
@@ -33,9 +20,18 @@ namespace gr {
 namespace gfdm {
 
 /*!
- * \brief modulate a GFDM block.
- *  This class initializes and performs all operations necessary to modulate a GFDM block.
+ * \brief GFDM modulator kernel
+ * \ingroup gfdm
  *
+ * This kernel holds the GFDM modulator. It takes a vector with occupied an unoccupied
+ * subcarriers. The result is one GFDM frame. The \p frequency_taps should decay rapidly
+ * outside the subcarrier bandwidth. In that case, \p overlap 2 yields very accurate
+ * results and holds complexity at bay.
+ *
+ * \param n_timeslots Number of timeslots in a GFDM frame
+ * \param n_subcarriers Number of subcarriers in a GFDM frame
+ * \param overlap Steers modulation complexity and accuracy. 2 is usually sufficient.
+ * \param frequency_taps Subcarrier filter taps in frequency domain
  */
 class __attribute__((visibility("default"))) modulator_kernel_cc
     : public gfdm_kernel_utils
@@ -74,7 +70,7 @@ private:
     static bool complex_compare(gfdm_complex i, gfdm_complex j)
     {
         return std::abs(i) < std::abs(j);
-    };
+    }
 };
 
 } // namespace gfdm

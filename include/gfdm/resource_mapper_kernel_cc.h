@@ -2,20 +2,7 @@
 /*
  * Copyright 2016 Johannes Demel.
  *
- * This is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3, or (at your option)
- * any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.  If not, write to
- * the Free Software Foundation, Inc., 51 Franklin Street,
- * Boston, MA 02110-1301, USA.
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 
@@ -29,10 +16,20 @@ namespace gr {
 namespace gfdm {
 
 /*!
- * \brief map complex information symbols to GFDM resource grid.
- * Input is a vector with all complex information symbols for one GFDM frame.
- * Result is a vector which is fed to gfdm_modulator.
+ * \brief Kernel to map and demap complex samples to/from a GFDM frame.
+ * \ingroup gfdm
  *
+ * Map complex information symbols to GFDM resource grid.
+ * Input is a vector with all complex information symbols for one GFDM frame.
+ * Result is a vector which is fed to gr::gfdm::modulator_kernel_cc
+ * In demapper mode, the gr::gfdm::receiver_kernel_cc emits the expected vector.
+ *
+ * \param timeslots Number of timeslots in a GFDM frame
+ * \param subcarriers Number of subcarriers in a GFDM frame
+ * \param active_subcarriers Number of occupied subcarriers smaller or equal to \p subcarriers
+ * \param subcarrier_map Indices of occupied subcarriers
+ * \param per_timeslot Fill vector timeslot-wise or subcarrier-wise
+ * \param is_mapper switch between mapping and demapping operation
  */
 class __attribute__((visibility("default"))) resource_mapper_kernel_cc
 {

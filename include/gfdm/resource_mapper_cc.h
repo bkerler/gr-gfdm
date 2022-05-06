@@ -1,21 +1,8 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2016 Johannes Demel.
+ * Copyright 2016, 2019, 2020, 2022 Johannes Demel.
  *
- * This is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3, or (at your option)
- * any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.  If not, write to
- * the Free Software Foundation, Inc., 51 Franklin Street,
- * Boston, MA 02110-1301, USA.
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 
@@ -29,9 +16,16 @@ namespace gr {
 namespace gfdm {
 
 /*!
- * \brief Take timeslots * active_subcarriers items and map them on a vector for GFDM
- * modulation. \ingroup gfdm
+ * \brief Map info symbols to GFDM frame.
+ * \ingroup gfdm
  *
+ * This block prepares the input vector for the GFDM modulator.
+ *
+ * \param timeslots Number of timeslots in a GFDM frame
+ * \param subcarriers Number of subcarriers in a GFDM frame
+ * \param active_subcarriers Number of occupied subcarriers smaller or equal to \p subcarriers
+ * \param subcarrier_map Indices of occupied subcarriers
+ * \param per_timeslot Fill vector timeslot-wise or subcarrier-wise
  */
 class GFDM_API resource_mapper_cc : virtual public gr::block
 {

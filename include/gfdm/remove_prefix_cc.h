@@ -1,21 +1,9 @@
 /* -*- c++ -*- */
 /*
  * Copyright 2016 Andrej Rode.
+ * Copyright 2016, 2019, 2020, 2022 Johannes Demel.
  *
- * This is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3, or (at your option)
- * any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.  If not, write to
- * the Free Software Foundation, Inc., 51 Franklin Street,
- * Boston, MA 02110-1301, USA.
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 
@@ -29,9 +17,14 @@ namespace gr {
 namespace gfdm {
 
 /*!
- * \brief extract block_len items from frame_len chunks of items, marked with a tag plus
- * offset \ingroup gfdm
+ * \brief Extract \p block_len samples from \p frame_len samples at \p offset
+ * \ingroup gfdm
  *
+ * \param frame_len Number of samples to extract sub part from
+ * \param block_len Number of samples to extract
+ * \param offset Offset to start at in \p frame_len
+ * \param gfdm_sync_tag_key Tag key that indicates start of a frame with \p frame_len
+ * samples.
  */
 class GFDM_API remove_prefix_cc : virtual public gr::block
 {

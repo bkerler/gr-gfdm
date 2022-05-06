@@ -1,21 +1,8 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2017 Johannes Demel.
+ * Copyright 2017 - 2022 Johannes Demel.
  *
- * This is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3, or (at your option)
- * any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.  If not, write to
- * the Free Software Foundation, Inc., 51 Franklin Street,
- * Boston, MA 02110-1301, USA.
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 
@@ -30,12 +17,17 @@ namespace gfdm {
 
 /*!
  * \brief Extract burst at tag position
- *
- * Burst must have constant size.
- * CFO correction may be applied if tag provides information.
- * May update tag key if desired.
  * \ingroup gfdm
  *
+ * Extract a burst, or block, or frame with a fixed length.
+ * A tag indicates the start of a burst and CFO compensation may be applied if this burst start tag carries such information.
+ * The \p burst_start_tag info may be forwarded with a different key.
+ *
+ * \param burst_len Number of samples to extract for each tag
+ * \param tag_backoff Number of samples before the tag to extract
+ * \param burst_start_tag Key of the tag indicating a burst start
+ * \param activate_cfo_correction Activate CFO compensation based on tag info
+ * \param forward_burst_start_tag Tag key for info forwarded from \p burst_start_tag
  */
 class GFDM_API extract_burst_cc : virtual public gr::block
 {

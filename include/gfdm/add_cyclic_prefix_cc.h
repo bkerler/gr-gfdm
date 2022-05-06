@@ -1,21 +1,8 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2016, 2021 Johannes Demel.
+ * Copyright 2016, 2019, 2020, 2021, 2022 Johannes Demel.
  *
- * This is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3, or (at your option)
- * any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.  If not, write to
- * the Free Software Foundation, Inc., 51 Franklin Street,
- * Boston, MA 02110-1301, USA.
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 
@@ -32,9 +19,23 @@ namespace gfdm {
 
 /*!
  * \brief Kernel adds cyclic prefix to GFDM frame and applies block pinching window.
+ * \ingroup gfdm
+ *
+ * This block prepends \p cp_len samples from the back of a block to the front
+ * and appends \p cs_len samples from the front to the back of a block.
+ * The first and last \p ramp_len samples are multiplied with the \p ramp_len
+ * first and last samples in \p window_taps. This measure helps to reduce OOB emissions.
+ *
+ * The \p cyclic_shift parameter helps with Cyclic Delay Diversity (CDD).
+ *
+ * \param block_len Number of modulated symbols
+ * \param cp_len Cyclic prefix length in samples
+ * \param cs_len Cyclic suffix length in samples. Typically equal to \p rampl_len
+ * \param ramp_len Number of samples used for block pinching.
+ * \param window_taps Taps used for block pinching. Typically RC taps cf. WiFi.
+ * \param cyclic_shift Number of samples cyclic block shift for CDD
  *
  */
-
 class __attribute__((visibility("default"))) add_cyclic_prefix_cc
 {
 public:
