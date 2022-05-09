@@ -24,6 +24,7 @@
 
 #include <gnuradio/io_signature.h>
 #include <gfdm/advanced_receiver_kernel_cc.h>
+#include <type_traits>
 #include <volk/volk.h>
 
 namespace gr {
@@ -45,6 +46,8 @@ advanced_receiver_kernel_cc::advanced_receiver_kernel_cc(
       d_kernel(std::make_unique<receiver_kernel_cc>(
           timeslots, subcarriers, overlap, frequency_taps))
 {
+    static_assert(std::is_same<gr_complex, gr::gfdm::gfdm_kernel_utils::gfdm_complex>(),
+                  "gr_complex and gfdm_complex MUST alias the same type!");
     // Initialize buffers for temporary subcarrier data
     d_freq_block.resize(d_kernel->block_size());
     d_ic_time_buffer.resize(d_kernel->block_size());
