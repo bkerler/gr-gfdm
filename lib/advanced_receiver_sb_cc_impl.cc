@@ -2,20 +2,7 @@
 /*
  * Copyright 2016 Andrej Rode, Johannes Demel.
  *
- * This is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3, or (at your option)
- * any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.  If not, write to
- * the Free Software Foundation, Inc., 51 Franklin Street,
- * Boston, MA 02110-1301, USA.
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 #ifdef HAVE_CONFIG_H
@@ -30,8 +17,8 @@ namespace gr {
 namespace gfdm {
 
 advanced_receiver_sb_cc::sptr
-advanced_receiver_sb_cc::make(int n_timeslots,
-                              int n_subcarriers,
+advanced_receiver_sb_cc::make(int timeslots,
+                              int subcarriers,
                               int overlap,
                               int ic_iter,
                               std::vector<gr_complex> frequency_taps,
@@ -39,8 +26,8 @@ advanced_receiver_sb_cc::make(int n_timeslots,
                               std::vector<int> subcarrier_map,
                               int do_phase_compensation)
 {
-    return gnuradio::make_block_sptr<advanced_receiver_sb_cc_impl>(n_timeslots,
-                                                                   n_subcarriers,
+    return gnuradio::make_block_sptr<advanced_receiver_sb_cc_impl>(timeslots,
+                                                                   subcarriers,
                                                                    overlap,
                                                                    ic_iter,
                                                                    frequency_taps,
@@ -53,8 +40,8 @@ advanced_receiver_sb_cc::make(int n_timeslots,
  * The private constructor
  */
 advanced_receiver_sb_cc_impl::advanced_receiver_sb_cc_impl(
-    int n_timeslots,
-    int n_subcarriers,
+    int timeslots,
+    int subcarriers,
     int overlap,
     int ic_iter,
     std::vector<gr_complex> frequency_taps,
@@ -66,8 +53,8 @@ advanced_receiver_sb_cc_impl::advanced_receiver_sb_cc_impl(
                      gr::io_signature::make(1, 1, sizeof(gr_complex)))
 {
     // int do_phase_compensation = 1;
-    d_adv_kernel = std::make_unique<advanced_receiver_kernel_cc>(n_timeslots,
-                                                                 n_subcarriers,
+    d_adv_kernel = std::make_unique<advanced_receiver_kernel_cc>(timeslots,
+                                                                 subcarriers,
                                                                  overlap,
                                                                  frequency_taps,
                                                                  subcarrier_map,

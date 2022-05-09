@@ -26,8 +26,8 @@ namespace gfdm {
  *
  * \param timeslots Number of timeslots in a GFDM frame
  * \param subcarriers Number of subcarriers in a GFDM frame
- * \param active_subcarriers Number of occupied subcarriers smaller or equal to \p
- * subcarriers \param subcarrier_map Indices of occupied subcarriers \param per_timeslot
+ * \param active_subcarriers Number of occupied subcarriers. Smaller/equal \p subcarriers
+ * \param subcarrier_map Indices of occupied subcarriers \param per_timeslot
  * Fill vector timeslot-wise or subcarrier-wise \param is_mapper switch between mapping
  * and demapping operation
  */

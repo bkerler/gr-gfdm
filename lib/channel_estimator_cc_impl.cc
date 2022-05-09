@@ -2,20 +2,7 @@
 /*
  * Copyright 2017 Johannes Demel.
  *
- * This is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3, or (at your option)
- * any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.  If not, write to
- * the Free Software Foundation, Inc., 51 Franklin Street,
- * Boston, MA 02110-1301, USA.
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 #ifdef HAVE_CONFIG_H
@@ -29,7 +16,7 @@ namespace gr {
 namespace gfdm {
 
 channel_estimator_cc::sptr channel_estimator_cc::make(int timeslots,
-                                                      int fft_len,
+                                                      int subcarriers,
                                                       int active_subcarriers,
                                                       bool is_dc_free,
                                                       int which_estimator,
@@ -38,7 +25,7 @@ channel_estimator_cc::sptr channel_estimator_cc::make(int timeslots,
                                                       const std::string& cnr_tag_key)
 {
     return gnuradio::make_block_sptr<channel_estimator_cc_impl>(timeslots,
-                                                                fft_len,
+                                                                subcarriers,
                                                                 active_subcarriers,
                                                                 is_dc_free,
                                                                 which_estimator,
@@ -51,7 +38,7 @@ channel_estimator_cc::sptr channel_estimator_cc::make(int timeslots,
  * The private constructor
  */
 channel_estimator_cc_impl::channel_estimator_cc_impl(int timeslots,
-                                                     int fft_len,
+                                                     int subcarriers,
                                                      int active_subcarriers,
                                                      bool is_dc_free,
                                                      int which_estimator,
@@ -64,13 +51,18 @@ channel_estimator_cc_impl::channel_estimator_cc_impl(int timeslots,
       d_snr_tag_key(pmt::intern(snr_tag_key)),
       d_cnr_vector_tag_key(pmt::intern(cnr_tag_key))
 {
-    d_estimator_kernel = std::make_unique<preamble_channel_estimator_cc>(
-        timeslots, fft_len, active_subcarriers, is_dc_free, which_estimator, preamble);
+    d_estimator_kernel =
+        std::make_unique<preamble_channel_estimator_cc>(timeslots,
+                                                        subcarriers,
+                                                        active_subcarriers,
+                                                        is_dc_free,
+                                                        which_estimator,
+                                                        preamble);
 
     // set block properties!
     set_relative_rate(timeslots / 2.0);
     set_fixed_rate(true);
-    set_output_multiple(fft_len * timeslots);
+    set_output_multiple(subcarriers * timeslots);
 }
 
 /*

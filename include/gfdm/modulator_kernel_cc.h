@@ -28,8 +28,8 @@ namespace gfdm {
  * outside the subcarrier bandwidth. In that case, \p overlap 2 yields very accurate
  * results and holds complexity at bay.
  *
- * \param n_timeslots Number of timeslots in a GFDM frame
- * \param n_subcarriers Number of subcarriers in a GFDM frame
+ * \param timeslots Number of timeslots in a GFDM frame
+ * \param subcarriers Number of subcarriers in a GFDM frame
  * \param overlap Steers modulation complexity and accuracy. 2 is usually sufficient.
  * \param frequency_taps Subcarrier filter taps in frequency domain
  */
@@ -37,8 +37,8 @@ class __attribute__((visibility("default"))) modulator_kernel_cc
     : public gfdm_kernel_utils
 {
 public:
-    modulator_kernel_cc(int n_timeslots,
-                        int n_subcarriers,
+    modulator_kernel_cc(int timeslots,
+                        int subcarriers,
                         int overlap,
                         std::vector<gfdm_complex> frequency_taps);
     ~modulator_kernel_cc();

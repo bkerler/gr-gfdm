@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Free Software Foundation, Inc.
+ * Copyright 2022 Free Software Foundation, Inc.
  *
  * This file is part of GNU Radio
  *
@@ -13,8 +13,8 @@
 /* If manual edits are made, the following tags should be modified accordingly.    */
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
-/* BINDTOOL_HEADER_FILE(simple_modulator_cc.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(34c2be9ad92bac9e8e9eaa7963675e70)                     */
+/* BINDTOOL_HEADER_FILE(simple_modulator_cc.h)                                     */
+/* BINDTOOL_HEADER_FILE_HASH(926a036e51c1f3dd1edaa3e1f348ad00)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -41,8 +41,8 @@ void bind_simple_modulator_cc(py::module& m)
         m, "simple_modulator_cc", D(simple_modulator_cc))
 
         .def(py::init(&simple_modulator_cc::make),
-             py::arg("n_timeslots"),
-             py::arg("n_subcarriers"),
+             py::arg("timeslots"),
+             py::arg("subcarriers"),
              py::arg("overlap"),
              py::arg("frequency_taps"),
              D(simple_modulator_cc, make))

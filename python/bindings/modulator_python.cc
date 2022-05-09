@@ -12,9 +12,10 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(modulator_kernel_cc.h)                                     */
-/* BINDTOOL_HEADER_FILE_HASH(71d391ff2f04c9ac1007324b3f62992d)                     */
+/* BINDTOOL_HEADER_FILE_HASH(44cedb1cfc613839bb2157d27f2bb4fb)                     */
 /***********************************************************************************/
 
+#include <fmt/core.h>
 #include <pybind11/complex.h>
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
@@ -45,10 +46,11 @@ void bind_modulator(py::module& m)
                      throw std::runtime_error("Only ONE-dimensional vectors allowed!");
                  }
                  if (inb.size != self.block_size()) {
-                     throw std::runtime_error("Input vector size(" +
-                                              std::to_string(inb.size) +
-                                              ") MUST be equal to Modulator.block_size(" +
-                                              std::to_string(self.block_size()) + ")!");
+                     throw std::runtime_error(
+                         fmt::format("Input vector size({}) MUST be equal to "
+                                     "Modulator.block_size({})!",
+                                     inb.size,
+                                     self.block_size()));
                  }
                  auto result = py::array_t<modulator_kernel_cc::gfdm_complex>(inb.size);
                  py::buffer_info resb = result.request();

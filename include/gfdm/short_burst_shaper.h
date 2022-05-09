@@ -1,21 +1,8 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2019, 2022 Johannes Demel.
+ * Copyright 2019 - 2022 Johannes Demel.
  *
- * This is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3, or (at your option)
- * any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.  If not, write to
- * the Free Software Foundation, Inc., 51 Franklin Street,
- * Boston, MA 02110-1301, USA.
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 
@@ -29,7 +16,7 @@ namespace gr {
 namespace gfdm {
 
 /*!
- * \brief Add Padding and Scale Burst.
+ * \brief Control burst transmit behavior
  * \ingroup gfdm
  *
  * In its simplest form, this block adds zero padding around every frame.
@@ -40,6 +27,19 @@ namespace gfdm {
  * It is possible to calculate a DSP latency time if a tag with key "time" is found.
  * This key needs to carry a uint64 pmt value with nanosecs from std::chrono.
  *
+ * This block is separate from the rest of the system. It doesn't necessarily require
+ * GFDM. Every bursty transmission may benefit from this block.
+ *
+ * \param pre_padding Number of zeros prepend to burst
+ * \param post_padding Number of zeros appended to burst
+ * \param scale Scaling value.
+ * \param nports Number of parallel streams to support.
+ * \param length_tag_name Tag key to update and use
+ * \param use_timed_commands Enable timed commands for USRP sink.
+ * \param timing_advance [in seconds] Add duration to current time for timed bursts.
+ * \param cycle_interval [in seconds] Allow a new burst every cycle interval
+ * \param enable_dsp_latency_reporting Debug parameter to read timestamp tags and print
+ * elapsed time to logging.
  */
 class GFDM_API short_burst_shaper : virtual public gr::tagged_stream_block
 {

@@ -2,20 +2,7 @@
 /*
  * Copyright 2017 Johannes Demel.
  *
- * This is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3, or (at your option)
- * any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.  If not, write to
- * the Free Software Foundation, Inc., 51 Franklin Street,
- * Boston, MA 02110-1301, USA.
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 #ifdef HAVE_CONFIG_H
@@ -33,34 +20,34 @@ namespace gfdm {
 
 preamble_channel_estimator_cc::preamble_channel_estimator_cc(
     int timeslots,
-    int fft_len,
+    int subcarriers,
     int active_subcarriers,
     bool is_dc_free,
     int which_estimator,
     std::vector<gfdm_complex> preamble)
     : d_timeslots(timeslots),
-      d_fft_len(fft_len),
+      d_fft_len(subcarriers),
       d_active_subcarriers(active_subcarriers),
       d_is_dc_free(is_dc_free),
       d_which_estimator(which_estimator),
       d_n_gaussian_taps(9)
 {
-    d_preamble_fft_in.resize(fft_len);
-    d_preamble_fft_out.resize(fft_len);
+    d_preamble_fft_in.resize(subcarriers);
+    d_preamble_fft_out.resize(subcarriers);
     d_preamble_fft_plan = initialize_fft(
-        d_preamble_fft_out.data(), d_preamble_fft_in.data(), fft_len, true);
+        d_preamble_fft_out.data(), d_preamble_fft_in.data(), subcarriers, true);
 
-    d_snr_fft_in.resize(2 * fft_len);
-    d_snr_fft_out.resize(2 * fft_len);
+    d_snr_fft_in.resize(2 * subcarriers);
+    d_snr_fft_out.resize(2 * subcarriers);
     d_snr_fft_plan =
-        initialize_fft(d_snr_fft_out.data(), d_snr_fft_in.data(), 2 * fft_len, true);
+        initialize_fft(d_snr_fft_out.data(), d_snr_fft_in.data(), 2 * subcarriers, true);
 
-    d_inv_freq_preamble0.resize(fft_len);
-    d_inv_freq_preamble1.resize(fft_len);
+    d_inv_freq_preamble0.resize(subcarriers);
+    d_inv_freq_preamble1.resize(subcarriers);
     initialize_inv_freq_preamble(d_inv_freq_preamble0.data(), &preamble[0]);
-    initialize_inv_freq_preamble(d_inv_freq_preamble1.data(), &preamble[fft_len]);
+    initialize_inv_freq_preamble(d_inv_freq_preamble1.data(), &preamble[subcarriers]);
 
-    d_intermediate_channel_estimate.resize(fft_len);
+    d_intermediate_channel_estimate.resize(subcarriers);
 
     d_gaussian_taps.resize(d_n_gaussian_taps);
     initialize_gaussian_filter(d_gaussian_taps.data(), 1.0f, d_n_gaussian_taps);
@@ -68,10 +55,10 @@ preamble_channel_estimator_cc::preamble_channel_estimator_cc(
     int intermediate_filter_len =
         active_subcarriers + d_n_gaussian_taps + (is_dc_free ? 1 : 0);
     d_filter_intermediate.resize(intermediate_filter_len);
-    d_preamble_estimate.resize(fft_len);
+    d_preamble_estimate.resize(subcarriers);
     d_filtered_estimate.resize(active_subcarriers + (is_dc_free ? 1 : 0));
 
-    d_one_reference.resize(timeslots * fft_len);
+    d_one_reference.resize(timeslots * subcarriers);
     for (int i = 0; i < frame_len(); ++i) {
         d_one_reference[i] = gfdm_complex(1.0f, 0.0f);
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Free Software Foundation, Inc.
+ * Copyright 2022 Free Software Foundation, Inc.
  *
  * This file is part of GNU Radio
  *
@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(channel_estimator_cc.h)                                    */
-/* BINDTOOL_HEADER_FILE_HASH(3091b6dd0ff759736a7a41019d6417f0)                     */
+/* BINDTOOL_HEADER_FILE_HASH(1bbea605cc9f3b2939abc85f51d85471)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -41,7 +41,7 @@ void bind_channel_estimator_cc(py::module& m)
 
         .def(py::init(&channel_estimator_cc::make),
              py::arg("timeslots"),
-             py::arg("fft_len"),
+             py::arg("subcarriers"),
              py::arg("active_subcarriers"),
              py::arg("is_dc_free"),
              py::arg("which_estimator"),

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Free Software Foundation, Inc.
+ * Copyright 2022 Free Software Foundation, Inc.
  *
  * This file is part of GNU Radio
  *
@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(advanced_receiver_sb_cc.h)                                 */
-/* BINDTOOL_HEADER_FILE_HASH(1f7cebd0161b71d033adeb0bf34900da)                     */
+/* BINDTOOL_HEADER_FILE_HASH(cc0931eca8cd3a33d81878f4d4ca323a)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -41,8 +41,8 @@ void bind_advanced_receiver_sb_cc(py::module& m)
         m, "advanced_receiver_sb_cc", D(advanced_receiver_sb_cc))
 
         .def(py::init(&advanced_receiver_sb_cc::make),
-             py::arg("n_timeslots"),
-             py::arg("n_subcarriers"),
+             py::arg("timeslots"),
+             py::arg("subcarriers"),
              py::arg("overlap"),
              py::arg("ic_iter"),
              py::arg("frequency_taps"),

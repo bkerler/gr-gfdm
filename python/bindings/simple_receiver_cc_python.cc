@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Free Software Foundation, Inc.
+ * Copyright 2022 Free Software Foundation, Inc.
  *
  * This file is part of GNU Radio
  *
@@ -13,8 +13,8 @@
 /* If manual edits are made, the following tags should be modified accordingly.    */
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
-/* BINDTOOL_HEADER_FILE(simple_receiver_cc.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(e504c62de6bc7e1a98560aed377d2cd5)                     */
+/* BINDTOOL_HEADER_FILE(simple_receiver_cc.h)                                      */
+/* BINDTOOL_HEADER_FILE_HASH(3232a1db0ad8b59f6742671d115cadad)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -41,8 +41,8 @@ void bind_simple_receiver_cc(py::module& m)
         m, "simple_receiver_cc", D(simple_receiver_cc))
 
         .def(py::init(&simple_receiver_cc::make),
-             py::arg("n_timeslots"),
-             py::arg("n_subcarriers"),
+             py::arg("timeslots"),
+             py::arg("subcarriers"),
              py::arg("overlap"),
              py::arg("frequency_taps"),
              D(simple_receiver_cc, make))

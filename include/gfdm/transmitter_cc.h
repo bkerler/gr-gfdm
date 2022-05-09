@@ -1,21 +1,8 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2018 Johannes Demel.
+ * Copyright 2018 - 2022 Johannes Demel.
  *
- * This is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3, or (at your option)
- * any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.  If not, write to
- * the Free Software Foundation, Inc., 51 Franklin Street,
- * Boston, MA 02110-1301, USA.
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 
@@ -29,9 +16,30 @@ namespace gr {
 namespace gfdm {
 
 /*!
- * \brief <+description of block+>
+ * \brief GFDM transmitter chain in one GR block
  * \ingroup gfdm
  *
+ * See gr::gfdm::transmitter_kernel
+ *
+ * This blocks performs resource mapping, modulation, cyclic prefixing, and preamble
+ * insertion. Besides GFDM modulation these operations are lightweight and thus combining
+ * them in one block seems beneficial from a latency point of view.
+ *
+ * \param timeslots Number of timeslots in a GFDM frame
+ * \param subcarriers Number of subcarriers in a GFDM frame
+ * \param active_subcarriers Number of occupied subcarriers smaller or equal to \p
+ * subcarriers
+ * \param cp_len Cyclic prefix length in samples
+ * \param cs_len Cyclic suffix length in samples. Typically equal to \p rampl_len
+ * \param ramp_len Number of samples used for block pinching.
+ * \param subcarrier_map Indices of occupied subcarriers
+ * \param per_timeslot Fill vector timeslot-wise or subcarrier-wise
+ * \param overlap Steers modulation complexity and accuracy. 2 is usually sufficient.
+ * \param frequency_taps Subcarrier filter taps in frequency domain
+ * \param window_taps Taps used for block pinching. Typically RC taps cf. WiFi.
+ * \param cyclic_shift Number of samples cyclic block shift for CDD
+ * \param preambles Preamble vectors with cyclic shifts.
+ * \param tsb_tag_key Length tag key. If non-empty update GR length tag key.
  */
 class GFDM_API transmitter_cc : virtual public gr::block
 {

@@ -39,8 +39,8 @@ public:
      * class. gfdm::advanced_receiver_sb_cc::make is the public interface for
      * creating new instances.
      */
-    static sptr make(int n_timeslots,
-                     int n_subcarriers,
+    static sptr make(int timeslots,
+                     int subcarriers,
                      int overlap,
                      int ic_iter,
                      std::vector<gr_complex> frequency_taps,

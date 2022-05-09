@@ -2,22 +2,10 @@
 /*
  * Copyright 2016 Johannes Demel.
  *
- * This is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3, or (at your option)
- * any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.  If not, write to
- * the Free Software Foundation, Inc., 51 Franklin Street,
- * Boston, MA 02110-1301, USA.
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+#include <fmt/core.h>
 #include <gfdm/modulator_kernel_cc.h>
 #include <string.h>
 #include <volk/volk.h>
@@ -27,39 +15,40 @@
 namespace gr {
 namespace gfdm {
 
-modulator_kernel_cc::modulator_kernel_cc(int n_timeslots,
-                                         int n_subcarriers,
+modulator_kernel_cc::modulator_kernel_cc(int timeslots,
+                                         int subcarriers,
                                          int overlap,
                                          std::vector<gfdm_complex> frequency_taps)
-    : d_n_timeslots(n_timeslots),
-      d_n_subcarriers(n_subcarriers),
-      d_ifft_len(n_timeslots * n_subcarriers),
+    : d_n_timeslots(timeslots),
+      d_n_subcarriers(subcarriers),
+      d_ifft_len(timeslots * subcarriers),
       d_overlap(overlap)
 {
-    if (int(frequency_taps.size()) != n_timeslots * overlap) {
-        std::string err_str("number of frequency taps(");
-        err_str += std::to_string(frequency_taps.size()) +
-                   ") MUST be equal to n_timeslots(" + std::to_string(n_timeslots) +
-                   ") * overlap(" + std::to_string(overlap) +
-                   ") = " + std::to_string(n_timeslots * overlap) + "!";
+    if (int(frequency_taps.size()) != timeslots * overlap) {
+        auto err_str = fmt::format("number of frequency taps({}) MUST be equal to "
+                                   "timeslots({}) * overlap({}) = {}!",
+                                   frequency_taps.size(),
+                                   timeslots,
+                                   overlap,
+                                   timeslots * overlap);
         throw std::invalid_argument(err_str.c_str());
     }
 
-    d_filter_taps.resize(n_timeslots * overlap);
-    initialize_taps_vector(d_filter_taps.data(), frequency_taps, n_timeslots);
+    d_filter_taps.resize(timeslots * overlap);
+    initialize_taps_vector(d_filter_taps.data(), frequency_taps, timeslots);
 
     // first create input and output buffers for a new FFTW plan.
-    d_sub_fft_in.resize(n_timeslots);
-    d_sub_fft_out.resize(n_timeslots);
+    d_sub_fft_in.resize(timeslots);
+    d_sub_fft_out.resize(timeslots);
     d_sub_fft_plan =
-        initialize_fft(d_sub_fft_out.data(), d_sub_fft_in.data(), n_timeslots, true);
+        initialize_fft(d_sub_fft_out.data(), d_sub_fft_in.data(), timeslots, true);
 
-    d_filtered.resize(n_timeslots);
+    d_filtered.resize(timeslots);
 
     d_ifft_in.resize(d_ifft_len);
     d_ifft_out.resize(d_ifft_len);
     d_ifft_plan = initialize_fft(
-        d_ifft_out.data(), d_ifft_in.data(), n_timeslots * n_subcarriers, false);
+        d_ifft_out.data(), d_ifft_in.data(), timeslots * subcarriers, false);
 }
 
 modulator_kernel_cc::~modulator_kernel_cc()

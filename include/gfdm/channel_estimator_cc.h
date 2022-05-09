@@ -22,11 +22,12 @@ namespace gfdm {
  * Estimate current channel realization based on a received preamble.
  * The output is a channel estimate that one may use directly
  * to equalize a GFDM frame in the frequency domain.
+ * Preamble length is 2 \p subcarriers.
  *
  * See gr::gfdm::preamble_channel_estimator_cc for details.
  *
  * \param timeslots Number of timeslots in a GFDM frame
- * \param fft_len Number of subcarriers in a GFDM frame. occupied an unoccupied.
+ * \param subcarriers Number of subcarriers in a GFDM frame. occupied an unoccupied.
  * \param active_subcarriers Number of occupied/used subcarriers.
  * \param is_dc_free true if the DC carrier is unoccupied.
  * \param which_estimator Select estimator by integer.
@@ -48,7 +49,7 @@ public:
      * creating new instances.
      */
     static sptr make(int timeslots,
-                     int fft_len,
+                     int subcarriers,
                      int active_subcarriers,
                      bool is_dc_free,
                      int which_estimator,

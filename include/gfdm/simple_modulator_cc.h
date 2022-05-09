@@ -1,21 +1,8 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2016 Johannes Demel.
+ * Copyright 2016, 2019, 2020, 2022 Johannes Demel.
  *
- * This is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3, or (at your option)
- * any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this software; see the file COPYING.  If not, write to
- * the Free Software Foundation, Inc., 51 Franklin Street,
- * Boston, MA 02110-1301, USA.
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 
@@ -29,9 +16,18 @@ namespace gr {
 namespace gfdm {
 
 /*!
- * \brief <+description of block+>
+ * \brief GFDM modulator block
  * \ingroup gfdm
  *
+ * This block takes in a vector emitted from gr::gfdm::resource_mapper_cc
+ * and performs modulation. Computational complexity is steered via \p overlap.
+ *
+ * See gr::gfdm::modulator_kernel_cc
+ *
+ * \param timeslots Number of timeslots in a GFDM frame
+ * \param subcarriers Number of subcarriers in a GFDM frame
+ * \param overlap Steers modulation complexity and accuracy. 2 is usually sufficient.
+ * \param frequency_taps Subcarrier filter taps in frequency domain
  */
 class GFDM_API simple_modulator_cc : virtual public gr::sync_block
 {
@@ -46,8 +42,8 @@ public:
      * class. gfdm::simple_modulator_cc::make is the public interface for
      * creating new instances.
      */
-    static sptr make(int n_timeslots,
-                     int n_subcarriers,
+    static sptr make(int timeslots,
+                     int subcarriers,
                      int overlap,
                      std::vector<gr_complex> frequency_taps);
 };

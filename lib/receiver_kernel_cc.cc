@@ -2,65 +2,50 @@
 /*
  * Copyright 2016 Andrej Rode.
  *
- * This file is part of GNU Radio
- *
- * GNU Radio is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3, or (at your option)
- * any later version.
- *
- * GNU Radio is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with GNU Radio; see the file COPYING.  If not, write to
- * the Free Software Foundation, Inc., 51 Franklin Street,
- * Boston, MA 02110-1301, USA.
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+#include <fmt/core.h>
 #include <gfdm/receiver_kernel_cc.h>
 #include <string.h>
 #include <volk/volk.h>
-#include <iostream>
 
 namespace gr {
 namespace gfdm {
 
-receiver_kernel_cc::receiver_kernel_cc(int n_timeslots,
-                                       int n_subcarriers,
+receiver_kernel_cc::receiver_kernel_cc(int timeslots,
+                                       int subcarriers,
                                        int overlap,
                                        std::vector<gfdm_complex> frequency_taps)
-    : d_n_subcarriers(n_subcarriers),
-      d_n_timeslots(n_timeslots),
-      d_block_len(n_timeslots * n_subcarriers),
+    : d_n_subcarriers(subcarriers),
+      d_n_timeslots(timeslots),
+      d_block_len(timeslots * subcarriers),
       d_overlap(overlap)
 {
-    if (int(frequency_taps.size()) != n_timeslots * overlap) {
-        std::stringstream sstm;
-        sstm << "number of frequency taps(" << frequency_taps.size()
-             << ") MUST be equal to n_timeslots(";
-        sstm << n_timeslots << ") * overlap(" << overlap
-             << ") = " << n_timeslots * overlap << "!";
-        throw std::invalid_argument(sstm.str().c_str());
+    if (int(frequency_taps.size()) != timeslots * overlap) {
+        auto err_str = fmt::format("number of frequency taps({}) MUST be equal to "
+                                   "timeslots({}) * overlap({}) = {}!",
+                                   frequency_taps.size(),
+                                   timeslots,
+                                   overlap,
+                                   timeslots * overlap);
+        throw std::invalid_argument(err_str.c_str());
     }
     if (d_overlap < 2) {
-        std::stringstream sstm;
-        sstm << "overlap MUST be greater or equal 2";
-        throw std::invalid_argument(sstm.str().c_str());
+        auto err_str = fmt::format("overlap({}) MUST be greater or equal 2!", overlap);
+        throw std::invalid_argument(err_str.c_str());
     }
-    d_filter_taps.resize(n_timeslots * overlap);
-    initialize_taps_vector(d_filter_taps.data(), frequency_taps, n_timeslots);
+    d_filter_taps.resize(timeslots * overlap);
+    initialize_taps_vector(d_filter_taps.data(), frequency_taps, timeslots);
 
-    d_ic_filter_taps.resize(n_timeslots);
+    d_ic_filter_taps.resize(timeslots);
     std::fill(d_ic_filter_taps.begin(), d_ic_filter_taps.end(), gfdm_complex(0.0f, 0.0f));
     // Calculate IC_Filter_taps d_overlap MUST be greater or equal to 2,only consider
     // interference of neigboring subcarriers
     ::volk_32fc_x2_multiply_32fc(d_ic_filter_taps.data(),
                                  d_filter_taps.data(),
-                                 d_filter_taps.data() + n_timeslots * (overlap - 1),
-                                 n_timeslots);
+                                 d_filter_taps.data() + timeslots * (overlap - 1),
+                                 timeslots);
 
     // Initialize input FFT
     d_in_fft_in.resize(d_block_len);
