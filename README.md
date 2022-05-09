@@ -1,9 +1,13 @@
+[![DOI](https://zenodo.org/badge/59550080.svg)](https://zenodo.org/badge/latestdoi/59550080)
+[![CI tests](https://github.com/jdemel/gr-gfdm/actions/workflows/run-test.yml/badge.svg)](https://github.com/jdemel/gr-gfdm/actions/workflows/run-test.yml)
+[![Code Formatting](https://github.com/jdemel/gr-gfdm/actions/workflows/check-formatting.yml/badge.svg)](https://github.com/jdemel/gr-gfdm/actions/workflows/check-formatting.yml)
+
 GNU Radio GFDM Modulator/Demodulator
 ================
 
 The *gr-gfdm* project is a Free Software Package which aims to provide an implementation of Generalized Frequency Division Multiplexing (GFDM) in the GNU Radio framework. GFDM is a proposed waveform for use in 5G.
 
-This project was initiated as a Bachelor thesis at the *Communication Engineering Lab (CEL)* at the *Karlsruhe Institute of Technology (KIT)*, Germany, <http://www.cel.kit.edu>.
+This project was initiated as a Bachelor thesis at the [*Communication Engineering Lab (CEL)*](http://www.cel.kit.edu) at the [*Karlsruhe Institute of Technology (KIT)*](https://www.kit.edu/), Germany.
 It has since evolved and is used in over-the-air demos at the [*Department of Communications Engineering (ANT)*](https://www.ant.uni-bremen.de) at [*University of Bremen*](https://uni-bremen.de).
 
 Concept
@@ -14,7 +18,7 @@ Tackling current issues with *OFDM* several new waveforms are proposed for consi
 
 *GFDM* can be described by parallelizing several *SC-FDE* streams on subcarrier. The transmit symbols are localized in a time/frequency-grid and pulshaping is applied subcarrier-wise. After pulshaping and localizing on the correct subcarrier-frequency the symbolstreams are superpositioned and can be transmitted. On receiver side the symbols on the subcarrier can be extracted by applying a *MF*, *ZF* or *MMSE*-filter of the previous pulseshaping filter. Non-orthogonality of neighboring subcarrier introduces *ICI* if demodulating with *MF*. A successive interference cancellation algorithm is proposed to remove interference.
 
-Due to its block-nature a block synchronisation with improved Schmidl & Cox - Symbols can be achievd.
+Due to its block-nature a block synchronisation with improved Schmidl & Cox - Symbols can be achieved.
 
 Capabilities
 -------------
@@ -100,6 +104,8 @@ References
 
 3. N. Michailow et al. “Generalized frequency division multiplexing: Analysis of an alternative multi-carrier technique for next generation cellular systems”. In: Wireless Communication Systems (ISWCS), 2012 International Symposium on. IEEE, 2012, S. 171–175. doi: 10.1109/ISWCS.2012.6328352.
 
+Publications
+-------------
 4. J. Demel, C. Bockelmann, A. Dekorsy "Evaluation of a Software Defined GFDM Implementation for Industry 4.0 Applications". In: IEEE International Conference on Industrial Technology (ICIT 2017), Toronto, Canada, 22. - 25. March 2017
 
 5. J. Demel, C. Bockelmann, A. Dekorsy, Andrej Rode, Sebastian Koslowski, Friedrich K. Jondral "An optimized GFDM software implementation for future Cloud-RAN and field tests". In: GNU Radio Conference 2017, San Diego, USA, 11. - 15. September 2017
