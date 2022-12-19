@@ -96,7 +96,7 @@ class qa_extract_burst_cc(gr_unittest.TestCase):
         tags = []
         for i in range(n_frames):
             frame = np.ones(burst_len) * (i + 1)
-            frame = frame.astype(np.complex)
+            frame = frame.astype(complex)
             ref = np.concatenate((ref, frame))
 
             phase = convert_frequency_to_phase_increment(freq_offset, samp_rate)
