@@ -1,6 +1,5 @@
 {
     "title": "GNU Radio GFDM Modulator & Demodulator (gr-gfdm)",
-    "description": "The *gr-gfdm* project is a Free Software Package which aims to provide an implementation of Generalized Frequency Division Multiplexing (GFDM) in the GNU Radio framework. GFDM is a more flexible alternative to OFDM.",
     "license": {
         "id": "GPL-3.0-or-later"
     },
@@ -14,6 +13,37 @@
         "multicarrier",
         "OFDM",
         "GFDM"
+    ],
+    "related_identifiers": [
+        {
+            "scheme": "doi",
+            "identifier": "10.1109/TCOMM.2014.2345566",
+            "relation": "references",
+            "resource_type": "publication-article"
+        },
+        {
+            "scheme": "doi",
+            "identifier": "10.1109/VTCSpring.2013.6692619",
+            "relation": "references",
+            "resource_type": "publication-conferencepaper"
+        },
+        {
+            "scheme": "doi",
+            "identifier": "10.1109/ISWCS.2012.6328352",
+            "relation": "references",
+            "resource_type": "publication-conferencepaper"
+        },
+        {
+            "scheme": "doi",
+            "identifier": "10.1109/ICIT.2017.7915548",
+            "relation": "isDocumentedBy",
+            "resource_type": "publication-conferencepaper"
+        },
+        {
+            "identifier": "https://pubs.gnuradio.org/index.php/grcon/article/view/23/17",
+            "relation": "isDocumentedBy",
+            "resource_type": "publication-conferencepaper"
+        }
     ],
     "creators": [
         {

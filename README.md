@@ -98,14 +98,14 @@ Further, we have a GitHub Action to check proper code formatting.
 
 References
 -------------
-1. N. Michailow et al. “Generalized Frequency Division Multiplexing for 5th Generation Cellular Networks”. In: Communications, IEEE Transactions on 62.9 (2014), S. 3045–3061. doi: 10.1109/TCOMM.2014.2345566.
+1. N. Michailow et al. “Generalized Frequency Division Multiplexing for 5th Generation Cellular Networks”. In: Communications, IEEE Transactions on 62.9 (2014), S. 3045–3061. doi: [10.1109/TCOMM.2014.2345566](https://doi.org/10.1109/TCOMM.2014.2345566).
 
-2. I.S. Gaspar et al. “Low Complexity GFDM Receiver Based on Sparse Frequency Domain Processing”. In: Vehicular Technology Conference (VTC Spring), 2013 IEEE 77th. IEEE, 2013, S. 1–6. doi: 10.1109/VTCSpring.2013.6692619.
+2. I.S. Gaspar et al. “Low Complexity GFDM Receiver Based on Sparse Frequency Domain Processing”. In: Vehicular Technology Conference (VTC Spring), 2013 IEEE 77th. IEEE, 2013, S. 1–6. doi: [10.1109/VTCSpring.2013.6692619](https://doi.org/10.1109/VTCSpring.2013.6692619).
 
-3. N. Michailow et al. “Generalized frequency division multiplexing: Analysis of an alternative multi-carrier technique for next generation cellular systems”. In: Wireless Communication Systems (ISWCS), 2012 International Symposium on. IEEE, 2012, S. 171–175. doi: 10.1109/ISWCS.2012.6328352.
+3. N. Michailow et al. “Generalized frequency division multiplexing: Analysis of an alternative multi-carrier technique for next generation cellular systems”. In: Wireless Communication Systems (ISWCS), 2012 International Symposium on. IEEE, 2012, S. 171–175. doi: [10.1109/ISWCS.2012.6328352](https://doi.org/10.1109/ISWCS.2012.6328352).
 
 Publications
 -------------
-4. J. Demel, C. Bockelmann, A. Dekorsy "Evaluation of a Software Defined GFDM Implementation for Industry 4.0 Applications". In: IEEE International Conference on Industrial Technology (ICIT 2017), Toronto, Canada, 22. - 25. March 2017
+4. J. Demel, C. Bockelmann, A. Dekorsy "Evaluation of a Software Defined GFDM Implementation for Industry 4.0 Applications". In: IEEE International Conference on Industrial Technology (ICIT 2017), Toronto, Canada, 22. - 25. March 2017, doi: [10.1109/ICIT.2017.7915548](https://doi.org/10.1109/ICIT.2017.7915548)
 
-5. J. Demel, C. Bockelmann, A. Dekorsy, Andrej Rode, Sebastian Koslowski, Friedrich K. Jondral "An optimized GFDM software implementation for future Cloud-RAN and field tests". In: GNU Radio Conference 2017, San Diego, USA, 11. - 15. September 2017
+5. J. Demel, C. Bockelmann, A. Dekorsy, Andrej Rode, Sebastian Koslowski, Friedrich K. Jondral ["An optimized GFDM software implementation for future Cloud-RAN and field tests"](https://pubs.gnuradio.org/index.php/grcon/article/view/23/17). In: GNU Radio Conference 2017, San Diego, USA, 11. - 15. September 2017
