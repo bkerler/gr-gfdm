@@ -74,7 +74,7 @@ private:
 
     double ticks2fracsecs(const uint64_t ticks) const
     {
-        return double(ticks % 1000000000ull) / 1000000000.0d;
+        return double(ticks % 1000000000ull) / 1000000000.0;
     }
 
     uint64_t pc_clock_ticks() const

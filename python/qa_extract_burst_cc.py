@@ -140,7 +140,7 @@ class qa_extract_burst_cc(gr_unittest.TestCase):
             absdiff = np.abs(right - left)
 
             print(
-                f"{i} {left:.7} == {right:.7}\t |{leftampl}|\t|{rightampl}|\tampl=={np.abs(leftampl - rightampl) < 1.0e-7}\t{absdiff=} != {absdiff < 1.0e-4}\t{phase:.7}"
+                f"{i:4} {left:.7} == {right:.7}\t |{leftampl:.7}|\t|{rightampl:.7}|\tampl=={np.abs(leftampl - rightampl) < 1.0e-7}\t{absdiff=:.7e} != {absdiff < 1.0e-4}\t{phase:.7}"
             )
             self.assertAlmostEqual(leftampl, rightampl, 4)
             self.assertLess(phase, 1.0e-6)

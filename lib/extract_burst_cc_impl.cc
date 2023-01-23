@@ -181,7 +181,7 @@ int extract_burst_cc_impl::general_work(int noutput_items,
 
         if (avail_items - burst_start >= d_burst_len &&
             produced_items + d_burst_len <= noutput_items) {
-            if (not tag.offset > d_last_tag_offset) {
+            if (not(tag.offset > d_last_tag_offset)) {
                 GR_LOG_DEBUG(d_logger,
                              fmt::format("DANGER! Burst {}/{}\tburst_idx={} @{} "
                                          "xcorr_offset={} xcorr_idx: {} src: {}",
