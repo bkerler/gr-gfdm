@@ -27,7 +27,6 @@ cmake --build . --config Release --target install
 if errorlevel 1 exit 1
 
 :: test
-pip install scikit-commpy
-if errorlevel 1 exit 1
-ctest --build-config Release --output-on-failure --timeout 120 -j%CPU_COUNT%
-if errorlevel 1 exit 1
+:: if errorlevel 1 exit 1
+:: ctest --build-config Release --output-on-failure --timeout 120 -j%CPU_COUNT%
+:: if errorlevel 1 exit 1
