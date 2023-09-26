@@ -47,6 +47,11 @@ public:
                      int active_subcarriers,
                      std::vector<int> subcarrier_map,
                      bool per_timeslot);
+
+    virtual void
+    set_pilots(const std::vector<std::tuple<unsigned, unsigned, gr_complex>> pilots) = 0;
+
+    virtual std::vector<std::tuple<unsigned, unsigned, gr_complex>> pilots() const = 0;
 };
 
 } // namespace gfdm

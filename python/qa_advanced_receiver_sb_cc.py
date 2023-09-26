@@ -26,7 +26,7 @@ from gnuradio import blocks, digital
 import gfdm_python as gfdm
 from pygfdm import filters, utils
 from pygfdm.gfdm_receiver import gfdm_demodulate_block
-from pygfdm.mapping import get_subcarrier_map
+from pygfdm.mapping import get_subcarrier_map, map_to_waveform_resources, map_to_waveform_resource_grid
 from pygfdm.utils import get_random_qpsk, calculate_signal_energy
 import numpy as np
 
@@ -197,6 +197,89 @@ class qa_advanced_receiver_sb_cc(gr_unittest.TestCase):
         self.assertComplexTuplesAlmostEqual(data, res, 1)
         # self.assertComplexTuplesAlmostEqual(data, res, 2)
 
+
+    def test_005_pilots(self):
+        np.set_printoptions(linewidth=250, precision=3)
+        print(f"Test receiver demodulator with pilots")
+        n_frames = 1
+        timeslots = 15
+        subcarriers = 64
+        active_subcarriers = 60
+        overlap = 2
+        ic_iterations = 2
+        f_taps = filters.get_frequency_domain_filter(
+            "rrc", 0.2, timeslots, subcarriers, overlap
+        )
+        gfdm_constellation = digital.constellation_calcdist(
+            [-0.707 - 0.707j, -0.707 + 0.707j, 0.707 + 0.707j, 0.707 - 0.707j],
+            [0, 1, 3, 2],
+            4,
+            1,
+            digital.constellation.AMPLITUDE_NORMALIZATION,
+        ).base()
+        # print(gfdm_constellation.points())
+        subcarrier_map = get_subcarrier_map(subcarriers, active_subcarriers, True)
+
+        import pathlib
+        data = np.load(pathlib.Path(__file__).parent / "symbols.npy")
+        # frame = np.load(pathlib.Path(__file__).parent / "frame.npy")
+
+        matdata = map_to_waveform_resource_grid(np.copy(data), active_subcarriers, subcarriers, subcarrier_map, True)
+
+        print(matdata)
+        print(matdata.shape)
+
+        scs = np.concatenate((np.arange(0, 29, 4) + 1, np.arange(63, 34, -4)))
+        scs = np.sort(scs)
+        refpilots = []
+        for s in scs:
+            p = matdata[s, 0]
+            print(f"{s=} t=0\t{p.real:+.3f} {p.imag:+.3f}")
+            refpilots.append((s, 0, p))
+
+        # data = get_random_qpsk(n_frames * timeslots * active_subcarriers)
+        # data *= 2.0
+        src = blocks.vector_source_c(data)
+        rot = 2. * np.pi * 0.02
+        eqdata = np.array([1.+0.j,] * timeslots * subcarriers) * np.exp(1.j * rot)
+        estimate = blocks.vector_source_c(eqdata)
+        mapper = gfdm.resource_mapper_cc(
+            timeslots, subcarriers, active_subcarriers, subcarrier_map, True
+        )
+        mod = gfdm.simple_modulator_cc(timeslots, subcarriers, overlap, f_taps)
+        demod = gfdm.advanced_receiver_sb_cc(
+            timeslots,
+            subcarriers,
+            overlap,
+            ic_iterations,
+            f_taps,
+            gfdm_constellation,
+            subcarrier_map,
+            0,
+        )
+        demod.set_ic(64)
+        demod.set_pilots(refpilots)
+        print(f"{demod.activate_pilot_estimation(True)=}")
+        demapper = gfdm.resource_demapper_cc(
+            timeslots, subcarriers, active_subcarriers, subcarrier_map, True
+        )
+        snk = blocks.vector_sink_c()
+        self.tb.connect(src, mapper, mod, demod, demapper, snk)
+        self.tb.connect(estimate, (demod, 1))
+        self.tb.run()
+
+        res = np.array(snk.data())
+        print(f"{rot=}")
+        print(data[0:10])
+        print(res[0:10])
+        used_pilots = demod.pilots()
+        print(used_pilots)
+        for ref, used in zip(refpilots, used_pilots):
+            self.assertEqual(ref[0], used[0])
+            self.assertEqual(ref[1], used[1])
+            self.assertComplexAlmostEqual(ref[2], used[2])
+        self.assertComplexTuplesAlmostEqual(data, res, 1)
+        # self.assertComplexTuplesAlmostEqual(data, res, 2)
 
 if __name__ == "__main__":
     gr_unittest.run(qa_advanced_receiver_sb_cc)

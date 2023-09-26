@@ -40,7 +40,7 @@ public:
                               int active_subcarriers,
                               std::vector<int> subcarrier_map,
                               bool per_timeslot);
-    ~resource_demapper_cc_impl();
+    ~resource_demapper_cc_impl() = default;
 
     // Where all the action really happens
     void forecast(int noutput_items, gr_vector_int& ninput_items_required);
@@ -51,6 +51,20 @@ public:
                      gr_vector_int& ninput_items,
                      gr_vector_const_void_star& input_items,
                      gr_vector_void_star& output_items);
+
+    void set_pilots(const std::vector<std::tuple<unsigned, unsigned, gr_complex>> pilots)
+    {
+        d_kernel->set_pilots(pilots);
+        set_relative_rate(1.0 * d_kernel->output_vector_size() /
+                          d_kernel->input_vector_size());
+        set_fixed_rate(true);
+        set_output_multiple(d_kernel->output_vector_size());
+    }
+
+    std::vector<std::tuple<unsigned, unsigned, gr_complex>> pilots() const
+    {
+        return d_kernel->pilots();
+    }
 };
 
 } // namespace gfdm

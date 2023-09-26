@@ -47,6 +47,6 @@ void bind_resource_demapper_cc(py::module& m)
              py::arg("per_timeslot"),
              D(resource_demapper_cc, make))
 
-
-        ;
+        .def("pilots", &resource_demapper_cc::pilots)
+        .def("set_pilots", &resource_demapper_cc::set_pilots);
 }

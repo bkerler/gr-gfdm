@@ -37,7 +37,7 @@ preamble_seed = int(3660365253)
 
 def get_gfdm_configuration(timeslots=9, subcarriers=64, active_subcarriers=52, overlap=2,
                            cp_len=16, cs_len=8, filtertype='rrc', filteralpha=0.2,
-                           cyclic_shifts=[0, ]):
+                           cyclic_shifts=[0, ], pilot_distance=4):
     ramp_len = cs_len
     dconf = {
         'timeslots': timeslots,

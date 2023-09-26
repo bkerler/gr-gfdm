@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(advanced_receiver_sb_cc.h)                                 */
-/* BINDTOOL_HEADER_FILE_HASH(cc0931eca8cd3a33d81878f4d4ca323a)                     */
+/* BINDTOOL_HEADER_FILE_HASH(54c2ca1ab836fbe0c1c510bfe45cf330)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -73,5 +73,9 @@ void bind_advanced_receiver_sb_cc(py::module& m)
              &advanced_receiver_sb_cc::get_ic,
              D(advanced_receiver_sb_cc, get_ic))
 
-        ;
+        .def("activate_pilot_estimation",
+             &advanced_receiver_sb_cc::activate_pilot_estimation)
+
+        .def("pilots", &advanced_receiver_sb_cc::pilots)
+        .def("set_pilots", &advanced_receiver_sb_cc::set_pilots);
 }

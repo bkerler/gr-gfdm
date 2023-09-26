@@ -167,3 +167,18 @@ class receiver_cc(gr.hier_block2):
 
     def set_activate_phase_compensation(self, activate_phase_compensation):
         self.advanced_receiver.set_phase_compensation(activate_phase_compensation)
+
+    def activate_pilot_estimation(self, activate):
+        active_pilot_estimation = self.advanced_receiver.activate_pilot_estimation(activate)
+        self.logger.debug(f"{active_pilot_estimation=}")
+        return active_pilot_estimation
+
+    def set_pilots(self, pilots):
+        self.advanced_receiver.set_pilots(pilots)
+        self.resource_demapper.set_pilots(pilots)
+
+    def pilots(self):
+        apilots = self.advanced_receiver.pilots()
+        dpilots = self.resource_demapper.pilots()
+        assert len(apilots) == len(dpilots)
+        return dpilots

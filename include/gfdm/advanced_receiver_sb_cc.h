@@ -52,6 +52,12 @@ public:
     virtual int get_phase_compensation() = 0;
     virtual void set_ic(int ic_iter) = 0;
     virtual int get_ic(void) = 0;
+    virtual bool activate_pilot_estimation(bool activate) = 0;
+
+    virtual void
+    set_pilots(const std::vector<std::tuple<unsigned, unsigned, gr_complex>> pilots) = 0;
+
+    virtual std::vector<std::tuple<unsigned, unsigned, gr_complex>> pilots() const = 0;
 };
 
 } // namespace gfdm

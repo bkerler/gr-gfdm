@@ -74,6 +74,9 @@ class qa_multi_port_receiver_cc(gr_unittest.TestCase):
         instance.set_ic_iterations(3)
         self.assertEqual(instance.get_ic_iterations(), 3)
 
+        self.assertTrue(instance.activate_pilot_estimation(True))
+        self.assertFalse(instance.activate_pilot_estimation(False))
+
     def test_002_basic_frames(self):
         print("test 002!")
         n_frames = 2

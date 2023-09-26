@@ -59,11 +59,6 @@ resource_mapper_cc_impl::resource_mapper_cc_impl(int timeslots,
     set_output_multiple(d_kernel->output_vector_size());
 }
 
-/*
- * Our virtual destructor.
- */
-resource_mapper_cc_impl::~resource_mapper_cc_impl() {}
-
 void resource_mapper_cc_impl::forecast(int noutput_items,
                                        gr_vector_int& ninput_items_required)
 {

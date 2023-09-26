@@ -63,7 +63,29 @@ public:
     }
     int get_phase_compensation() { return d_do_phase_compensation; }
 
+    bool activate_pilot_estimation(bool activate)
+    {
+        d_active_pilot_estimation = activate;
+        return d_active_pilot_estimation;
+    }
+
+    void set_pilots(const std::vector<std::tuple<unsigned, unsigned, gr_complex>> pilots)
+    {
+        for (const auto& pilot : pilots) {
+            auto [sidx, tidx, ref] = pilot;
+            fmt::print("{}\tsidx={}, tidx={}, ref={}\n", pilot, sidx, tidx, ref);
+        }
+        d_pilot_reference = pilots;
+    }
+
+    std::vector<std::tuple<unsigned, unsigned, gr_complex>> pilots() const
+    {
+        return d_pilot_reference;
+    }
+
 private:
+    bool d_active_pilot_estimation = false;
+    std::vector<std::tuple<unsigned, unsigned, gr_complex>> d_pilot_reference;
     std::unique_ptr<receiver_kernel_cc> d_kernel;
     std::vector<int> d_subcarrier_map;
     int d_ic_iter;
@@ -74,6 +96,8 @@ private:
     void perform_ic_iterations(gr_complex* p_out, gr_complex* p_freq_block);
     float calculate_phase_offset(const gr_complex* detected_symbols_buffer,
                                  const gr_complex* demod_symbols_buffer);
+
+    gr_complex estimate_pilot_distortion(const gr_complex* p_in);
 
     volk::vector<gr_complex> d_freq_block;
     volk::vector<gr_complex> d_ic_time_buffer;

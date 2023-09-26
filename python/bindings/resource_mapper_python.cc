@@ -82,5 +82,7 @@ void bind_resource_mapper(py::module& m)
                      (resource_mapper_kernel_cc::gfdm_complex*)inb.ptr,
                      self.block_size());
                  return result;
-             });
+             })
+        .def("pilots", &resource_mapper_kernel_cc::pilots)
+        .def("set_pilots", &resource_mapper_kernel_cc::set_pilots);
 }

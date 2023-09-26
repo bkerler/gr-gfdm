@@ -70,6 +70,27 @@ class qa_resource_demapper_cc(gr_unittest.TestCase):
 
         self.assertComplexTuplesAlmostEqual(data, res)
 
+    def test_003_pilots_timeslot_first(self):
+        timeslots = 9
+        subcarriers = 32
+        active_subcarriers = 20
+        subcarrier_map = get_subcarrier_map(subcarriers, active_subcarriers)
+
+        pilots = [(6, 0, 99+0j), (6, 2, 99+0j), (25, 0, 99+0j)]
+
+        data = get_random_qpsk(10 * (timeslots * active_subcarriers - len(pilots)))
+        src = blocks.vector_source_c(data)
+        mapper = gfdm.resource_mapper_cc(timeslots, subcarriers, active_subcarriers, subcarrier_map, True)
+        mapper.set_pilots(pilots)
+        demapper = gfdm.resource_demapper_cc(timeslots, subcarriers, active_subcarriers, subcarrier_map, True)
+        demapper.set_pilots(pilots)
+        snk = blocks.vector_sink_c()
+        self.tb.connect(src, mapper, demapper, snk)
+        self.tb.run()
+        # check data
+        res = np.array(snk.data())
+
+        self.assertComplexTuplesAlmostEqual(data, res)
 
 if __name__ == '__main__':
     gr_unittest.run(qa_resource_demapper_cc)

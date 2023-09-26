@@ -23,6 +23,8 @@
 #endif
 
 #include <gnuradio/io_signature.h>
+#include <fmt/core.h>
+#include <fmt/ranges.h>
 #include <gfdm/advanced_receiver_kernel_cc.h>
 #include <type_traits>
 #include <volk/volk.h>
@@ -52,6 +54,24 @@ advanced_receiver_kernel_cc::advanced_receiver_kernel_cc(
     d_freq_block.resize(d_kernel->block_size());
     d_ic_time_buffer.resize(d_kernel->block_size());
     d_ic_freq_buffer.resize(d_kernel->block_size());
+
+    d_pilot_reference.push_back({ 0, 0, gr_complex(0.70710678, -0.70710678) });
+    d_pilot_reference.push_back({ 4, 0, gr_complex(-0.70710678, 0.70710678) });
+    d_pilot_reference.push_back({ 8, 0, gr_complex(0.70710678, -0.70710678) });
+    d_pilot_reference.push_back({ 12, 0, gr_complex(0.70710678, 0.70710678) });
+    d_pilot_reference.push_back({ 16, 0, gr_complex(0.70710678, -0.70710678) });
+    d_pilot_reference.push_back({ 20, 0, gr_complex(-0.70710678, -0.70710678) });
+    d_pilot_reference.push_back({ 24, 0, gr_complex(0.70710678, 0.70710678) });
+    d_pilot_reference.push_back({ 28, 0, gr_complex(-0.70710678, 0.70710678) });
+
+    d_pilot_reference.push_back({ 34, 0, gr_complex(-0.70710678, -0.70710678) });
+    d_pilot_reference.push_back({ 38, 0, gr_complex(0.70710678, -0.70710678) });
+    d_pilot_reference.push_back({ 42, 0, gr_complex(0.70710678, -0.70710678) });
+    d_pilot_reference.push_back({ 46, 0, gr_complex(-0.70710678, -0.70710678) });
+    d_pilot_reference.push_back({ 50, 0, gr_complex(0.70710678, -0.70710678) });
+    d_pilot_reference.push_back({ 54, 0, gr_complex(-0.70710678, 0.70710678) });
+    d_pilot_reference.push_back({ 58, 0, gr_complex(0.70710678, -0.70710678) });
+    d_pilot_reference.push_back({ 62, 0, gr_complex(0.70710678, 0.70710678) });
 }
 
 void advanced_receiver_kernel_cc::perform_ic_iterations(gr_complex* p_out,
@@ -104,7 +124,52 @@ void advanced_receiver_kernel_cc::generic_work_equalize(gr_complex* p_out,
 {
     d_kernel->fft_equalize_filter_downsample(d_freq_block.data(), p_in, f_eq_in);
     d_kernel->transform_subcarriers_to_td(p_out, d_freq_block.data());
+    if (d_active_pilot_estimation) {
+        /*
+         * IDEA
+         * 1. Equalize based on channel estimate from preamble.
+         * 2. Use a few pilots to estimate residual phase distortion
+         * 3. Single value is the same scalar for frequency and time domain.
+         * 4. Apply more phase corrections.
+         *
+         * Investigations into error patterns suggest to causes for erroneous frames:
+         * 1. High residual frequency offset. Probably bad offset estimation.
+         * 2. Phase rotation of the whole frame.
+         * -> We add a second stage equalizer for this phase error.
+         * TODO: Improve equalization and preamble-based channel estimation.
+         */
+        auto distortion = estimate_pilot_distortion(p_out);
+        volk_32fc_s32fc_multiply_32fc(
+            p_out, p_out, distortion, d_kernel->timeslots() * d_subcarrier_map.size());
+        if (d_ic_iter > 0) {
+            volk_32fc_s32fc_multiply_32fc(d_freq_block.data(),
+                                          d_freq_block.data(),
+                                          distortion,
+                                          d_kernel->block_size());
+        }
+    }
     perform_ic_iterations(p_out, d_freq_block.data());
+}
+
+gr_complex advanced_receiver_kernel_cc::estimate_pilot_distortion(const gr_complex* p_in)
+{
+    auto result = 0.0f;
+
+    for (const auto& pilot : d_pilot_reference) {
+
+        auto [sidx, tidx, ref] = pilot;
+        // fmt::print("{}\tsidx={}, tidx={}, ref={}\n", pilot, sidx, tidx, ref);
+        auto val = p_in[sidx * d_kernel->timeslots() + tidx];
+        // fmt::print("val={}\n", val);
+
+        auto phase = std::arg(val) - std::arg(ref);
+        result += phase;
+    }
+    result /= float(d_pilot_reference.size());
+
+    fmt::print("result={}, complex={}\n", result, std::polar(1.0f, result));
+
+    return std::polar(1.0f, -1.0f * result);
 }
 
 void advanced_receiver_kernel_cc::map_symbols_to_constellation_points(

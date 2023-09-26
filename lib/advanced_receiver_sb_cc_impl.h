@@ -8,9 +8,10 @@
 #ifndef INCLUDED_GFDM_ADVANCED_RECEIVER_SB_CC_IMPL_H
 #define INCLUDED_GFDM_ADVANCED_RECEIVER_SB_CC_IMPL_H
 
+#include <fmt/core.h>
+#include <fmt/ranges.h>
 #include <gfdm/advanced_receiver_kernel_cc.h>
 #include <gfdm/advanced_receiver_sb_cc.h>
-
 #include <memory>
 
 namespace gr {
@@ -38,6 +39,21 @@ public:
         d_adv_kernel->set_phase_compensation(do_phase_compensation);
     }
     int get_phase_compensation() { return d_adv_kernel->get_phase_compensation(); }
+
+    bool activate_pilot_estimation(bool activate)
+    {
+        return d_adv_kernel->activate_pilot_estimation(activate);
+    }
+
+    void set_pilots(const std::vector<std::tuple<unsigned, unsigned, gr_complex>> pilots)
+    {
+        d_adv_kernel->set_pilots(pilots);
+    }
+
+    std::vector<std::tuple<unsigned, unsigned, gr_complex>> pilots() const
+    {
+        return d_adv_kernel->pilots();
+    }
 
     void set_ic(int ic_iter) { d_adv_kernel->set_ic(ic_iter); }
 
