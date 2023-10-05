@@ -68,6 +68,11 @@ public:
                      std::vector<int> cyclic_shifts,
                      std::vector<std::vector<gr_complex>> preambles,
                      const std::string& tsb_tag_key = "");
+
+    virtual void
+    set_pilots(const std::vector<std::tuple<unsigned, unsigned, gr_complex>> pilots) = 0;
+
+    virtual std::vector<std::tuple<unsigned, unsigned, gr_complex>> pilots() const = 0;
 };
 
 } // namespace gfdm

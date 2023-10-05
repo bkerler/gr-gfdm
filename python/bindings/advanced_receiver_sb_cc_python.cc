@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Free Software Foundation, Inc.
+ * Copyright 2023 Free Software Foundation, Inc.
  *
  * This file is part of GNU Radio
  *
@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(advanced_receiver_sb_cc.h)                                 */
-/* BINDTOOL_HEADER_FILE_HASH(54c2ca1ab836fbe0c1c510bfe45cf330)                     */
+/* BINDTOOL_HEADER_FILE_HASH(c6ab508d80a31daded55e62f9793eab5)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -30,7 +30,7 @@ namespace py = pybind11;
 void bind_advanced_receiver_sb_cc(py::module& m)
 {
 
-    using advanced_receiver_sb_cc = ::gr::gfdm::advanced_receiver_sb_cc;
+    using advanced_receiver_sb_cc = gr::gfdm::advanced_receiver_sb_cc;
 
 
     py::class_<advanced_receiver_sb_cc,
@@ -51,23 +51,19 @@ void bind_advanced_receiver_sb_cc(py::module& m)
              py::arg("do_phase_compensation"),
              D(advanced_receiver_sb_cc, make))
 
-
         .def("set_phase_compensation",
              &advanced_receiver_sb_cc::set_phase_compensation,
              py::arg("do_phase_compensation"),
              D(advanced_receiver_sb_cc, set_phase_compensation))
 
-
         .def("get_phase_compensation",
              &advanced_receiver_sb_cc::get_phase_compensation,
              D(advanced_receiver_sb_cc, get_phase_compensation))
-
 
         .def("set_ic",
              &advanced_receiver_sb_cc::set_ic,
              py::arg("ic_iter"),
              D(advanced_receiver_sb_cc, set_ic))
-
 
         .def("get_ic",
              &advanced_receiver_sb_cc::get_ic,

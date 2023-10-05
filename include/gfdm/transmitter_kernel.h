@@ -77,6 +77,16 @@ public:
     void add_frame(gfdm_complex* out, const gfdm_complex* in, const int cyclic_shift);
     const std::vector<int>& cyclic_shifts() const { return d_cyclic_shifts; };
 
+    void set_pilots(const std::vector<std::tuple<unsigned, unsigned, gr_complex>> pilots)
+    {
+        d_mapper->set_pilots(pilots);
+    }
+
+    std::vector<std::tuple<unsigned, unsigned, gr_complex>> pilots() const
+    {
+        return d_mapper->pilots();
+    }
+
 private:
     std::unique_ptr<resource_mapper_kernel_cc> d_mapper;
     std::unique_ptr<modulator_kernel_cc> d_modulator;

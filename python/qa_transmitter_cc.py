@@ -77,6 +77,51 @@ class qa_transmitter_cc (gr_unittest.TestCase):
     def tearDown(self):
         self.tb = None
 
+    def test_003_instance(self):
+        active_subcarriers = 52
+        timeslots = 9
+        subcarriers = 64
+        cp_len = subcarriers // 4
+        cs_len = cp_len // 2
+
+        taps = get_frequency_domain_filter(self.filter_type, self.alpha, timeslots,
+                                           subcarriers, self.overlap)
+
+        window_taps = get_raised_cosine_ramp(
+            cs_len, get_window_len(cp_len, timeslots, subcarriers, cs_len))
+
+        smap = get_subcarrier_map(subcarriers, active_subcarriers, True)
+        preambles = get_full_preambles(self.filter_type, self.alpha, active_subcarriers,
+                                       subcarriers, smap, self.overlap, cp_len, cs_len, [0, ])
+
+        num_pilots = 16
+        pilot_spacing = 1 + smap.size // num_pilots
+
+        pilot_values = np.repeat((1+1j) / np.sqrt(2), num_pilots)
+        upper_subcarrier_map = smap[0:smap.size // 2]
+        lower_subcarrier_map = smap[smap.size // 2:]
+        pilot_subcarriers = np.concatenate((upper_subcarrier_map[::-1][::pilot_spacing][::-1], lower_subcarrier_map[::pilot_spacing]))
+        pilot_subcarriers = np.sort(pilot_subcarriers)
+
+        pilots = []
+        for sidx, value in zip(pilot_subcarriers, pilot_values):
+            pilots.append((sidx, 0, value))
+
+        dut = gfdm.transmitter_cc(timeslots, subcarriers, active_subcarriers,
+                                  cp_len, cs_len, cs_len, smap, True,
+                                  self.overlap, taps, window_taps, [0, ], preambles, "packet_len")
+
+        empty_pilots = dut.pilots()
+        self.assertEqual(len(empty_pilots), 0)
+
+        dut.set_pilots(pilots)
+        used_pilots = dut.pilots()
+
+        for ref, used in zip(pilots, used_pilots):
+            self.assertEqual(ref[0], used[0])
+            self.assertEqual(ref[1], used[1])
+            self.assertComplexAlmostEqual(ref[2], used[2])
+
     def test_001_t(self):
         np.set_printoptions(precision=2)
         n_frames = 7
@@ -181,6 +226,8 @@ class qa_transmitter_cc (gr_unittest.TestCase):
                 print(f'p={j}, t={i}, offset={t.offset}, value={pmt.to_python(t.value)}')
                 self.assertEqual(t.offset, i * frame_size)
                 self.assertEqual(pmt.to_python(t.value), frame_size)
+
+
 
 
 if __name__ == '__main__':

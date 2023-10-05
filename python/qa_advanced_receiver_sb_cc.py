@@ -219,6 +219,13 @@ class qa_advanced_receiver_sb_cc(gr_unittest.TestCase):
         ).base()
         # print(gfdm_constellation.points())
         subcarrier_map = get_subcarrier_map(subcarriers, active_subcarriers, True)
+        num_pilots = 16
+        pilot_spacing = 1 + subcarrier_map.size // num_pilots
+
+        upper_subcarrier_map = subcarrier_map[0:subcarrier_map.size // 2]
+        lower_subcarrier_map = subcarrier_map[subcarrier_map.size // 2:]
+        pilot_subcarriers = np.concatenate((upper_subcarrier_map[::-1][::pilot_spacing][::-1], lower_subcarrier_map[::pilot_spacing]))
+        pilot_subcarriers = np.sort(pilot_subcarriers)
 
         import pathlib
         data = np.load(pathlib.Path(__file__).parent / "symbols.npy")
@@ -280,6 +287,97 @@ class qa_advanced_receiver_sb_cc(gr_unittest.TestCase):
             self.assertComplexAlmostEqual(ref[2], used[2])
         self.assertComplexTuplesAlmostEqual(data, res, 1)
         # self.assertComplexTuplesAlmostEqual(data, res, 2)
+
+    def test_006_pilot_processing_chain(self):
+        np.set_printoptions(linewidth=250, precision=3)
+        print(f"Test pilot chain")
+        n_frames = 1
+        timeslots = 15
+        subcarriers = 64
+        active_subcarriers = 60
+        overlap = 2
+        ic_iterations = 2
+        f_taps = filters.get_frequency_domain_filter(
+            "rrc", 0.2, timeslots, subcarriers, overlap
+        )
+        gfdm_constellation = digital.constellation_calcdist(
+            [-0.707 - 0.707j, -0.707 + 0.707j, 0.707 + 0.707j, 0.707 - 0.707j],
+            [0, 1, 3, 2],
+            4,
+            1,
+            digital.constellation.AMPLITUDE_NORMALIZATION,
+        ).base()
+        subcarrier_map = get_subcarrier_map(subcarriers, active_subcarriers, True)
+        num_pilots = 16
+        pilot_spacing = 1 + subcarrier_map.size // num_pilots
+
+        pilot_values = np.repeat((1+1j) / np.sqrt(2), num_pilots)
+        upper_subcarrier_map = subcarrier_map[0:subcarrier_map.size // 2]
+        lower_subcarrier_map = subcarrier_map[subcarrier_map.size // 2:]
+        pilot_subcarriers = np.concatenate((upper_subcarrier_map[::-1][::pilot_spacing][::-1], lower_subcarrier_map[::pilot_spacing]))
+        pilot_subcarriers = np.sort(pilot_subcarriers)
+
+        pilots = []
+        for sidx, value in zip(pilot_subcarriers, pilot_values):
+            pilots.append((sidx, 0, value))
+
+        data_frame_len = active_subcarriers * timeslots - len(pilots)
+        data = get_random_qpsk(data_frame_len * n_frames)
+        src = blocks.vector_source_c(data)
+        rot = 2. * np.pi * 0.02
+        eqdata = np.array([1.+0.j,] * timeslots * subcarriers) * np.exp(1.j * rot)
+        estimate = blocks.vector_source_c(eqdata)
+        mapper = gfdm.resource_mapper_cc(
+            timeslots, subcarriers, active_subcarriers, subcarrier_map, True
+        )
+        mapper.set_pilots(pilots)
+        mod = gfdm.simple_modulator_cc(timeslots, subcarriers, overlap, f_taps)
+        demod = gfdm.advanced_receiver_sb_cc(
+            timeslots,
+            subcarriers,
+            overlap,
+            ic_iterations,
+            f_taps,
+            gfdm_constellation,
+            subcarrier_map,
+            0,
+        )
+        demod.set_ic(64)
+        demod.set_pilots(pilots)
+        demod.activate_pilot_estimation(True)
+        demapper = gfdm.resource_demapper_cc(
+            timeslots, subcarriers, active_subcarriers, subcarrier_map, True
+        )
+        demapper.set_pilots(pilots)
+        # print(f"{mapper.pilots()=}")
+        # print(f"{demapper.pilots()=}")
+        # print(f"{demod.pilots()=}")
+
+        snk = blocks.vector_sink_c()
+        demodsnk = blocks.vector_sink_c()
+
+        self.tb.connect(src, mapper, mod, demod, demapper, snk)
+        self.tb.connect(estimate, (demod, 1))
+        self.tb.connect(demod, demodsnk)
+        self.tb.run()
+
+        res = np.array(snk.data())
+        frame = np.array(demodsnk.data())
+        print(f"{rot=}")
+
+        used_pilots = demod.pilots()
+
+        for ref, used in zip(pilots, used_pilots):
+            self.assertEqual(ref[0], used[0])
+            self.assertEqual(ref[1], used[1])
+            self.assertComplexAlmostEqual(ref[2], used[2])
+
+        framemat = np.reshape(frame, (-1, timeslots))
+        rxpilots = np.array([framemat[p[0], p[1]] for p in pilots])
+        # print(framemat)
+        # print(rxpilots)
+        self.assertComplexTuplesAlmostEqual(rxpilots, [p[2] for p in pilots], 1)
+        self.assertComplexTuplesAlmostEqual(data, res, 1)
 
 if __name__ == "__main__":
     gr_unittest.run(qa_advanced_receiver_sb_cc)

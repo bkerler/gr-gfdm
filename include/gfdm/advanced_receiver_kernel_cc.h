@@ -73,7 +73,7 @@ public:
     {
         for (const auto& pilot : pilots) {
             auto [sidx, tidx, ref] = pilot;
-            fmt::print("{}\tsidx={}, tidx={}, ref={}\n", pilot, sidx, tidx, ref);
+            // fmt::print("{}\tsidx={}, tidx={}, ref={}\n", pilot, sidx, tidx, ref);
         }
         d_pilot_reference = pilots;
     }

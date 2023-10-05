@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Free Software Foundation, Inc.
+ * Copyright 2023 Free Software Foundation, Inc.
  *
  * This file is part of GNU Radio
  *
@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(resource_demapper_cc.h)                                    */
-/* BINDTOOL_HEADER_FILE_HASH(1996fc09d5a5cc67f6058ef55c3cfb46)                     */
+/* BINDTOOL_HEADER_FILE_HASH(5e4a9a5a78c66f8a4170df65bbf15331)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -30,7 +30,7 @@ namespace py = pybind11;
 void bind_resource_demapper_cc(py::module& m)
 {
 
-    using resource_demapper_cc = ::gr::gfdm::resource_demapper_cc;
+    using resource_demapper_cc = gr::gfdm::resource_demapper_cc;
 
 
     py::class_<resource_demapper_cc,

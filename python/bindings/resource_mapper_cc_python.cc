@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Free Software Foundation, Inc.
+ * Copyright 2023 Free Software Foundation, Inc.
  *
  * This file is part of GNU Radio
  *
@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(resource_mapper_cc.h)                                      */
-/* BINDTOOL_HEADER_FILE_HASH(5a59b14dd39efea98be218e5aff8e86e)                     */
+/* BINDTOOL_HEADER_FILE_HASH(43238d862a6a3e6a3c45e8783dc9fedf)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -30,7 +30,7 @@ namespace py = pybind11;
 void bind_resource_mapper_cc(py::module& m)
 {
 
-    using resource_mapper_cc = ::gr::gfdm::resource_mapper_cc;
+    using resource_mapper_cc = gr::gfdm::resource_mapper_cc;
 
 
     py::class_<resource_mapper_cc,

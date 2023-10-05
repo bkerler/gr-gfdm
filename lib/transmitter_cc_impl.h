@@ -62,6 +62,16 @@ public:
                      gr_vector_int& ninput_items,
                      gr_vector_const_void_star& input_items,
                      gr_vector_void_star& output_items);
+
+    void set_pilots(const std::vector<std::tuple<unsigned, unsigned, gr_complex>> pilots)
+    {
+        d_kernel->set_pilots(pilots);
+    }
+
+    std::vector<std::tuple<unsigned, unsigned, gr_complex>> pilots() const
+    {
+        return d_kernel->pilots();
+    }
 };
 
 } // namespace gfdm

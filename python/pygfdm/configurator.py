@@ -35,9 +35,31 @@ def get_padding_configuration(frame_len):
 preamble_seed = int(3660365253)
 
 
+def generate_pilots(num_pilots, subcarrier_map, timeslot_index=0, pilot_values=None):
+    if num_pilots < 1:
+        return []
+    if pilot_values is None:
+        pilot_values = np.repeat((1+1j) / np.sqrt(2), num_pilots)
+    else:
+        assert num_pilots == len(pilot_values)
+
+    pilot_spacing = 1 + subcarrier_map.size // num_pilots
+
+    upper_subcarrier_map = subcarrier_map[0:subcarrier_map.size // 2]
+    lower_subcarrier_map = subcarrier_map[subcarrier_map.size // 2:]
+    pilot_subcarriers = np.concatenate((upper_subcarrier_map[::-1][::pilot_spacing][::-1], lower_subcarrier_map[::pilot_spacing]))
+    pilot_subcarriers = np.sort(pilot_subcarriers)
+
+    pilots = []
+    for sidx, value in zip(pilot_subcarriers, pilot_values):
+        pilots.append((sidx, timeslot_index, value))
+    assert num_pilots == len(pilots)
+    return pilots
+
+
 def get_gfdm_configuration(timeslots=9, subcarriers=64, active_subcarriers=52, overlap=2,
                            cp_len=16, cs_len=8, filtertype='rrc', filteralpha=0.2,
-                           cyclic_shifts=[0, ], pilot_distance=4):
+                           cyclic_shifts=[0, ], num_pilots=0):
     ramp_len = cs_len
     dconf = {
         'timeslots': timeslots,
@@ -76,6 +98,7 @@ def get_gfdm_configuration(timeslots=9, subcarriers=64, active_subcarriers=52, o
     dconf['tx_filter_taps'] = tx_filter_taps = get_frequency_domain_filter(
         filtertype, filteralpha, timeslots, subcarriers, overlap)
     dconf['rx_filter_taps'] = rx_f_taps = np.conjugate(tx_filter_taps)
+    dconf['pilots'] = generate_pilots(num_pilots, subcarrier_map)
 
     co = namedtuple("configuration", dconf.keys())(*dconf.values())
     return co

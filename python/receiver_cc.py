@@ -180,5 +180,5 @@ class receiver_cc(gr.hier_block2):
     def pilots(self):
         apilots = self.advanced_receiver.pilots()
         dpilots = self.resource_demapper.pilots()
-        assert len(apilots) == len(dpilots)
-        return dpilots
+        # assert len(apilots) == len(dpilots)
+        return apilots

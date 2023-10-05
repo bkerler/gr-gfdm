@@ -55,6 +55,8 @@ void bind_transmitter_cc(py::module& m)
              py::arg("tsb_tag_key") = "",
              D(transmitter_cc, make))
 
+        .def("pilots", &transmitter_cc::pilots)
+        .def("set_pilots", &transmitter_cc::set_pilots)
 
         ;
 }
