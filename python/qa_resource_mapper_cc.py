@@ -44,14 +44,25 @@ class qa_resource_mapper_cc(gr_unittest.TestCase):
         smap = np.arange(active_subcarriers) + (subcarriers - active_subcarriers) // 2
 
         data = get_random_qpsk(active_subcarriers * timeslots)
-        ref = map_to_waveform_resources(data, active_subcarriers, subcarriers, smap, True)
+        ref = map_to_waveform_resources(
+            data, active_subcarriers, subcarriers, smap, True
+        )
         for i in range(n_frames - 1):
             d = get_random_qpsk(active_subcarriers * timeslots)
             data = np.concatenate((data, d))
-            ref = np.concatenate((ref, map_to_waveform_resources(d, active_subcarriers, subcarriers, smap, True)))
+            ref = np.concatenate(
+                (
+                    ref,
+                    map_to_waveform_resources(
+                        d, active_subcarriers, subcarriers, smap, True
+                    ),
+                )
+            )
 
         src = blocks.vector_source_c(data)
-        mapper = gfdm.resource_mapper_cc(timeslots, subcarriers, active_subcarriers, smap, True)
+        mapper = gfdm.resource_mapper_cc(
+            timeslots, subcarriers, active_subcarriers, smap, True
+        )
         snk = blocks.vector_sink_c()
         self.tb.connect(src, mapper, snk)
         self.tb.run()
@@ -68,14 +79,25 @@ class qa_resource_mapper_cc(gr_unittest.TestCase):
         smap = np.arange(active_subcarriers) + (subcarriers - active_subcarriers) // 2
 
         data = get_random_qpsk(active_subcarriers * timeslots)
-        ref = map_to_waveform_resources(data, active_subcarriers, subcarriers, smap, False)
+        ref = map_to_waveform_resources(
+            data, active_subcarriers, subcarriers, smap, False
+        )
         for i in range(n_frames - 1):
             d = get_random_qpsk(active_subcarriers * timeslots)
             data = np.concatenate((data, d))
-            ref = np.concatenate((ref, map_to_waveform_resources(d, active_subcarriers, subcarriers, smap, False)))
+            ref = np.concatenate(
+                (
+                    ref,
+                    map_to_waveform_resources(
+                        d, active_subcarriers, subcarriers, smap, False
+                    ),
+                )
+            )
 
         src = blocks.vector_source_c(data)
-        mapper = gfdm.resource_mapper_cc(timeslots, subcarriers, active_subcarriers, smap, False)
+        mapper = gfdm.resource_mapper_cc(
+            timeslots, subcarriers, active_subcarriers, smap, False
+        )
         snk = blocks.vector_sink_c()
         self.tb.connect(src, mapper, snk)
         self.tb.run()
@@ -83,26 +105,27 @@ class qa_resource_mapper_cc(gr_unittest.TestCase):
         res = snk.data()
         self.assertComplexTuplesAlmostEqual(ref, res)
 
-
     def test_003_pilots(self):
         active_subcarriers = 110
         subcarriers = 128
         timeslots = 205
         smap = np.arange(active_subcarriers) + (subcarriers - active_subcarriers) // 2
-        mapper = gfdm.resource_mapper_cc(timeslots, subcarriers, active_subcarriers, smap, True)
+        mapper = gfdm.resource_mapper_cc(
+            timeslots, subcarriers, active_subcarriers, smap, True
+        )
 
-        pilots = [(0, 1, 1+1j)]
+        pilots = [(0, 1, 1 + 1j)]
         self.assertRaises(ValueError, mapper.set_pilots, pilots)
 
-        pilots = [(64, 225, 1+1j)]
+        pilots = [(64, 225, 1 + 1j)]
         self.assertRaises(ValueError, mapper.set_pilots, pilots)
 
-        pilots = [(64, 100, 1+1j)]
+        pilots = [(64, 100, 1 + 1j)]
         mapper.set_pilots(pilots)
         value = mapper.pilots()[0]
         self.assertEqual(value[0], 64)
         self.assertEqual(value[1], 100)
-        self.assertComplexAlmostEqual(value[2], 1+1j)
+        self.assertComplexAlmostEqual(value[2], 1 + 1j)
 
     def test_004_pilots_per_timeslot(self):
         # set up fg
@@ -111,24 +134,30 @@ class qa_resource_mapper_cc(gr_unittest.TestCase):
         subcarriers = 32
         timeslots = 5
         smap = np.arange(active_subcarriers) + (subcarriers - active_subcarriers) // 2
-        pilots = [(6, 0, 99+0j), (6, 2, 99+0j), (12, 0, 99+0j)]
+        pilots = [(6, 0, 99 + 0j), (6, 2, 99 + 0j), (12, 0, 99 + 0j)]
 
         frame_len = active_subcarriers * timeslots - len(pilots)
 
         data = get_random_qpsk(frame_len)
-        ref = map_to_waveform_resources(data, active_subcarriers, subcarriers, smap, True)
+        ref = map_to_waveform_resources(
+            data, active_subcarriers, subcarriers, smap, True
+        )
 
         for i in range(n_frames - 1):
             d = get_random_qpsk(frame_len)
             data = np.concatenate((data, d))
             for p in pilots:
                 d = np.insert(d, p[0] * timeslots + p[1], p[2])
-            r = map_to_waveform_resources(d, active_subcarriers, subcarriers, smap, True)
+            r = map_to_waveform_resources(
+                d, active_subcarriers, subcarriers, smap, True
+            )
             ref = np.concatenate((ref, r))
         print(f"{len(data)=}\t{frame_len*n_frames=}")
         print(f"{len(data)=}\t{frame_len=}\t{n_frames=}\t{len(pilots)=}")
         src = blocks.vector_source_c(data)
-        mapper = gfdm.resource_mapper_cc(timeslots, subcarriers, active_subcarriers, smap, True)
+        mapper = gfdm.resource_mapper_cc(
+            timeslots, subcarriers, active_subcarriers, smap, True
+        )
         mapper.set_pilots(pilots)
         snk = blocks.vector_sink_c()
         self.tb.connect(src, mapper, snk)
@@ -140,5 +169,5 @@ class qa_resource_mapper_cc(gr_unittest.TestCase):
             self.assertComplexAlmostEqual(res[pos], p[2])
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     gr_unittest.run(qa_resource_mapper_cc)

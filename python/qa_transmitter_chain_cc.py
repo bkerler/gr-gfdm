@@ -24,9 +24,19 @@ from gnuradio import blocks
 import gfdm_python as gfdm
 from pygfdm.filters import get_frequency_domain_filter
 from pygfdm.gfdm_modulation import gfdm_modulate_block
-from pygfdm.mapping import get_data_matrix, map_to_waveform_resources, get_subcarrier_map
+from pygfdm.mapping import (
+    get_data_matrix,
+    map_to_waveform_resources,
+    get_subcarrier_map,
+)
 from pygfdm.utils import get_random_qpsk, calculate_signal_energy
-from pygfdm.cyclic_prefix import get_window_len, get_raised_cosine_ramp, add_cyclic_prefix, pinch_block, add_cyclic_starfix
+from pygfdm.cyclic_prefix import (
+    get_window_len,
+    get_raised_cosine_ramp,
+    add_cyclic_prefix,
+    pinch_block,
+    add_cyclic_starfix,
+)
 from pygfdm.preamble import get_sync_symbol
 import numpy as np
 
@@ -41,7 +51,7 @@ class qa_transmitter_chain_cc(gr_unittest.TestCase):
     def test_001_t(self):
         np.set_printoptions(precision=2)
         n_frames = 3
-        alpha = .5
+        alpha = 0.5
         active = 8
         M = 8
         K = 16
@@ -51,11 +61,11 @@ class qa_transmitter_chain_cc(gr_unittest.TestCase):
         ramp_len = 4
         block_len = M * K
         window_len = get_window_len(cp_len, M, K, cs_len)
-        taps = get_frequency_domain_filter('rrc', alpha, M, K, L)
+        taps = get_frequency_domain_filter("rrc", alpha, M, K, L)
         taps /= np.sqrt(calculate_signal_energy(taps) / M)
         window_taps = get_raised_cosine_ramp(ramp_len, window_len)
         pn_symbols = get_random_qpsk(K)
-        H_preamble = get_frequency_domain_filter('rrc', alpha, 2, K, L)
+        H_preamble = get_frequency_domain_filter("rrc", alpha, 2, K, L)
         preamble = get_sync_symbol(pn_symbols, H_preamble, K, L, cp_len, ramp_len)[0]
         smap = get_subcarrier_map(K, active, dc_free=True)
 
@@ -76,7 +86,9 @@ class qa_transmitter_chain_cc(gr_unittest.TestCase):
         src = blocks.vector_source_c(data)
         mapper = gfdm.resource_mapper_cc(active, K, M, smap, True)
         mod = gfdm.simple_modulator_cc(M, K, L, taps)
-        prefixer = gfdm.cyclic_prefixer_cc(block_len, cp_len, cs_len, ramp_len, window_taps)
+        prefixer = gfdm.cyclic_prefixer_cc(
+            block_len, cp_len, cs_len, ramp_len, window_taps
+        )
         preambler = blocks.vector_insert_c(preamble, window_len + len(preamble), 0)
         gapper = blocks.vector_insert_c(frame_gap, frame_len + len(frame_gap), 0)
         dst = blocks.vector_sink_c()
@@ -84,7 +96,7 @@ class qa_transmitter_chain_cc(gr_unittest.TestCase):
         self.tb.connect(src, mapper, mod, prefixer, preambler, gapper, dst)
         # self.tb.connect(src, mapper, dst)
         self.tb.run()
-        res = np.array(dst.data())[0:len(ref)]
+        res = np.array(dst.data())[0 : len(ref)]
 
         self.assertComplexTuplesAlmostEqual(ref, res, 5)
 
@@ -122,5 +134,5 @@ class qa_transmitter_chain_cc(gr_unittest.TestCase):
     #     self.assertComplexTuplesAlmostEqual(ref, res, 2)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     gr_unittest.run(qa_transmitter_chain_cc)

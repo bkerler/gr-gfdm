@@ -38,13 +38,25 @@ import numpy as np
 # input('Press Enter to continue: ')
 
 
-def generate_reference_frame(symbols, timeslots, subcarriers, active_subcarriers, subcarrier_map,
-                             taps, overlap, cp_len, cs_len, window_taps, cyclic_shifts, preambles):
-    dd = map_to_waveform_resources(symbols, active_subcarriers,
-                                   subcarriers, subcarrier_map)
+def generate_reference_frame(
+    symbols,
+    timeslots,
+    subcarriers,
+    active_subcarriers,
+    subcarrier_map,
+    taps,
+    overlap,
+    cp_len,
+    cs_len,
+    window_taps,
+    cyclic_shifts,
+    preambles,
+):
+    dd = map_to_waveform_resources(
+        symbols, active_subcarriers, subcarriers, subcarrier_map
+    )
     D = get_data_matrix(dd, subcarriers, group_by_subcarrier=False)
-    b = gfdm_modulate_block(D, taps, timeslots, subcarriers,
-                            overlap, False)
+    b = gfdm_modulate_block(D, taps, timeslots, subcarriers, overlap, False)
     frame = []
     for cs, p in zip(cyclic_shifts, preambles):
         data = np.roll(b, cs)
@@ -54,24 +66,42 @@ def generate_reference_frame(symbols, timeslots, subcarriers, active_subcarriers
     return frame
 
 
-def get_full_preambles(filtertype, alpha, active_subcarriers, subcarriers,
-                       subcarrier_map, overlap, cp_len, ramp_len,
-                       cyclic_shifts):
+def get_full_preambles(
+    filtertype,
+    alpha,
+    active_subcarriers,
+    subcarriers,
+    subcarrier_map,
+    overlap,
+    cp_len,
+    ramp_len,
+    cyclic_shifts,
+):
     seed = 4711
     preambles = []
     for cs in cyclic_shifts:
-        p = mapped_preamble(seed, filtertype, alpha, active_subcarriers, subcarriers,
-                            subcarrier_map, overlap, cp_len, ramp_len,
-                            use_zadoff_chu=True, cyclic_shift=cs)
+        p = mapped_preamble(
+            seed,
+            filtertype,
+            alpha,
+            active_subcarriers,
+            subcarriers,
+            subcarrier_map,
+            overlap,
+            cp_len,
+            ramp_len,
+            use_zadoff_chu=True,
+            cyclic_shift=cs,
+        )
         preambles.append(p[0])
     return preambles
 
 
-class qa_transmitter_cc (gr_unittest.TestCase):
+class qa_transmitter_cc(gr_unittest.TestCase):
     def setUp(self):
         self.tb = gr.top_block()
-        self.filter_type = 'rrc'
-        self.alpha = .5
+        self.filter_type = "rrc"
+        self.alpha = 0.5
         self.overlap = 2
 
     def tearDown(self):
@@ -84,32 +114,65 @@ class qa_transmitter_cc (gr_unittest.TestCase):
         cp_len = subcarriers // 4
         cs_len = cp_len // 2
 
-        taps = get_frequency_domain_filter(self.filter_type, self.alpha, timeslots,
-                                           subcarriers, self.overlap)
+        taps = get_frequency_domain_filter(
+            self.filter_type, self.alpha, timeslots, subcarriers, self.overlap
+        )
 
         window_taps = get_raised_cosine_ramp(
-            cs_len, get_window_len(cp_len, timeslots, subcarriers, cs_len))
+            cs_len, get_window_len(cp_len, timeslots, subcarriers, cs_len)
+        )
 
         smap = get_subcarrier_map(subcarriers, active_subcarriers, True)
-        preambles = get_full_preambles(self.filter_type, self.alpha, active_subcarriers,
-                                       subcarriers, smap, self.overlap, cp_len, cs_len, [0, ])
+        preambles = get_full_preambles(
+            self.filter_type,
+            self.alpha,
+            active_subcarriers,
+            subcarriers,
+            smap,
+            self.overlap,
+            cp_len,
+            cs_len,
+            [
+                0,
+            ],
+        )
 
         num_pilots = 16
         pilot_spacing = 1 + smap.size // num_pilots
 
-        pilot_values = np.repeat((1+1j) / np.sqrt(2), num_pilots)
-        upper_subcarrier_map = smap[0:smap.size // 2]
-        lower_subcarrier_map = smap[smap.size // 2:]
-        pilot_subcarriers = np.concatenate((upper_subcarrier_map[::-1][::pilot_spacing][::-1], lower_subcarrier_map[::pilot_spacing]))
+        pilot_values = np.repeat((1 + 1j) / np.sqrt(2), num_pilots)
+        upper_subcarrier_map = smap[0 : smap.size // 2]
+        lower_subcarrier_map = smap[smap.size // 2 :]
+        pilot_subcarriers = np.concatenate(
+            (
+                upper_subcarrier_map[::-1][::pilot_spacing][::-1],
+                lower_subcarrier_map[::pilot_spacing],
+            )
+        )
         pilot_subcarriers = np.sort(pilot_subcarriers)
 
         pilots = []
         for sidx, value in zip(pilot_subcarriers, pilot_values):
             pilots.append((sidx, 0, value))
 
-        dut = gfdm.transmitter_cc(timeslots, subcarriers, active_subcarriers,
-                                  cp_len, cs_len, cs_len, smap, True,
-                                  self.overlap, taps, window_taps, [0, ], preambles, "packet_len")
+        dut = gfdm.transmitter_cc(
+            timeslots,
+            subcarriers,
+            active_subcarriers,
+            cp_len,
+            cs_len,
+            cs_len,
+            smap,
+            True,
+            self.overlap,
+            taps,
+            window_taps,
+            [
+                0,
+            ],
+            preambles,
+            "packet_len",
+        )
 
         empty_pilots = dut.pilots()
         self.assertEqual(len(empty_pilots), 0)
@@ -131,15 +194,28 @@ class qa_transmitter_cc (gr_unittest.TestCase):
         cp_len = subcarriers // 4
         cs_len = cp_len // 2
 
-        taps = get_frequency_domain_filter(self.filter_type, self.alpha, timeslots,
-                                           subcarriers, self.overlap)
+        taps = get_frequency_domain_filter(
+            self.filter_type, self.alpha, timeslots, subcarriers, self.overlap
+        )
 
         window_taps = get_raised_cosine_ramp(
-            cs_len, get_window_len(cp_len, timeslots, subcarriers, cs_len))
+            cs_len, get_window_len(cp_len, timeslots, subcarriers, cs_len)
+        )
 
         smap = get_subcarrier_map(subcarriers, active_subcarriers, True)
-        preambles = get_full_preambles(self.filter_type, self.alpha, active_subcarriers,
-                                       subcarriers, smap, self.overlap, cp_len, cs_len, [0, ])
+        preambles = get_full_preambles(
+            self.filter_type,
+            self.alpha,
+            active_subcarriers,
+            subcarriers,
+            smap,
+            self.overlap,
+            cp_len,
+            cs_len,
+            [
+                0,
+            ],
+        )
 
         frame_size = preambles[0].size + cp_len + timeslots * subcarriers + cs_len
 
@@ -148,26 +224,55 @@ class qa_transmitter_cc (gr_unittest.TestCase):
 
         for i in range(n_frames):
             d = get_random_qpsk(active_subcarriers * timeslots)
-            frame = generate_reference_frame(d, timeslots, subcarriers, active_subcarriers, smap,
-                                             taps, self.overlap, cp_len, cs_len, window_taps, [0, ], preambles)
+            frame = generate_reference_frame(
+                d,
+                timeslots,
+                subcarriers,
+                active_subcarriers,
+                smap,
+                taps,
+                self.overlap,
+                cp_len,
+                cs_len,
+                window_taps,
+                [
+                    0,
+                ],
+                preambles,
+            )
 
             ref = np.concatenate((ref, frame[0]))
             data = np.concatenate((data, d))
 
         src = blocks.vector_source_c(data)
-        dut = gfdm.transmitter_cc(timeslots, subcarriers, active_subcarriers,
-                                  cp_len, cs_len, cs_len, smap, True,
-                                  self.overlap, taps, window_taps, [0, ], preambles, "packet_len")
+        dut = gfdm.transmitter_cc(
+            timeslots,
+            subcarriers,
+            active_subcarriers,
+            cp_len,
+            cs_len,
+            cs_len,
+            smap,
+            True,
+            self.overlap,
+            taps,
+            window_taps,
+            [
+                0,
+            ],
+            preambles,
+            "packet_len",
+        )
         dst = blocks.vector_sink_c()
 
         self.tb.connect(src, dut, dst)
         self.tb.run()
-        res = np.array(dst.data())[0:len(ref)]
+        res = np.array(dst.data())[0 : len(ref)]
         self.assertComplexTuplesAlmostEqual(ref, res, 5)
 
         tags = dst.tags()
         for i, t in enumerate(tags):
-            print(f't={i}, offset={t.offset}, value={pmt.to_python(t.value)}')
+            print(f"t={i}, offset={t.offset}, value={pmt.to_python(t.value)}")
             self.assertEqual(t.offset, i * frame_size)
             self.assertEqual(pmt.to_python(t.value), frame_size)
 
@@ -181,15 +286,26 @@ class qa_transmitter_cc (gr_unittest.TestCase):
         cs_len = cp_len // 2
         cyclic_shifts = [0, 3, 7, 8]
 
-        taps = get_frequency_domain_filter(self.filter_type, self.alpha, timeslots,
-                                           subcarriers, self.overlap)
+        taps = get_frequency_domain_filter(
+            self.filter_type, self.alpha, timeslots, subcarriers, self.overlap
+        )
 
         window_taps = get_raised_cosine_ramp(
-            cs_len, get_window_len(cp_len, timeslots, subcarriers, cs_len))
+            cs_len, get_window_len(cp_len, timeslots, subcarriers, cs_len)
+        )
 
         smap = get_subcarrier_map(subcarriers, active_subcarriers, True)
-        preambles = get_full_preambles(self.filter_type, self.alpha, active_subcarriers,
-                                       subcarriers, smap, self.overlap, cp_len, cs_len, cyclic_shifts)
+        preambles = get_full_preambles(
+            self.filter_type,
+            self.alpha,
+            active_subcarriers,
+            subcarriers,
+            smap,
+            self.overlap,
+            cp_len,
+            cs_len,
+            cyclic_shifts,
+        )
 
         frame_size = preambles[0].size + cp_len + timeslots * subcarriers + cs_len
 
@@ -198,17 +314,41 @@ class qa_transmitter_cc (gr_unittest.TestCase):
 
         for i in range(n_frames):
             d = get_random_qpsk(active_subcarriers * timeslots)
-            frame = generate_reference_frame(d, timeslots, subcarriers, active_subcarriers, smap,
-                                             taps, self.overlap, cp_len, cs_len, window_taps,
-                                             cyclic_shifts, preambles)
+            frame = generate_reference_frame(
+                d,
+                timeslots,
+                subcarriers,
+                active_subcarriers,
+                smap,
+                taps,
+                self.overlap,
+                cp_len,
+                cs_len,
+                window_taps,
+                cyclic_shifts,
+                preambles,
+            )
 
             ref = [np.concatenate((r, f)) for r, f in zip(ref, frame)]
             data = np.concatenate((data, d))
 
         src = blocks.vector_source_c(data)
-        dut = gfdm.transmitter_cc(timeslots, subcarriers, active_subcarriers,
-                                  cp_len, cs_len, cs_len, smap, True,
-                                  self.overlap, taps, window_taps, cyclic_shifts, preambles, "packet_len")
+        dut = gfdm.transmitter_cc(
+            timeslots,
+            subcarriers,
+            active_subcarriers,
+            cp_len,
+            cs_len,
+            cs_len,
+            smap,
+            True,
+            self.overlap,
+            taps,
+            window_taps,
+            cyclic_shifts,
+            preambles,
+            "packet_len",
+        )
         snks = [blocks.vector_sink_c() for _ in cyclic_shifts]
 
         self.tb.connect(src, dut)
@@ -217,18 +357,18 @@ class qa_transmitter_cc (gr_unittest.TestCase):
         self.tb.run()
 
         for snk, refport in zip(snks, ref):
-            res = np.array(snk.data())[0:refport.size]
+            res = np.array(snk.data())[0 : refport.size]
             self.assertComplexTuplesAlmostEqual(refport, res, 5)
 
         for j, snk in enumerate(snks):
             tags = snk.tags()
             for i, t in enumerate(tags):
-                print(f'p={j}, t={i}, offset={t.offset}, value={pmt.to_python(t.value)}')
+                print(
+                    f"p={j}, t={i}, offset={t.offset}, value={pmt.to_python(t.value)}"
+                )
                 self.assertEqual(t.offset, i * frame_size)
                 self.assertEqual(pmt.to_python(t.value), frame_size)
 
 
-
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     gr_unittest.run(qa_transmitter_cc)

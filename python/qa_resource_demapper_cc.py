@@ -42,8 +42,12 @@ class qa_resource_demapper_cc(gr_unittest.TestCase):
 
         data = get_random_qpsk(10 * timeslots * active_subcarriers)
         src = blocks.vector_source_c(data)
-        mapper = gfdm.resource_mapper_cc(timeslots, subcarriers, active_subcarriers, subcarrier_map, True)
-        demapper = gfdm.resource_demapper_cc(timeslots, subcarriers, active_subcarriers, subcarrier_map, True)
+        mapper = gfdm.resource_mapper_cc(
+            timeslots, subcarriers, active_subcarriers, subcarrier_map, True
+        )
+        demapper = gfdm.resource_demapper_cc(
+            timeslots, subcarriers, active_subcarriers, subcarrier_map, True
+        )
         snk = blocks.vector_sink_c()
         self.tb.connect(src, mapper, demapper, snk)
         self.tb.run()
@@ -60,8 +64,12 @@ class qa_resource_demapper_cc(gr_unittest.TestCase):
 
         data = get_random_qpsk(10 * timeslots * active_subcarriers)
         src = blocks.vector_source_c(data)
-        mapper = gfdm.resource_mapper_cc(timeslots, subcarriers, active_subcarriers, subcarrier_map, False)
-        demapper = gfdm.resource_demapper_cc(timeslots, subcarriers, active_subcarriers, subcarrier_map, False)
+        mapper = gfdm.resource_mapper_cc(
+            timeslots, subcarriers, active_subcarriers, subcarrier_map, False
+        )
+        demapper = gfdm.resource_demapper_cc(
+            timeslots, subcarriers, active_subcarriers, subcarrier_map, False
+        )
         snk = blocks.vector_sink_c()
         self.tb.connect(src, mapper, demapper, snk)
         self.tb.run()
@@ -76,13 +84,17 @@ class qa_resource_demapper_cc(gr_unittest.TestCase):
         active_subcarriers = 20
         subcarrier_map = get_subcarrier_map(subcarriers, active_subcarriers)
 
-        pilots = [(6, 0, 99+0j), (6, 2, 99+0j), (25, 0, 99+0j)]
+        pilots = [(6, 0, 99 + 0j), (6, 2, 99 + 0j), (25, 0, 99 + 0j)]
 
         data = get_random_qpsk(10 * (timeslots * active_subcarriers - len(pilots)))
         src = blocks.vector_source_c(data)
-        mapper = gfdm.resource_mapper_cc(timeslots, subcarriers, active_subcarriers, subcarrier_map, True)
+        mapper = gfdm.resource_mapper_cc(
+            timeslots, subcarriers, active_subcarriers, subcarrier_map, True
+        )
         mapper.set_pilots(pilots)
-        demapper = gfdm.resource_demapper_cc(timeslots, subcarriers, active_subcarriers, subcarrier_map, True)
+        demapper = gfdm.resource_demapper_cc(
+            timeslots, subcarriers, active_subcarriers, subcarrier_map, True
+        )
         demapper.set_pilots(pilots)
         snk = blocks.vector_sink_c()
         self.tb.connect(src, mapper, demapper, snk)
@@ -92,5 +104,6 @@ class qa_resource_demapper_cc(gr_unittest.TestCase):
 
         self.assertComplexTuplesAlmostEqual(data, res)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     gr_unittest.run(qa_resource_demapper_cc)

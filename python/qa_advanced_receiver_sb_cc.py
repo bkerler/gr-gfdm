@@ -26,7 +26,11 @@ from gnuradio import blocks, digital
 import gfdm_python as gfdm
 from pygfdm import filters, utils
 from pygfdm.gfdm_receiver import gfdm_demodulate_block
-from pygfdm.mapping import get_subcarrier_map, map_to_waveform_resources, map_to_waveform_resource_grid
+from pygfdm.mapping import (
+    get_subcarrier_map,
+    map_to_waveform_resources,
+    map_to_waveform_resource_grid,
+)
 from pygfdm.utils import get_random_qpsk, calculate_signal_energy
 import numpy as np
 
@@ -220,10 +224,15 @@ class qa_advanced_receiver_sb_cc(gr_unittest.TestCase):
         num_pilots = 16
         pilot_spacing = 1 + subcarrier_map.size // num_pilots
 
-        pilot_values = np.repeat((1+1j) / np.sqrt(2), num_pilots)
-        upper_subcarrier_map = subcarrier_map[0:subcarrier_map.size // 2]
-        lower_subcarrier_map = subcarrier_map[subcarrier_map.size // 2:]
-        pilot_subcarriers = np.concatenate((upper_subcarrier_map[::-1][::pilot_spacing][::-1], lower_subcarrier_map[::pilot_spacing]))
+        pilot_values = np.repeat((1 + 1j) / np.sqrt(2), num_pilots)
+        upper_subcarrier_map = subcarrier_map[0 : subcarrier_map.size // 2]
+        lower_subcarrier_map = subcarrier_map[subcarrier_map.size // 2 :]
+        pilot_subcarriers = np.concatenate(
+            (
+                upper_subcarrier_map[::-1][::pilot_spacing][::-1],
+                lower_subcarrier_map[::pilot_spacing],
+            )
+        )
         pilot_subcarriers = np.sort(pilot_subcarriers)
 
         pilots = []
@@ -233,8 +242,14 @@ class qa_advanced_receiver_sb_cc(gr_unittest.TestCase):
         data_frame_len = active_subcarriers * timeslots - len(pilots)
         data = get_random_qpsk(data_frame_len * n_frames)
         src = blocks.vector_source_c(data)
-        rot = 2. * np.pi * 0.02
-        eqdata = np.array([1.+0.j,] * timeslots * subcarriers) * np.exp(1.j * rot)
+        rot = 2.0 * np.pi * 0.02
+        eqdata = np.array(
+            [
+                1.0 + 0.0j,
+            ]
+            * timeslots
+            * subcarriers
+        ) * np.exp(1.0j * rot)
         estimate = blocks.vector_source_c(eqdata)
         mapper = gfdm.resource_mapper_cc(
             timeslots, subcarriers, active_subcarriers, subcarrier_map, True
@@ -287,6 +302,7 @@ class qa_advanced_receiver_sb_cc(gr_unittest.TestCase):
         # print(rxpilots)
         self.assertComplexTuplesAlmostEqual(rxpilots, [p[2] for p in pilots], 1)
         self.assertComplexTuplesAlmostEqual(data, res, 1)
+
 
 if __name__ == "__main__":
     gr_unittest.run(qa_advanced_receiver_sb_cc)

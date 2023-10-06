@@ -12,7 +12,12 @@ from .mapping import get_subcarrier_map
 from .filters import get_frequency_domain_filter
 from .preamble import mapped_preamble
 from .gfdm_modulation import modulate_mapped_gfdm_block
-from .cyclic_prefix import add_cyclic_starfix, get_raised_cosine_ramp, pinch_block, get_window_len
+from .cyclic_prefix import (
+    add_cyclic_starfix,
+    get_raised_cosine_ramp,
+    pinch_block,
+    get_window_len,
+)
 
 
 def round_up_power_of_2(value):
@@ -39,15 +44,20 @@ def generate_pilots(num_pilots, subcarrier_map, timeslot_index=0, pilot_values=N
     if num_pilots < 1:
         return []
     if pilot_values is None:
-        pilot_values = np.repeat((1+1j) / np.sqrt(2), num_pilots)
+        pilot_values = np.repeat((1 + 1j) / np.sqrt(2), num_pilots)
     else:
         assert num_pilots == len(pilot_values)
 
     pilot_spacing = 1 + subcarrier_map.size // num_pilots
 
-    upper_subcarrier_map = subcarrier_map[0:subcarrier_map.size // 2]
-    lower_subcarrier_map = subcarrier_map[subcarrier_map.size // 2:]
-    pilot_subcarriers = np.concatenate((upper_subcarrier_map[::-1][::pilot_spacing][::-1], lower_subcarrier_map[::pilot_spacing]))
+    upper_subcarrier_map = subcarrier_map[0 : subcarrier_map.size // 2]
+    lower_subcarrier_map = subcarrier_map[subcarrier_map.size // 2 :]
+    pilot_subcarriers = np.concatenate(
+        (
+            upper_subcarrier_map[::-1][::pilot_spacing][::-1],
+            lower_subcarrier_map[::pilot_spacing],
+        )
+    )
     pilot_subcarriers = np.sort(pilot_subcarriers)
 
     pilots = []
@@ -57,48 +67,75 @@ def generate_pilots(num_pilots, subcarrier_map, timeslot_index=0, pilot_values=N
     return pilots
 
 
-def get_gfdm_configuration(timeslots=9, subcarriers=64, active_subcarriers=52, overlap=2,
-                           cp_len=16, cs_len=8, filtertype='rrc', filteralpha=0.2,
-                           cyclic_shifts=[0, ], num_pilots=0):
+def get_gfdm_configuration(
+    timeslots=9,
+    subcarriers=64,
+    active_subcarriers=52,
+    overlap=2,
+    cp_len=16,
+    cs_len=8,
+    filtertype="rrc",
+    filteralpha=0.2,
+    cyclic_shifts=[
+        0,
+    ],
+    num_pilots=0,
+):
     ramp_len = cs_len
     dconf = {
-        'timeslots': timeslots,
-        'subcarriers': subcarriers,
-        'active_subcarriers': active_subcarriers,
-        'overlap': overlap,
-        'cp_len': cp_len,
-        'cs_len': cs_len,
-        'ramp_len': ramp_len,
-        'cyclic_shifts': cyclic_shifts,
-        'seed': preamble_seed,
+        "timeslots": timeslots,
+        "subcarriers": subcarriers,
+        "active_subcarriers": active_subcarriers,
+        "overlap": overlap,
+        "cp_len": cp_len,
+        "cs_len": cs_len,
+        "ramp_len": ramp_len,
+        "cyclic_shifts": cyclic_shifts,
+        "seed": preamble_seed,
     }
-    dconf['block_len'] = block_len = timeslots * subcarriers
-    dconf['window_len'] = window_len = block_len + cp_len + cs_len
+    dconf["block_len"] = block_len = timeslots * subcarriers
+    dconf["window_len"] = window_len = block_len + cp_len + cs_len
     # for k, v in dconf.items():
     #    print('{:16s}:\t{}'.format(k, v))
 
-    dconf['subcarrier_map'] = subcarrier_map = get_subcarrier_map(
-        subcarriers, active_subcarriers, dc_free=True)
-    preambles = [mapped_preamble(preamble_seed, filtertype, filteralpha, active_subcarriers,
-                                 subcarriers, subcarrier_map, overlap, cp_len, ramp_len, use_zadoff_chu=True,
-                                 cyclic_shift=cs) for cs in cyclic_shifts]
-    dconf['full_preambles'] = full_preambles = [p[0] for p in preambles]
-    dconf['core_preamble'] = core_preamble = preambles[0][1]
-    dconf['preamble_len'] = preamble_len = full_preambles[0].size
-    dconf['core_preamble_len'] = core_preamble_len = core_preamble.size
-    dconf['frame_len'] = frame_len = window_len + preamble_len
+    dconf["subcarrier_map"] = subcarrier_map = get_subcarrier_map(
+        subcarriers, active_subcarriers, dc_free=True
+    )
+    preambles = [
+        mapped_preamble(
+            preamble_seed,
+            filtertype,
+            filteralpha,
+            active_subcarriers,
+            subcarriers,
+            subcarrier_map,
+            overlap,
+            cp_len,
+            ramp_len,
+            use_zadoff_chu=True,
+            cyclic_shift=cs,
+        )
+        for cs in cyclic_shifts
+    ]
+    dconf["full_preambles"] = full_preambles = [p[0] for p in preambles]
+    dconf["core_preamble"] = core_preamble = preambles[0][1]
+    dconf["preamble_len"] = preamble_len = full_preambles[0].size
+    dconf["core_preamble_len"] = core_preamble_len = core_preamble.size
+    dconf["frame_len"] = frame_len = window_len + preamble_len
     pre_padding_len, post_padding_len = get_padding_configuration(frame_len)
-    dconf['pre_padding_len'] = pre_padding_len
-    dconf['post_padding_len'] = post_padding_len
-    dconf['padded_frame_len'] = pre_padding_len + frame_len + post_padding_len
+    dconf["pre_padding_len"] = pre_padding_len
+    dconf["post_padding_len"] = post_padding_len
+    dconf["padded_frame_len"] = pre_padding_len + frame_len + post_padding_len
 
-    dconf['window_taps'] = window_taps = get_raised_cosine_ramp(
-        ramp_len, get_window_len(cp_len, timeslots, subcarriers, cs_len))
+    dconf["window_taps"] = window_taps = get_raised_cosine_ramp(
+        ramp_len, get_window_len(cp_len, timeslots, subcarriers, cs_len)
+    )
 
-    dconf['tx_filter_taps'] = tx_filter_taps = get_frequency_domain_filter(
-        filtertype, filteralpha, timeslots, subcarriers, overlap)
-    dconf['rx_filter_taps'] = rx_f_taps = np.conjugate(tx_filter_taps)
-    dconf['pilots'] = generate_pilots(num_pilots, subcarrier_map)
+    dconf["tx_filter_taps"] = tx_filter_taps = get_frequency_domain_filter(
+        filtertype, filteralpha, timeslots, subcarriers, overlap
+    )
+    dconf["rx_filter_taps"] = rx_f_taps = np.conjugate(tx_filter_taps)
+    dconf["pilots"] = generate_pilots(num_pilots, subcarrier_map)
 
     co = namedtuple("configuration", dconf.keys())(*dconf.values())
     return co
