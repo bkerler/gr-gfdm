@@ -118,7 +118,6 @@ class qa_resource_mapper_cc(gr_unittest.TestCase):
         data = get_random_qpsk(frame_len)
         ref = map_to_waveform_resources(data, active_subcarriers, subcarriers, smap, True)
 
-
         for i in range(n_frames - 1):
             d = get_random_qpsk(frame_len)
             data = np.concatenate((data, d))

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Free Software Foundation, Inc.
+ * Copyright 2023 Free Software Foundation, Inc.
  *
  * This file is part of GNU Radio
  *
@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(transmitter_cc.h)                                          */
-/* BINDTOOL_HEADER_FILE_HASH(8f7b28bfbde25e48c4af97a0c4aed39b)                     */
+/* BINDTOOL_HEADER_FILE_HASH(764d84082aa27068d3df9c4e3abd4ca5)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -30,7 +30,7 @@ namespace py = pybind11;
 void bind_transmitter_cc(py::module& m)
 {
 
-    using transmitter_cc = ::gr::gfdm::transmitter_cc;
+    using transmitter_cc = gr::gfdm::transmitter_cc;
 
 
     py::class_<transmitter_cc,

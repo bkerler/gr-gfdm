@@ -74,33 +74,6 @@ class multi_port_receiver_cc(gr.hier_block2):
             for port in range(num_antenna_ports)
         ]
 
-        # pilotsc = np.concatenate((np.arange(0, 29, 4) + 1, np.arange(63, 34, -4)))
-        # pilotsc = np.sort(pilotsc)
-        # pilots = []
-        # # pilots.append((1, 0, 1-1j ));
-        # pilots.append((5, 0, -1+1j ));
-        # pilots.append((9, 0, 1-1j ));
-        # pilots.append((13, 0, 1+1j ));
-        # pilots.append((17, 0, 1-1j ));
-        # pilots.append((21, 0, -1-1j ));
-        # pilots.append((25, 0, 1+1j ));
-        # pilots.append((29, 0, -1+1j ));
-
-        # pilots.append((35, 0, -1-1j ));
-        # pilots.append((39, 0, 1-1j ));
-        # pilots.append((43, 0, 1-1j ));
-        # pilots.append((47, 0, -1-1j ));
-        # pilots.append((51, 0, 1-1j ));
-        # pilots.append((55, 0, -1+1j ));
-        # pilots.append((59, 0, 1-1j ));
-        # pilots.append((63, 0, 1+1j ));
-
-        # pilots = [(p[0] - 1, p[1], p[2] / np.sqrt(2.)) for p in pilots]
-
-        # for r in self.receivers:
-        #     r.activate_pilot_estimation(True)
-            # r.set_pilots(pilots)
-
         # Define blocks and connect them
         for port in range(num_antenna_ports):
             # The demodulated complex symbols output

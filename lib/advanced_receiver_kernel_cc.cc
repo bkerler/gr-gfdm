@@ -54,24 +54,6 @@ advanced_receiver_kernel_cc::advanced_receiver_kernel_cc(
     d_freq_block.resize(d_kernel->block_size());
     d_ic_time_buffer.resize(d_kernel->block_size());
     d_ic_freq_buffer.resize(d_kernel->block_size());
-
-    // d_pilot_reference.push_back({ 0, 0, gr_complex(0.70710678, -0.70710678) });
-    // d_pilot_reference.push_back({ 4, 0, gr_complex(-0.70710678, 0.70710678) });
-    // d_pilot_reference.push_back({ 8, 0, gr_complex(0.70710678, -0.70710678) });
-    // d_pilot_reference.push_back({ 12, 0, gr_complex(0.70710678, 0.70710678) });
-    // d_pilot_reference.push_back({ 16, 0, gr_complex(0.70710678, -0.70710678) });
-    // d_pilot_reference.push_back({ 20, 0, gr_complex(-0.70710678, -0.70710678) });
-    // d_pilot_reference.push_back({ 24, 0, gr_complex(0.70710678, 0.70710678) });
-    // d_pilot_reference.push_back({ 28, 0, gr_complex(-0.70710678, 0.70710678) });
-
-    // d_pilot_reference.push_back({ 34, 0, gr_complex(-0.70710678, -0.70710678) });
-    // d_pilot_reference.push_back({ 38, 0, gr_complex(0.70710678, -0.70710678) });
-    // d_pilot_reference.push_back({ 42, 0, gr_complex(0.70710678, -0.70710678) });
-    // d_pilot_reference.push_back({ 46, 0, gr_complex(-0.70710678, -0.70710678) });
-    // d_pilot_reference.push_back({ 50, 0, gr_complex(0.70710678, -0.70710678) });
-    // d_pilot_reference.push_back({ 54, 0, gr_complex(-0.70710678, 0.70710678) });
-    // d_pilot_reference.push_back({ 58, 0, gr_complex(0.70710678, -0.70710678) });
-    // d_pilot_reference.push_back({ 62, 0, gr_complex(0.70710678, 0.70710678) });
 }
 
 void advanced_receiver_kernel_cc::perform_ic_iterations(gr_complex* p_out,
@@ -162,12 +144,12 @@ gr_complex advanced_receiver_kernel_cc::estimate_pilot_distortion(const gr_compl
         auto val = p_in[sidx * d_kernel->timeslots() + tidx];
         // fmt::print("val={}\n", val);
         auto phase = std::arg(val) - std::arg(ref);
-        fmt::print("sidx={:2}, tidx={}, {:+.3} vs. {:+.3}\t{:+.3}\n",
-                   sidx,
-                   tidx,
-                   std::arg(ref),
-                   std::arg(val),
-                   phase);
+        // fmt::print("sidx={:2}, tidx={}, {:+.3} vs. {:+.3}\t{:+.3}\n",
+        //            sidx,
+        //            tidx,
+        //            std::arg(ref),
+        //            std::arg(val),
+        //            phase);
 
         result += phase;
     }
