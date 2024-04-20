@@ -28,6 +28,7 @@
 #include <gfdm/advanced_receiver_kernel_cc.h>
 #include <type_traits>
 #include <volk/volk.h>
+#include <boost/format.hpp>
 
 namespace gr {
 namespace gfdm {
