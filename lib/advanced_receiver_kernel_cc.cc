@@ -153,10 +153,10 @@ gr_complex advanced_receiver_kernel_cc::estimate_pilot_distortion(const gr_compl
 
         result += phase;
     }
-    result /= float(d_pilot_reference.size());
+    std::ostringstream msg;
+    msg << boost::format("result = %0.6f, complex = %0.6f") % result % std::polar(1.0f, result);
 
-    fmt::print("result={}, complex={}\n", result, std::polar(1.0f, result));
-
+    fmt::print("{}\n", msg.str());
     return std::polar(1.0f, -1.0f * result);
 }
 
