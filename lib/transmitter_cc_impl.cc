@@ -139,7 +139,6 @@ int transmitter_cc_impl::general_work(int noutput_items,
         for (auto tag : tags) {
             if (tag.key == d_length_tag_key) {
                 assert(pmt::to_long(tag.value) == d_kernel->input_vector_size());
-                remove_item_tag(0, tag);
             }
         }
     }
